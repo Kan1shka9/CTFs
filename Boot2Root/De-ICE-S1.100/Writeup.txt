@@ -1,0 +1,3 @@
+URL : https://www.vulnhub.com/entry/de-ice-s1100,8/
+
+1.) Identify the IP address of the victim machine
