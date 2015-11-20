@@ -1,0 +1,8 @@
+HEX to ASCII converter
+http://www.rapidtables.com/convert/number/hex-to-ascii.htm
+
+JS Unpacker
+http://matthewfl.com/unPacker.html
+
+Hide encrypted files inside videos
+http://oskarhane.com/hide-encrypted-files-inside-videos/
