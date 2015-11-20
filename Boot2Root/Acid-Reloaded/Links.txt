@@ -1,0 +1,9 @@
+OverlayFS
+https://en.wikipedia.org/wiki/OverlayFS
+
+Linux Standard Base
+https://en.wikipedia.org/wiki/Linux_Standard_Base
+lsb_release -a
+
+Ubuntu 12.04, 14.04, 14.10, 15.04 - overlayfs Local Root (Shell)
+https://www.exploit-db.com/exploits/37292/
