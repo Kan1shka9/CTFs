@@ -1,0 +1,28 @@
+HEX to ASCII converter
+http://www.rapidtables.com/convert/number/hex-to-ascii.htm
+
+MD5 decrypt
+https://hashkiller.co.uk/md5-decrypter.aspx
+
+Pentest Monkey PHP reverse shell
+http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet
+
+Privilege Escalation
+http://pwnwiki.io/#!privesc/linux/index.md
+
+Post-Exploitation Without A TTY
+http://pentestmonkey.net/blog/ssh-with-no-tty
+http://pentestmonkey.net/blog/post-exploitation-without-a-tty
+
+php://filter 
+It is a kind of meta-wrapper designed to permit the application of filters to a stream at the time of opening, and forces PHP to base64 encode the file before it is used in the include statement, so we can examine its source code.
+
+Apport/Ubuntu - Local Root Race Condition
+https://www.exploit-db.com/exploits/37088/
+
+Remote Code Execution with LFI and Apache Log Poisoning
+http://www.pentesteracademy.com/video?id=550
+http://security.stackexchange.com/questions/11098/how-can-log-poisoning-be-successful-with-a-local-file-inclusion-attack
+
+LFI to RCE via /proc/self/environ
+https://www.youtube.com/watch?v=rCTfMdqlpAE
