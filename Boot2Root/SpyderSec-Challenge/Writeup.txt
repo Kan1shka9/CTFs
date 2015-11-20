@@ -1,0 +1,166 @@
+URL : https://www.vulnhub.com/entry/tr0ll-1,100/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+
+ Currently scanning: 192.168.33.0/16   |   Screen View: Unique Hosts                                                                                                                                              
+
+ 14 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 840                                                                                                                                                 
+ _____________________________________________________________________________ 
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:ff:fc:d3    03    180   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.131 00:0c:29:72:78:ac    09    540   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:ff:b0:47    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+ 
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.174.131
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-19 19:54 EST
+Nmap scan report for 192.168.174.131
+Host is up (0.00064s latency).
+Not shown: 65533 filtered ports
+PORT   STATE  SERVICE VERSION
+22/tcp closed ssh
+80/tcp open   http    Apache httpd
+|_http-methods: No Allow or Public header in OPTIONS response (status code 200)
+|_http-title: SpyderSec | Challenge
+MAC Address: 00:0C:29:72:78:AC (VMware)
+Device type: general purpose
+Running: Linux 2.6.X|3.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3
+OS details: Linux 2.6.32 - 3.10
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.64 ms 192.168.174.131
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 140.97 seconds
+root@kali:~# 
+
+3.) Enumerting port 80/tcp
+Open in browser
+http://192.168.174.131/
+Images of interest
+http://192.168.174.131/SpyderSecLogo200.png
+http://192.168.174.131/Challenge.png
+
+4.) Exiftools
+root@kali:~/Desktop/Images# exiftool SpyderSecLogo200.png 
+ExifTool Version Number         : 8.60
+File Name                       : SpyderSecLogo200.png
+Directory                       : .
+File Size                       : 25 kB
+File Modification Date/Time     : 2015:11:19 19:59:50-05:00
+File Permissions                : rw-r--r--
+File Type                       : PNG
+MIME Type                       : image/png
+Image Width                     : 200
+Image Height                    : 200
+Bit Depth                       : 8
+Color Type                      : RGB with Alpha
+Compression                     : Deflate/Inflate
+Filter                          : Adaptive
+Interlace                       : Noninterlaced
+Significant Bits                : 8 8 8 8
+Pixels Per Unit X               : 599
+Pixels Per Unit Y               : 599
+Pixel Units                     : Meters
+Software                        : www.inkscape.org
+Image Size                      : 200x200
+root@kali:~/Desktop/Images# exiftool Challenge.png 
+ExifTool Version Number         : 8.60
+File Name                       : Challenge.png
+Directory                       : .
+File Size                       : 83 kB
+File Modification Date/Time     : 2015:11:19 19:59:53-05:00
+File Permissions                : rw-r--r--
+File Type                       : PNG
+MIME Type                       : image/png
+Image Width                     : 540
+Image Height                    : 540
+Bit Depth                       : 8
+Color Type                      : RGB with Alpha
+Compression                     : Deflate/Inflate
+Filter                          : Adaptive
+Interlace                       : Noninterlaced
+Background Color                : 255 255 255
+Pixels Per Unit X               : 2835
+Pixels Per Unit Y               : 2835
+Pixel Units                     : Meters
+Comment                         : 35:31:3a:35:33:3a:34:36:3a:35:37:3a:36:34:3a:35:38:3a:33:35:3a:37:31:3a:36:34:3a:34:35:3a:36:37:3a:36:61:3a:34:65:3a:37:61:3a:34:39:3a:33:35:3a:36:33:3a:33:30:3a:37:38:3a:34:32:3a:34:66:3a:33:32:3a:36:37:3a:33:30:3a:34:61:3a:35:31:3a:33:64:3a:33:64
+Image Size                      : 540x540
+root@kali:~/Desktop/Images# 
+
+Hex -> Hex -> Base64
+Convert the HEX in comments to ASCII
+http://www.rapidtables.com/convert/number/hex-to-ascii.htm
+35:31:3a:35:33:3a:34:36:3a:35:37:3a:36:34:3a:35:38:3a:33:35:3a:37:31:3a:36:34:3a:34:35:3a:36:37:3a:36:61:3a:34:65:3a:37:61:3a:34:39:3a:33:35:3a:36:33:3a:33:30:3a:37:38:3a:34:32:3a:34:66:3a:33:32:3a:36:37:3a:33:30:3a:34:61:3a:35:31:3a:33:64:3a:33:64
+gets converted to
+51:53:46:57:64:58:35:71:64:45:67:6a:4e:7a:49:35:63:30:78:42:4f:32:67:30:4a:51:3d:3d
+
+Repeat the process
+51:53:46:57:64:58:35:71:64:45:67:6a:4e:7a:49:35:63:30:78:42:4f:32:67:30:4a:51:3d:3d
+gets converted to
+QSFWdX5qdEgjNzI5c0xBO2g0JQ==
+
+Base64 decode
+QSFWdX5qdEgjNzI5c0xBO2g0JQ==
+gets converted to
+root@kali:~# echo 'QSFWdX5qdEgjNzI5c0xBO2g0JQ==' | base64 --decode 
+A!Vu~jtH#729sLA;h4%
+root@kali:~# 
+
+5.) Unpact the JS in source
+<script>
+eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('7:0:1:2:8:6:3:5:4:0:a:1:2:d:c:b:f:3:9:e',16,16,'6c|65|72|27|75|6d|28|61|74|29|64|62|66|2e|3b|69'.split('|'),0,{}))
+</script>
+http://matthewfl.com/unPacker.html
+gets converted to
+61:6c:65:72:74:28:27:6d:75:6c:64:65:72:2e:66:62:69:27:29:3b
+HEX -> Text
+http://www.rapidtables.com/convert/number/hex-to-ascii.htm
+61:6c:65:72:74:28:27:6d:75:6c:64:65:72:2e:66:62:69:27:29:3b
+gets converted to
+alert('mulder.fbi');
+
+6.) Intercept the traffic using burp
+In Burp
+GET / HTTP/1.1
+Host: 192.168.174.131
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.5.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Cookie: URI=%2Fv%2F81JHPbvyEQ8729161jd6aKQ0N4%2F
+Connection: keep-alive
+
+Take a closer look at the cookie
+Cookie: URI=/v/81JHPbvyEQ8729161jd6aKQ0N4/
+
+Now try accessing the URL
+http://192.168.174.131/v/81JHPbvyEQ8729161jd6aKQ0N4/
+The page says
+You don't have permission to access /v/81JHPbvyEQ8729161jd6aKQ0N4/ on this server.
+Now modify the URL as
+http://192.168.174.131/v/81JHPbvyEQ8729161jd6aKQ0N4/mulder.fbi
+And we get the file mulder.fbi
+root@kali:~/Desktop/Images# file mulder.fbi 
+mulder.fbi: ISO Media, MPEG v4 system, version 2
+root@kali:~/Desktop/Images# 
+
+Referring to this http://oskarhane.com/hide-encrypted-files-inside-videos/
+{Stegnography}
+Open truecrypt
+Select the file mulder.fbi, a volume and Mount
+Use the password -> A!Vu~jtH#729sLA;h4%
+We see the file "flag.txt"
+Congratulations! 
+You are a winner. 
+Please leave some feedback on your thoughts regarding this challenge Was it fun? Was it hard enough or too easy? What did you like or dislike, what could be done better?
+https://www.spydersec.com/feedback
