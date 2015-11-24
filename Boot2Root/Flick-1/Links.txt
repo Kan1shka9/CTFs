@@ -1,0 +1,15 @@
+ASCII to HEX
+http://www.asciitohex.com/
+
+Using the docker command to root the host
+http://reventlov.com/advisories/using-the-docker-command-to-root-the-host
+
+Use the Docker command line
+http://docs.docker.com/engine/reference/commandline/cli/
+
+Shocker
+https://github.com/gabrtv/shocker
+http://stealth.openwall.net/xSports/shocker.c
+
+Laravel cookie forgery, decryption, and RCE
+https://labs.mwrinfosecurity.com/blog/2014/04/11/laravel-cookie-forgery-decryption-and-rce/
