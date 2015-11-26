@@ -1,0 +1,8 @@
+Transfer files using nc
+http://nakkaya.com/2009/04/15/using-netcat-for-file-transfers/
+
+Peda setup and usage
+http://security.cs.pub.ro/hexcellents/wiki/kb/toolset/peda
+
+Various other methods to get root
+http://oleaass.com/nullbyte-1-writeup/
