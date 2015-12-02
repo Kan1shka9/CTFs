@@ -1,0 +1,8 @@
+LinEnum
+https://github.com/rebootuser/LinEnum
+
+PrivEscalation
+https://github.com/expl0i13r/privescalation
+
+LinuxPrivChecker
+http://www.securitysift.com/download/linuxprivchecker.py
