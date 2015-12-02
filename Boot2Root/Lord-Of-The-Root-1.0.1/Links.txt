@@ -1,0 +1,11 @@
+MySQL 4.x/5.0 - User-Defined Function Local Privilege Escalation Exploit
+https://www.exploit-db.com/exploits/1518/
+
+Gaining a root shell using mysql user defined functions and setuid binaries
+http://infamoussyn.com/2014/07/11/gaining-a-root-shell-using-mysql-user-defined-functions-and-setuid-binaries/
+
+What is GID? What is EUID? What is SUID? What is RUID?
+http://centoscert.com/content/what-gid-what-euid-what-suid-what-ruid
+
+Port Knocking
+https://en.wikipedia.org/wiki/Port_knocking
