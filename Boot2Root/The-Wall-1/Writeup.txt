@@ -916,7 +916,7 @@ New website for review:    pinkfloyd1965newblogsite50yearscelebration-temp/index
 # You have to be trusted by the people you lie to. So that when they turn their backs on you, you'll get the chance to put the knife in. - Pink Floyd, Dogs 
 $ 
 
-11.) Explorint the new website
+11.) Exploring the new website
 In Browser
 http://192.168.174.141/pinkfloyd1965newblogsite50yearscelebration-temp/index.php
 In Page Source
