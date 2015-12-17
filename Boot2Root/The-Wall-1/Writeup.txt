@@ -14,7 +14,7 @@ root@kali:~# netdiscover
 
 root@kali:~# 
 
-2.) Run an nmap syn scan to identify open ports and running services
+2.) Run a nmap syn scan to identify open ports and running services
 root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.174.141
 
 Starting Nmap 6.47 ( http://nmap.org ) at 2015-12-16 13:33 EST
