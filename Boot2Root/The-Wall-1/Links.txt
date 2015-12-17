@@ -1,0 +1,2 @@
+SUDO
+http://www.tutorialspoint.com/unix_commands/sudo.htm
