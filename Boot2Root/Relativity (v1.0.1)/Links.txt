@@ -1,0 +1,29 @@
+ProFTPD 'mod_sql' Username SQL Injection Vulnerability
+http://www.securityfocus.com/bid/33722/exploit
+
+PHP Wrappers
+http://php.net/manual/en/wrappers.php
+http://php.net/manual/en/wrappers.data.php
+
+PHP Remote File Inclusion command shell using data://
+https://www.idontplaydarts.com/2011/03/php-remote-file-inclusion-command-shell-using-data-stream/
+https://www.idontplaydarts.com/
+
+UnrealIRCd 3.2.8.1 backdoored, investigation
+http://blog.stalkr.net/2010/06/unrealircd-3281-backdoored.html
+
+How to check if a shell is login/interactive/batch
+http://unix.stackexchange.com/questions/26676/how-to-check-if-a-shell-is-login-interactive-batch
+To check if you are in an interactive shell:
+[[ $- == *i* ]] && echo 'Interactive' || echo 'Not interactive'
+To check if you are in a login shell:
+shopt -q login_shell && echo 'Login shell' || echo 'Not login shell'
+
+Post-Exploitation Without A TTY
+http://pentestmonkey.net/blog/post-exploitation-without-a-tty
+
+Spawning a TTY Shell
+http://netsec.ws/?p=337
+
+Reverse Shell Cheat Sheet
+http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet

