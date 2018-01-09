@@ -264,3 +264,5 @@ $ cat /etc/narnia_pass/narnia6
 neezocaeng
 $
 ```
+
+[``Solution``](https://www.lukeaddison.co.uk/blog/narnia-level-5/)
