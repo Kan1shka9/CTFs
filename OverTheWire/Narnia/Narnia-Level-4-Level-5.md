@@ -246,13 +246,13 @@ Breakpoint 1, 0x0804853a in main ()
 0xffffd5c0:	0xffffffff	0x0000002f	0xf7e23dc8	0xf7fcb000
 0xffffd5d0:	0x00008000	0xf7fc7000	0x00000000	0xf7e2f32a
 0xffffd5e0:	0x00000002	0x00000000	0xf7e45830	0x0804863b
-(gdb) quit
-A debugging session is active.
-
-	Inferior 1 [process 15883] will be killed.
-
-Quit anyway? (y or n) y
-narnia5@narnia:/narnia$
+(gdb) c
+Continuing.
+Change i's value from 1 -> 500. No way...let me give you a hint!
+buffer : [AAAAc2670xc267] (14)
+i = 1 (0xffffd60c)
+[Inferior 1 (process 16210) exited normally]
+(gdb)
 ```
 
 ```sh
