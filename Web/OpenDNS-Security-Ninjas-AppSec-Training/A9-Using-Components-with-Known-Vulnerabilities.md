@@ -19,7 +19,7 @@
 - Payload
 
 ```
-http://172.17.0.1:8899/a9.html#%3Cimg%20src=x%20onerror=alert(1)%3E
+http://172.17.0.1:8899/a9.html#<img src=x onerror=alert(1)>
 ```
 
 - Links
