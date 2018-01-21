@@ -715,6 +715,7 @@ xalvas@calamity:~$
 
 ###### Reference
 
+- [``Privilege Escalation via lxd``](https://reboare.github.io/lxd/lxd-escape.html)
 - [``EUD Security Guidance: Ubuntu 16.04 LTS``](https://www.ncsc.gov.uk/guidance/eud-security-guidance-ubuntu-1604-lts) &rarr; User setup
 - [``User can use lxc hooks for privilege escalation on lxd host``](https://github.com/lxc/lxd/issues/2003)
 - [``Installation via apt-get automatically adds user to lxd group``](https://github.com/lxc/lxd/issues/3844)
