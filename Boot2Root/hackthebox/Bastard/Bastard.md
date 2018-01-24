@@ -1,9 +1,12 @@
 #### Bastard
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [Drupal Enumeration]()
-- [Drupal Exploitation]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Drupal Enumeration](#drupal-enumeration)
+- [Drupal Exploitation](#drupal-exploitation)
+- [Local Privilege Escalation](#local-privilege-escalation)
+- [Bonus - View installed updates](#bonus---view-installed-updates)
+- [Bonus - Execute files on a UNC share](#bonus---execute-files-on-a-unc-share)
 
 ###### Attacker Info
 
