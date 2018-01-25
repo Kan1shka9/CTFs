@@ -1,11 +1,11 @@
 #### Joker
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [squid-http Proxy]()
-- [Reverse Shell]()
-- [Privilege Escalation - SymLink]()
-- [Privilege Escalation - Tar Checkpoint]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [squid-http Proxy](#squid-http-proxy)
+- [Reverse Shell](#reverse-shell)
+- [Privilege Escalation - SymLink](#privilege-escalation---symlink)
+- [Privilege Escalation - Tar Checkpoint](#privilege-escalation---tar-checkpoint)
 
 ###### Attacker Info
 
