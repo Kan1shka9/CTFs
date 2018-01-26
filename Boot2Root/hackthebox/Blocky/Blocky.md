@@ -1,12 +1,13 @@
 #### Blocky
 
-- [Attacker Info]()
-- [Reconnoitre]()
-- [Jar file inspection]()
-- [WP-Scan]()
-- [Privilege Escalation - ``sudo -l``]()
-- [Bonus - FTP, Wordpress Enumeration]()
-- [Bonus - Becoming root using CVE-2017-6074 (Unstable)]()
+- [Attacker Info](#attacker-info)
+- [Reconnoitre](#reconnoitre)
+- [Jar file inspection](#jar-file-inspection)
+- [WP-Scan](#wp-scan)
+- [Getting user shell](#getting-user-shell)
+- [Privilege Escalation - ``sudo -l``](#privilege-escalation)
+- [Bonus - FTP, Wordpress Enumeration](#bonus---ftp-wordpress-enumeration)
+- [Bonus - Becoming root using CVE-2017-6074 (Unstable)](#bonus---becoming-root-using-cve-2017-6074-unstable)
 
 ###### Attacker Info
 
