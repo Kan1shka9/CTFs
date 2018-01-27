@@ -1,12 +1,12 @@
 #### Cronos
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [DNS Enumeration]()
-- [Gobuster]()
-- [Reverse Shell]()
-- [Privilege Escalation]()
-- [PrivEsc using laravel scheduled tasks]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [DNS Enumeration](#dns-enumeration)
+- [Gobuster](#gobuster)
+- [Reverse Shell](#reverse-shell)
+- [Privilege Escalation](#privilege-escalation)
+- [PrivEsc using laravel scheduled tasks](#privesc-using-laravel-scheduled-tasks)
 
 ###### Attacker Info
 
