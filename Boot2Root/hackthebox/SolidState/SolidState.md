@@ -1,13 +1,13 @@
 #### SolidState
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [HTTP Enumeration]()
-- [Port 4555]()
-- [Restricted shell access]()
-- [Shell access with ``bash --noprofile``]()
-- [Privilege Escalation]()
-- [Bonus - Exploit JAMES smtpd 2.3.2]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [HTTP Enumeration](#http-enumeration)
+- [Port 4555](#port-4555)
+- [Restricted shell access](#restricted-shell-access)
+- [Shell access with ``bash --noprofile``](#shell-access-with-bash---noprofile)
+- [Privilege Escalation](#privilege-escalation)
+- [Bonus - Exploit JAMES smtpd 2.3.2](#bonus---exploit-james-smtpd-232)
 
 ###### Attacker Info
 
