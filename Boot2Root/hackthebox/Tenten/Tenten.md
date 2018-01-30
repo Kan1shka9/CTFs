@@ -1,10 +1,10 @@
 #### Tenten
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [WPScan]()
-- [Steganography]()
-- [Decrypting ``id_rsa``]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [WPScan](#wpscan)
+- [Steganography](#steganography)
+- [Decrypting ``id_rsa``](#decrypting-id_rsa)
 
 ###### Attacker Info
 
