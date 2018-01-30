@@ -114,7 +114,7 @@ https://sup3rs3cr3t.brainfuck.htb
 
 ![](images/5.png)
 
-- WPScan
+###### WPScan
 
 ```sh
 root@kali:~/brainfuck# wpscan -u https://brainfuck.htb --disable-tls-checks --enumerate u
