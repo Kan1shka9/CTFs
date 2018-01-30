@@ -3,7 +3,7 @@
 - [Attacker Info](#attacker-info)
 - [Nmap Scan](#nmap-scan)
 - [WPScan](#wpscan)
-- [SMTP Enumeration]()
+- [SMTP Enumeration](#smtp-enumeration)
 - [Decryption](#decryption)
 - [Decrypting ``id_rsa``](#decrypting-id_rsa)
 
