@@ -1,11 +1,11 @@
 #### Brainfuck
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [WPScan]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [WPScan](#wpscan)
 - [SMTP Enumeration]()
-- [Decryption]()
-- [Decrypting ``id_rsa``]()
+- [Decryption](#decryption)
+- [Decrypting ``id_rsa``](#decrypting-id_rsa)
 
 ###### Attacker Info
 
