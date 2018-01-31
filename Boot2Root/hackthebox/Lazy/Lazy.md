@@ -1,9 +1,9 @@
 #### Lazy
 
-- Attacker Info
-- Nmap Scan
-- Oracle Padding Attack
-- Privilege Escalation using absolute path
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Oracle Padding Attack](#oracle-padding-attack)
+- [Privilege Escalation using absolute path](#privilege-escalation-using-absolute-path)
 
 ###### Attacker Info
 
