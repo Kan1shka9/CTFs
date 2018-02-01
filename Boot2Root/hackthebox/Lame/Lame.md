@@ -1,10 +1,10 @@
 #### Lame
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [Enumareting FTP]
-- [Enumerating Samba]()
-- [Reference]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Enumareting FTP](#enumareting-ftp)
+- [Enumerating Samba](#enumerating-samba)
+- [Reference](#reference)
 
 ###### Attacker Info
 
