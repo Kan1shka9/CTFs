@@ -4,7 +4,7 @@
 - [Nmap Scan](#nmap-scan)
 - [Media Forensics](#media-forensics)
 - [Crypto](#crypto)
-- [Privilege Escalation using Chown file reference trick]()
+- [Privilege Escalation using Chown file reference trick](#privilege-escalation-using-chown-file-reference-trick)
 
 ###### Attacker Info
 
