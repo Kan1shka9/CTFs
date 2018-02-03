@@ -1,9 +1,9 @@
 #### Shrek
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [Media Forensics]()
-- [Crypto]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Media Forensics](#media-forensics)
+- [Crypto](#crypto)
 - [Privilege Escalation using Chown file reference trick]()
 
 ###### Attacker Info
