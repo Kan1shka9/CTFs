@@ -1,8 +1,8 @@
 #### Grandpa
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [Exploitation and Privilege Escalation]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Exploitation and Privilege Escalation](#exploitation-and-privilege-escalation)
 
 ###### Attacker Info
 
