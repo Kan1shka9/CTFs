@@ -1,8 +1,8 @@
 #### Legacy
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [Exploitation of ``ms08_067_netapi``]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Exploitation of ``ms08_067_netapi``](#exploitation-of-ms08_067_netapi)
 
 ###### Attacker Info
 
