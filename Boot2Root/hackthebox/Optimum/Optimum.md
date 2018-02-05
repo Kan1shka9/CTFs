@@ -272,7 +272,8 @@ connect to [10.10.14.5] from (UNKNOWN) [10.10.10.8] 49230
 Windows PowerShell running as user kostas on OPTIMUM
 Copyright (C) 2015 Microsoft Corporation. All rights reserved.
 
-PS C:\Users\kostas\Desktop>
+PS C:\Users\kostas\Desktop> systeminfo
+
 Host Name:                 OPTIMUM
 OS Name:                   Microsoft Windows Server 2012 R2 Standard
 OS Version:                6.3.9600 N/A Build 9600
