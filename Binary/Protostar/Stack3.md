@@ -9,6 +9,8 @@
 	
 - This level is at ``/opt/protostar/bin/stack3``
 
+``stack3.c``
+
 ```c
 #include <stdlib.h>
 #include <unistd.h>
