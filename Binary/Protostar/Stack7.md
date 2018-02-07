@@ -7,6 +7,8 @@
 - This level is at ``/opt/protostar/bin/stack7``
 - **``ret2text``**
 
+``stack7.c``
+
 ```c
 #include <stdlib.h>
 #include <unistd.h>
