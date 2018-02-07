@@ -65,6 +65,3 @@ calling function pointer, jumping to 0x08048424
 code flow successfully changed
 user@protostar:/opt/protostar/bin$
 ```
-
-
-
