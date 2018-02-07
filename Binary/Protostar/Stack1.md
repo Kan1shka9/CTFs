@@ -10,7 +10,7 @@
 	- If you are unfamiliar with the hexadecimal being displayed, ``man ascii`` is your friend.
 	- Protostar is little endian
 
-``stack1``
+``stack1.c``
 
 ```c
 #include <stdlib.h>
