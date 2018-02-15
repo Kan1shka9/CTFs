@@ -1,9 +1,9 @@
 #### Mirai
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [HTTP Enumeration]()
-- [Default SSh Creds ``raspberry ``]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [HTTP Enumeration](#http-enumeration)
+- [Default SSH Creds ``raspberry ``](#default-ssh-creds-raspberry)
 
 ###### Attacker Info
 
@@ -163,7 +163,7 @@ root@kali:~/mirai#
 
 ![](images/6.png)
 
-###### [Default SSh Creds ``raspberry ``](https://www.raspberrypi.org/documentation/linux/usage/users.md)
+###### [Default SSH Creds ``raspberry ``](https://www.raspberrypi.org/documentation/linux/usage/users.md)
 
 ```sh
 root@kali:~/mirai# ssh pi@10.10.10.48
