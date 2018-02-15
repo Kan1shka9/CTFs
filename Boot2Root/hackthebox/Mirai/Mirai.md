@@ -3,7 +3,7 @@
 - [Attacker Info]()
 - [Nmap Scan]()
 - [HTTP Enumeration]()
-- [Default SSh Creds ``raspberry ``]()
+- [Default SSH Creds ``raspberry ``]()
 
 ###### Attacker Info
 
