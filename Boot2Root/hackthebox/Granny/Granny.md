@@ -1,8 +1,8 @@
 #### Granny
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [WebDAV Exploitation]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [WebDAV Exploitation](#webdav-exploitation)
 
 ###### Attacker Info
 
