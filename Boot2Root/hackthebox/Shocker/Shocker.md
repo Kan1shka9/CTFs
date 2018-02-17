@@ -1,10 +1,10 @@
 #### Shocker
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [HTTP Enumeration]()
-- [Shellshock]()
-- [Privilege Escalation]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [HTTP Enumeration](#http-enumeration)
+- [Shellshock](#shellshock)
+- [Privilege Escalation](#privilege-escalation)
 
 ###### Attacker Info
 
