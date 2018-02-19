@@ -1,10 +1,10 @@
 #### Haircut
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [HTTP Enumeration]()
-- [Reverse Shell]()
-- [Privilege Escalation]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [HTTP Enumeration](#http-enumeration)
+- [Reverse Shell](#reverse-shell)
+- [Privilege Escalation](#privilege-escalation)
 
 ###### Attacker Info
 
