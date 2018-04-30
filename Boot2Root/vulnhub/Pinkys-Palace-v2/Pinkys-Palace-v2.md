@@ -1,14 +1,14 @@
 #### Pinkys Palace v2
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [Web Enumeration]()
-- [Port Knocking]()
-- [LFI]()
-- [Reverse Shell]()
-- [Crack SSH keys]()
-- [Binary Exploitation]()
-- [References]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Web Enumeration](#web-enumeration)
+- [Port Knocking](#port-knocking)
+- [LFI](#lfi)
+- [Reverse Shell](#reverse-shell)
+- [Crack SSH keys](#crack-ssh-keys)
+- [Binary Exploitation](#binary-exploitation)
+- [References](#references)
 
 ###### Attacker Info
 
