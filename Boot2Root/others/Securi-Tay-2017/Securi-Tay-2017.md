@@ -1,12 +1,12 @@
 #### Securi-Tay 2017
 
-- [Attacker Info]()
-- [Identify Victim]()
-- [Nmap Scan]()
-- [Dirb]()
-- [Nikto]()
-- [Web Exploitation]()
-- [Privilege Escalation]()
+- [Attacker Info](#attacker-info)
+- [Identify Victim](#identify-victim)
+- [Nmap Scan](#nmap-scan)
+- [Dirb](#dirb)
+- [Nikto](#nikto)
+- [Web Exploitation](#web-exploitation)
+- [Privilege Escalation](#privilege-escalation)
 
 ###### Attacker Info
 
