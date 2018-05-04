@@ -1,12 +1,12 @@
 #### Drunk Admin Web Hacking
 
-- [Attacker Info]()
-- [Identify Victim]()
-- [Nmap Scan]()
-- [Web Enumeration]()
-- [Nikto]()
-- [Dirb]()
-- [Shell]()
+- [Attacker Info](#attacker-info)
+- [Identify Victim](#identify-victim)
+- [Nmap Scan](#nmap-scan)
+- [Web Enumeration](#web-enumeration)
+- [Nikto](#nikto)
+- [Dirb](#dirb)
+- [Shell](#shell)
 
 ###### Attacker Info
 
