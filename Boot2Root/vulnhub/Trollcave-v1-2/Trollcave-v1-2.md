@@ -1,15 +1,15 @@
 #### Trollcave-v1-2
 
-- [Attacker Info]()
-- [Identify Victim]()
-- [Nmap Scan]()
-- [Masscan]()
-- [Web Enumeration]()
-- [Privilege Escalation]()
-- [Method 2]()
-- [XSS]()
-- [Web Server Enumeration]()
-- [Enumerating 8888]()
+- [Attacker Info](#attacker-info)
+- [Identify Victim](#identify-victim)
+- [Nmap Scan](#nmap-scan)
+- [Masscan](#masscan)
+- [Web Enumeration](#web-enumeration)
+- [Privilege Escalation](#privilege-escalation)
+- [Method 2](#method-2)
+- [XSS](#xss)
+- [Web Server Enumeration](#web-server-enumeration)
+- [Enumerating 8888](#enumerating-8888)
 
 ###### Attacker Info
 
