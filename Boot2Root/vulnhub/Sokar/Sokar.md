@@ -1,13 +1,13 @@
 #### Sokar
 
-- [Attacker Info]()
-- [Identify Victim]()
-- [Nmap Scan]()
-- [Masscan]()
-- [Web Enumeration]()
-- [Shellshock]()
-- [Privilege Escalation]()
-- [Reference]()
+- [Attacker Info](#attacker-info)
+- [Identify Victim](#identify-victim)
+- [Nmap Scan](#nmap-scan)
+- [Masscan](#masscan)
+- [Web Enumeration](#web-enumeration)
+- [Shellshock](#shellshock)
+- [Privilege Escalation](#privilege-escalation)
+- [Reference](#reference)
 
 ###### Attacker Info
 
