@@ -1,13 +1,13 @@
 #### Gemini Inc: 1
 
-- [Attacker Info]()
-- [Identify Victim]()
-- [Nmap Scan]()
-- [Masscan]()
-- [Web Enumeration]()
-- [Export Injection]()
-- [Privilege Escalation]()
-- [Binary Hijacking]()
+- [Attacker Info](#attacker-info)
+- [Identify Victim](#identify-victim)
+- [Nmap Scan](#nmap-scan)
+- [Masscan](#masscan)
+- [Web Enumeration](#web-enumeration)
+- [Export Injection](#export-injection)
+- [Privilege Escalation](#privilege-escalation)
+- [Binary Hijacking](#binary-hijacking)
 
 ###### Attacker Info
 
