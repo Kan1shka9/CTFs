@@ -8,7 +8,7 @@
 - [SMB](#smb)
 - [Interactive database shell](#interactive-database-shell)
 - [Reverse Shell 1 using sqsh and xp_cmdshell](#reverse-shell-1-using-sqsh-and-xp_cmdshell)
-- [Reverse Shell 2 using scheduled task (SPBestWarmUp.ps1 and SPBestWarmUp.xml)](##reverse-shell-2-using-scheduled-task-spbestwarmupps1-and-spbestwarmupxml)
+- [Reverse Shell 2 using scheduled task (SPBestWarmUp.ps1 and SPBestWarmUp.xml)](#reverse-shell-2-using-scheduled-task-spbestwarmupps1-and-spbestwarmupxml)
 - [Privilege Escalation using LonelyPotato and AV Evasion](#privilege-escalation-using-lonelypotato-and-av-evasion)
 - [Privilege Escalation using cve-2017-0213](#privilege-escalation-using-cve-2017-0213)
 - [Reference](#Reference)
