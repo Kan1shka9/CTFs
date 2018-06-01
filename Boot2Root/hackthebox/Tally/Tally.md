@@ -3355,7 +3355,7 @@ update server inventory
 PS C:\Users\sarah\Desktop>
 ```
 
-###### Reverse Shell 2
+###### Reverse Shell 2 using scheduled task (SPBestWarmUp.ps1 and SPBestWarmUp.xml)
 
 ```sh
 root@kali:~/tally/www# ls -l
