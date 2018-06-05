@@ -2,7 +2,7 @@
 
 - [Attacker Info](#attacker-info)
 - [Nmap Scan](#nmap-scan)
-- [Web Enumeration](#web-rnumeration)
+- [Web Enumeration](#web-enumeration)
 - [Source Backup](#source-backup)
 - [SSH Access using MongoDB password](#ssh-access-using-mongodb-password)
 - [Privilege Escalation](#privilege-escalation)
