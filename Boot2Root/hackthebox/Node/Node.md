@@ -7,10 +7,10 @@
 - [SSH Access using MongoDB password](#ssh-access-using-mongodb-password)
 - [Privilege Escalation](#privilege-escalation)
 - [Binary Exploitation](#binary-exploitation)
-- [Method 1 - Abusing CWD](#method-1-abusing-cwd)
-- [Method 2 - Wildcards to bypass blacklist](#method-2-wildcards-to-bypass-blacklist)
-- [Method 3 - Command injection via new line](#method-3-command-injection-via-new-line)
-- [Method 4 - Buffer Overflow](#method-4-buffer-overflow)
+- [Method 1 - Abusing CWD](#method-1---abusing-cwd)
+- [Method 2 - Wildcards to bypass blacklist](#method-2---wildcards-to-bypass-blacklist)
+- [Method 3 - Command injection via new line](#method-3---command-injection-via-new-line)
+- [Method 4 - Buffer Overflow](#method-4---buffer-overflow)
 
 ###### Attacker Info
 
