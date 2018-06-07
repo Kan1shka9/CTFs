@@ -1,15 +1,15 @@
 #### Sneaky
 
-- [Attacker Info]()
-- [Nmap Scan]()
-- [Gobuster]()
-- [HTTP Enumeration]()
-- [SQLmap]()
-- [IPv6]()
-- [Method 1 - Hopping on the htb network]()
-- [Method 2 - Enumerating Networks by pinging Multicast]()
-- [SNMP Enumeration]()
-- [Privilege Escalation using buffer overflow]()
+- [Attacker Info](#attacker-info)
+- [Nmap Scan](#nmap-scan)
+- [Gobuster](#gobuster)
+- [HTTP Enumeration](#http-enumeration)
+- [SQLmap](#sqlmap)
+- [IPv6](#ipv6)
+- [Method 1 - Hopping on the htb network](#method-1---hopping-on-the-htb-network)
+- [Method 2 - Enumerating Networks by pinging Multicast](#method-2---enumerating-networks-by-pinging-multicast)
+- [SNMP Enumeration](#snmp-enumeration)
+- [Privilege Escalation using buffer overflow](#privilege-escalation-using-buffer-overflow)
 
 ###### Attacker Info
 
