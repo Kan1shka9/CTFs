@@ -8,9 +8,9 @@
 - [ICMP Reverse Shell](#icmp-reverse-shell)
 - [PrivEsc form IIS to Decoder](#privesc-form-iis-to-decoder)
 - [NTFS File Stream](#ntfs-file-stream)
-- [net use to mount C: as Administrator](#)
-- [Analyze root.exe](#)
-- [Invoke-Command to execute root.exe as admin](#)
+- [net use to mount C: as Administrator](#net-use-to-mount-c-as-administrator)
+- [Analyze root.exe](#analyze-rootexe)
+- [Invoke-Command to execute root.exe as admin](#invoke-command-to-execute-rootexe-as-admin)
 - [Create a firewall rule for RDP](#create-a-firewall-rule-for-rdp)
 
 ###### Attacker Info
