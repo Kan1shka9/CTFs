@@ -9,7 +9,7 @@
 - [Reverse Shell](#reverse-shell)
 - [User flag](#user-flag)
 - [Privilege Escalation using debugfs](#privilege-escalation-using-debugfs)
-- [Manual SQL Injection](#manual-sql-Injection)
+- [Manual SQL Injection](#manual-sql-injection)
 
 ###### Attacker Info
 
