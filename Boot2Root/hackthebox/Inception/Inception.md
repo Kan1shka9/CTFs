@@ -11,7 +11,7 @@
 - [Getting nmap on Inception](#getting-nmap-on-inception)
 - [FTP Anonymous Login](#ftp-anonymous-login)
 - [Finding TFTP as a Running Service](#finding-tftp-as-a-running-service)
-- [Using TFTP to grab crontab & creating a pre-invoke apt script](#using-tftp-to-grab-crontab-&-creating-a-pre-invoke-apt-script)
+- [Using TFTP to grab crontab & creating a pre-invoke apt script](#using-tftp-to-grab-crontab--creating-a-pre-invoke-apt-script)
 
 ###### Attacker Info
 
