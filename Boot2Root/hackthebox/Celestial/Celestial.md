@@ -69,6 +69,17 @@ http://10.10.10.85:3000/
 ![](images/2.png)
 
 ```sh
+root@kali:~/celestail# gobuster -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://10.10.10.85:3000
+
+Gobuster v1.4.1              OJ Reeves (@TheColonial)
+=====================================================
+=====================================================
+[+] Mode         : dir
+[+] Url/Domain   : http://10.10.10.85:3000/
+[+] Threads      : 10
+[+] Wordlist     : /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Status codes : 200,204,301,302,307
+=====================================================
 ```
 
 ![](images/3.png)
