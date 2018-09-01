@@ -3,7 +3,7 @@
 - [Attacker Info](#attacker-info)
 - [Nmap Scan](#nmap-scan)
 - [Web Enumeration](#web-enumeration)
-- [Node.js deserialization](#node.js-deserialization)
+- [Node.js deserialization](#nodejs-deserialization)
 - [Privilege Escalation](#privilege-escalation)
 - [Using nodejsshell](#using-nodejsshell)
 
