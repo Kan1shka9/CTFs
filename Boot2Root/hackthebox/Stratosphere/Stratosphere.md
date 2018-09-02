@@ -3,7 +3,7 @@
 - [Attacker Info](#attacker-info)
 - [Nmap Scan](#nmap-scan)
 - [Web Enumeration](#web-enumeration)
-- [Struts Vulnerability - CVE-2017-5638](#struts-Vulnerability-CVE-2017-5638)
+- [Struts Vulnerability - CVE-2017-5638](#struts-vulnerability---cve-2017-5638)
 - [Privilege Escalation](#privilege-escalation)
 
 ###### Attacker Info
