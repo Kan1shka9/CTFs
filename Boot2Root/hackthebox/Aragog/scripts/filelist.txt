@@ -1,0 +1,5 @@
+/.bash_history
+/password.txt
+/.historu
+/.mysql_history
+/.ssh/id_rsa
