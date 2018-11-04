@@ -6,7 +6,7 @@
 - [SSH Enumeration](#ssh-enumeration)
 - [Privilege Escalation](#privilege-escalation)
 - [Gaining root](#gaining-root)
-- [DirtyCow](#rirtycow)
+- [DirtyCow](#drirtycow)
 
 ###### Attacker Info
 
