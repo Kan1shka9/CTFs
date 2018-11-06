@@ -7,6 +7,7 @@
 - [User shell using gtfobins](#user-shell-using-gtfobins)
 - [Privilege Escalation](#privilege-escalation)
 - [Gaining root](#gaining-root)
+- [Reference](#reference)
 
 ###### Attacker Info
 
@@ -5137,3 +5138,9 @@ drwxr-xr-x  2 root root  4.0K Feb 21  2018 .nano
 e79abdab8b8a4b64f8579a10b2cd09f9
 #
 ```
+
+###### Reference
+
+- [`Walkthrough TartarSauce`](https://medium.com/@DRX_Sicher/walkthrough-tartarsauce-b325f3695c13)
+- [`HTB: TartarSauce`](https://0xdf.gitlab.io/2018/10/20/htb-tartarsauce.html)
+- [`HTB TartarSauce: backuperer Follow-Up`](https://0xdf.gitlab.io/2018/10/21/htb-tartarsauce-part-2-backuperer-follow-up.html)
