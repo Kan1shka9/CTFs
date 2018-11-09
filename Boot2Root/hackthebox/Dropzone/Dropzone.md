@@ -1294,3 +1294,4 @@ root@kali:~/dropzone#
 
 - [`Abusing WMI to Build a Persistent, Asyncronous, and Fileless Backdoor`](https://www.blackhat.com/docs/us-15/materials/us-15-Graeber-Abusing-Windows-Management-Instrumentation-WMI-To-Build-A-Persistent%20Asynchronous-And-Fileless-Backdoor-wp.pdf)
 - [`Playing with MOF files on Windows, for fun & profit`](http://poppopret.blogspot.com/2011/09/playing-with-mof-files-on-windows-for.html)
+- [`ippsec - dropzone`](https://www.youtube.com/watch?v=QzP5nUEhZeg)
