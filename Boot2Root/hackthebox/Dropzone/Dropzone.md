@@ -6,6 +6,7 @@
 - [Target powershell of psexec](#target-powershell-of-psexec)
 - [Target MOF of psexec](#target-mof-of-psexec)
 - [Get flag using ADS](#get-flag-using-ads)
+- [Reference](#reference)
 
 ###### Attacker Info
 
@@ -1288,3 +1289,8 @@ C:\DOCUME~1\Administrator\Desktop\flags\2 for the price of 1!.txt:
 C:\DOCUME~1\Administrator\Desktop\flags>
 root@kali:~/dropzone#
 ```
+
+###### Reference
+
+- [`Abusing WMI to Build a Persistent, Asyncronous, and Fileless Backdoor`](https://www.blackhat.com/docs/us-15/materials/us-15-Graeber-Abusing-Windows-Management-Instrumentation-WMI-To-Build-A-Persistent%20Asynchronous-And-Fileless-Backdoor-wp.pdf)
+- [`Playing with MOF files on Windows, for fun & profit`](http://poppopret.blogspot.com/2011/09/playing-with-mof-files-on-windows-for.html)
