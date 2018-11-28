@@ -277,6 +277,7 @@ No. of RRSIG records for witrap.com &rarr; `11`
 ###### References
 
 - [`dnssec-primer`](https://www.ayrx.me/dnssec-primer)
+- [`dnssec-best-practice`](https://inforuum.internet.ee/best-practices-for-registrars/dnssec-best-practice)
 
 ----
 
