@@ -274,8 +274,10 @@ No. of RRSIG records for witrap.com &rarr; `11`
 
 ----
 
-EOF
-
 ###### References
 
 - [`dnssec-primer`](https://www.ayrx.me/dnssec-primer)
+
+----
+
+EOF
