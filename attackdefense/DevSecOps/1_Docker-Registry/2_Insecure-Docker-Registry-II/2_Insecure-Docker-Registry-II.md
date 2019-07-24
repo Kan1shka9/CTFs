@@ -179,6 +179,4 @@ root@attackdefense:~/compress#
 
 ----
 
-----
-
 EOF
