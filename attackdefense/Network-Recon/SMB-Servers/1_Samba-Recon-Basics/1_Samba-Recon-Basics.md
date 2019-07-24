@@ -345,4 +345,6 @@ Allowed
 - [PWK Notes: SMB Enumeration Checklist [Updated]](https://0xdf.gitlab.io/2018/12/02/pwk-notes-smb-enumeration-checklist-update1.html#check-null-sessions)
 - [How to interpret output of nmblookup -A](https://superuser.com/questions/710304/how-to-interpret-output-of-nmblookup-a)
 
+----
+
 EOF
