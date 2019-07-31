@@ -6,7 +6,7 @@ Performance monitoring and tracking tools can provide a wealth of information ab
 
 ----
 
-In this lab, we will analyze Opensnoop script's trace logs to unearth suspicious activity. Please start the lab, answer the below questions and submit the flags to verify:
+In this lab, we will analyze [`Opensnoop script's`](https://github.com/iovisor/bcc/blob/master/tools/opensnoop.py) trace logs to unearth suspicious activity. Please start the lab, answer the below questions and submit the flags to verify:
 
 - A malicious process was searching for some files on the system. What is the name of that process?
 
@@ -243,6 +243,14 @@ root@attackdefense:~#
 ```
 oscar
 ```
+
+----
+
+###### References
+
+- [Opensnoop script](​https://github.com/iovisor/bcc/blob/master/tools/opensnoop.py​)
+- [Opensnoop Examples](​https://github.com/iovisor/bcc/blob/master/tools/opensnoop_example.txt​)
+- [BCC Tools](​https://github.com/iovisor/bcc​)
 
 ----
 
