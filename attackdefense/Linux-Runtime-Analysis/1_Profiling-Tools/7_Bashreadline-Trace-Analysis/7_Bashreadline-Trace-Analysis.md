@@ -213,8 +213,9 @@ random-dummy-module
 ###### Reference
 
 - [Bashreadline script](https://github.com/iovisor/bcc/blob/master/tools/bashreadline.py)
-- [Bashreadline Examples]
-(https://github.com/iovisor/bcc/blob/master/tools/bashreadline_example.txt)
+- [Bashreadline Examples](https://github.com/iovisor/bcc/blob/master/tools/bashreadline_example.txt)
 - [BCC Tools](https://github.com/iovisor/bcc)
+
+----
 
 EOF
