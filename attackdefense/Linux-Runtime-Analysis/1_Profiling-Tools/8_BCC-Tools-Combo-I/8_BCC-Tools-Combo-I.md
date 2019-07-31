@@ -169,11 +169,9 @@ ce859f7b2d82cc7c06eb75b95707708f
 ###### References:
 
 - [Execsnoop script](https://github.com/iovisor/bcc/blob/master/tools/execsnoop.py)
-- [Execsnoop Examples]
-(https://github.com/iovisor/bcc/blob/master/tools/execsnoop_example.txt)
+- [Execsnoop Examples](https://github.com/iovisor/bcc/blob/master/tools/execsnoop_example.txt)
 - [Tcptracer script](https://github.com/iovisor/bcc/blob/master/tools/tcptracer.py)
-- [Tcptracer Examples]
-(https://github.com/iovisor/bcc/blob/master/tools/tcptracer_example.txt)
+- [Tcptracer Examples](https://github.com/iovisor/bcc/blob/master/tools/tcptracer_example.txt)
 - [BCC Tools](https://github.com/iovisor/bcc)
 
 ----
