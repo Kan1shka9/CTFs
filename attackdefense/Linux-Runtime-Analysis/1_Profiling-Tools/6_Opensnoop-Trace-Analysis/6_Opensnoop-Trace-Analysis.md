@@ -248,9 +248,9 @@ oscar
 
 ###### References
 
-- [Opensnoop script](​https://github.com/iovisor/bcc/blob/master/tools/opensnoop.py​)
-- [Opensnoop Examples](​https://github.com/iovisor/bcc/blob/master/tools/opensnoop_example.txt​)
-- [BCC Tools](​https://github.com/iovisor/bcc​)
+- [Opensnoop script](https://github.com/iovisor/bcc/blob/master/tools/opensnoop.py)
+- [Opensnoop Examples](https://github.com/iovisor/bcc/blob/master/tools/opensnoop_example.txt)
+- [BCC Tools](https://github.com/iovisor/bcc)
 
 ----
 
