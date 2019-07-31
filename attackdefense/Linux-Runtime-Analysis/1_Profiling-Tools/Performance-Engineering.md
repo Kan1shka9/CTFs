@@ -3,7 +3,7 @@
 ----
 
 - [BPF Performance Tools](http://www.brendangregg.com/bpf-performance-tools-book.html)
-- [Velocity 2017: Performance Analysis Superpowers with Linux eBPF](https://www.youtube.com/watch?v=bj3qdEDbCD4)
+- [Brendan Gregg](https://www.youtube.com/user/brendangregg/videos)
 
 ----
 
