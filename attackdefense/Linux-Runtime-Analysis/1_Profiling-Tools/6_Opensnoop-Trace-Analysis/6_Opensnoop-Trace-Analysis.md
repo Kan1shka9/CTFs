@@ -241,7 +241,7 @@ root@attackdefense:~#
 ```
 
 ```
-/home/oscar/.ssh/id_rsa
+oscar
 ```
 
 ----
