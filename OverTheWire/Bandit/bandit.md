@@ -1638,8 +1638,9 @@ Wrong! Please enter the correct pincode. Try again.
 bandit24@bandit:/tmp/level25unlocker$ 
 ```
 
+`crack.py`
+
 ```python
-bandit24@bandit:/tmp/level25unlocker$ cat crack.py 
 #!/usr/bin/python
 
 import sys
