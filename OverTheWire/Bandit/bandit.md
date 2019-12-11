@@ -1638,7 +1638,7 @@ Wrong! Please enter the correct pincode. Try again.
 bandit24@bandit:/tmp/level25unlocker$ 
 ```
 
-```sh
+```python
 bandit24@bandit:/tmp/level25unlocker$ cat crack.py 
 #!/usr/bin/python
 
