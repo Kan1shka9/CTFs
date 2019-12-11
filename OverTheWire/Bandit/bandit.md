@@ -1336,6 +1336,8 @@ GbKksEFF4yrVs6il55v6gwY5aVje5f0j
 bandit19@bandit:~$ 
 ```
 
+- [suid](https://en.wikipedia.org/wiki/Setuid)
+
 ----
 
 ###### Level 20 → Level 21
