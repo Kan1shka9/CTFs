@@ -28,4 +28,10 @@
 
 ----
 
+#### Lessons learnt
+
+- Reverse shell on Jenkins
+
+----
+
 EOF

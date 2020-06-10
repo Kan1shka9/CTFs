@@ -118,4 +118,10 @@ root@attackdefense:~/Desktop/sample-web-server#
 
 ----
 
+#### Lessons learnt
+
+- Anonymous users having write access to the git repository and Jenkins UI can inturn lead to RCE.
+
+----
+
 EOF
