@@ -1,5 +1,9 @@
 # jenkins-abusing-groovy-script-console
 
+#### Objective: Abuse Groovy Script console to get a shell on the Jenkins machine!
+
+----
+
 - [Jenkins](http://jenkins:8080/)
 - [Gitlab](http://gitlab/root)
 - [frohoff/revsh.groovy](https://gist.github.com/frohoff/fed1ffaab9b9beeb1c76)

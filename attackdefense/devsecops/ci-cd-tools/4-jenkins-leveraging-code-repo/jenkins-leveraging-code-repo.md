@@ -1,5 +1,9 @@
 # jenkins-leveraging-code-repo
 
+#### Objective: Leverage the scenario to get a shell on the Jenkins machine and retrieve the flag!
+
+----
+
 #### Bug
 
 - The administrator has allowed all users to fire build on a pre-defined job and view build logs without logging in. However, defining a new task or changing the build process is only allowed to logged-in users.
